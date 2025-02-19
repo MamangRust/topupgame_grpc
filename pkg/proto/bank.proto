@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package pb;
+
+import "api.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "topup_game/internal/pb";
+
+
+message FindAllBankRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+    string search = 3;
+}
+
+
+message FindByIdBankRequest{
+    int32 Bank_id = 1;
+}
+
+message CreateBankRequest{
+    string name = 1;
+}
+
+message UpdateBankRequest{
+    int32 id = 1;
+    string name = 2;
+}
+
+
+message BankResponse {
+    int32 id = 1;
+    string name = 2;
+    string created_at = 3;
+    string updated_at = 4;
+}
+
+message BankResponseDeleteAt {
+    int32 id = 1;
+    string name = 2;
+    string created_at = 3;
+    string updated_at = 4;
+    string deleted_at = 5;
+}
+
+message ApiResponseBankAll{
+    string status = 1;
+    string message = 2;
+}
+
+message ApiResponseBankDelete{
+    string status = 1;
+    string message = 2;
+}
+
+
+message ApiResponseBank{
+    string status = 1;
+    string message = 2;
+    BankResponse data = 3;
+}
+
+
+message ApiResponseBankDeleteAt{
+    string status = 1;
+    string message = 2;
+    BankResponseDeleteAt data = 3;
+}
+
+
+message ApiResponsesBank{
+    string status = 1;
+    string message = 2;
+    repeated BankResponse data = 3;
+}
+
+message ApiResponsePaginationBank{
+    string status = 1;
+    string message = 2;
+    repeated BankResponse data = 3;
+    PaginationMeta pagination = 4;
+}
+
+
+message ApiResponsePaginationBankDeleteAt{
+    string status = 1;
+    string message = 2;
+    repeated BankResponseDeleteAt data = 3;
+    PaginationMeta pagination = 4;
+}
+
+
+service BankService{
+    rpc FindAll(FindAllBankRequest) returns(ApiResponsePaginationBank){}
+    rpc FindById(FindByIdBankRequest) returns(ApiResponseBank){}
+
+    rpc FindByActive(FindAllBankRequest) returns(ApiResponsePaginationBankDeleteAt){}
+    rpc FindByTrashed(FindAllBankRequest) returns(ApiResponsePaginationBankDeleteAt){}
+
+    rpc Create(CreateBankRequest) returns (ApiResponseBank) {}
+    rpc Update(UpdateBankRequest) returns (ApiResponseBank) {}
+    rpc Trashed(FindByIdBankRequest) returns (ApiResponseBankDeleteAt) {}
+    rpc Restore(FindByIdBankRequest) returns (ApiResponseBankDeleteAt) {}
+    rpc DeletePermanent(FindByIdBankRequest) returns (ApiResponseBankDelete) {}
+    rpc RestoreAll(google.protobuf.Empty) returns (ApiResponseBankAll){}
+    rpc DeleteAllPermanent(google.protobuf.Empty) returns (ApiResponseBankAll){}
+}
+

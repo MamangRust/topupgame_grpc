@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package pb;
+
+import "api.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "topup_game/internal/pb";
+
+
+message FindAllTransactionRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+    string search = 3;
+}
+
+message FindByIdTransactionRequest {
+    int32 id = 1;
+}
+
+message TransactionResponse {
+    int32 id = 1;
+    int32 user_id = 2;
+    int32 merchant_id = 3;
+    int32 voucher_id = 4;
+    int32 nominal_id = 5;
+    int32 category_id = 6;
+    int32 bank_id = 7;
+    string payment_method = 8;
+    string tax_rate = 9;
+    string status = 10;
+    string created_at = 11;
+    string updated_at = 12;
+}
+  
+
+message TransactionResponseDeleteAt {
+    int32 id = 1;
+    int32 user_id = 2;
+    int32 merchant_id = 3;
+    int32 voucher_id = 4;
+    int32 nominal_id = 5;
+    int32 category_id = 6;
+    int32 bank_id = 7;
+    string payment_method = 8;
+    string tax_rate = 9;
+    string status = 10;
+    string created_at = 11;
+    string updated_at = 12;
+    string deleted_at = 13;
+}
+  
+message CreateTransactionRequest {
+    int32 user_id = 1;
+    int32 merchant_id = 2;
+    int32 nominal_id = 3;
+    int32 category_id = 4;
+    int32 bank_id = 5;
+    string payment_method = 6;
+    string status = 7;
+    int32 voucher_id = 8; 
+}
+
+message UpdateTransactionRequest {
+    int32 id = 1;
+    int32 user_id = 2;
+    int32 merchant_id = 3;
+    int32 nominal_id = 4; 
+    int32 category_id = 5; 
+    int32 bank_id = 6; 
+    string payment_method = 7; 
+    string status = 8; 
+    int32 voucher_id = 9; 
+}
+
+message ApiResponseTransaction {
+    string status = 1;
+    string message = 2;
+    TransactionResponse data = 3;
+}
+
+message ApiResponseTransactionDeleteAt {
+    string status = 1;
+    string message = 2;
+    TransactionResponseDeleteAt data = 3;
+}
+  
+message ApiResponsesTransaction {
+    string status = 1;
+    string message = 2;
+    repeated TransactionResponse data = 3;
+}
+  
+message ApiResponseTransactionDelete {
+    string status = 1;
+    string message = 2;
+}
+  
+message ApiResponseTransactionAll {
+    string status = 1;
+    string message = 2;
+}
+  
+message ApiResponsePaginationTransactionDeleteAt {
+    string status = 1;
+    string message = 2;
+    repeated TransactionResponseDeleteAt data = 3;
+    PaginationMeta pagination = 4;
+}
+  
+message ApiResponsePaginationTransaction {
+    string status = 1;
+    string message = 2;
+    repeated TransactionResponse data = 3;
+    PaginationMeta pagination = 4;
+}
+
+
+service TransactionService {
+    rpc FindAll(FindAllTransactionRequest) returns (ApiResponsePaginationTransaction);
+    rpc FindById(FindByIdTransactionRequest) returns (ApiResponseTransaction);
+
+    rpc FindByActive(FindAllTransactionRequest) returns (ApiResponsePaginationTransactionDeleteAt) {}
+    rpc FindByTrashed(FindAllTransactionRequest) returns (ApiResponsePaginationTransactionDeleteAt) {}
+
+
+    rpc Create(CreateTransactionRequest) returns (ApiResponseTransaction);
+    rpc Update(UpdateTransactionRequest) returns (ApiResponseTransaction);
+    rpc Trashed(FindByIdTransactionRequest) returns (ApiResponseTransactionDeleteAt);
+    rpc Restore(FindByIdTransactionRequest) returns (ApiResponseTransactionDeleteAt);
+    rpc DeletePermanent(FindByIdTransactionRequest) returns (ApiResponseTransactionDelete);
+
+    rpc RestoreAll(google.protobuf.Empty) returns (ApiResponseTransactionAll){}
+    rpc DeleteAllPermanent(google.protobuf.Empty) returns (ApiResponseTransactionAll){}
+}

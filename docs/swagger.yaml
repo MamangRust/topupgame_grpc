@@ -1,0 +1,4159 @@
+definitions:
+  pb.ApiResponseBank:
+    properties:
+      data:
+        $ref: '#/definitions/pb.BankResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseBankAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseBankDelete:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseCategory:
+    properties:
+      data:
+        $ref: '#/definitions/pb.CategoryResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseCategoryAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseCategoryDelete:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseGetMe:
+    properties:
+      data:
+        $ref: '#/definitions/pb.UserResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseLogin:
+    properties:
+      data:
+        $ref: '#/definitions/pb.TokenResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseNominal:
+    properties:
+      data:
+        $ref: '#/definitions/pb.NominalResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseNominalAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseNominalDelete:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponsePaginationRole:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/pb.RoleResponse'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/pb.PaginationMeta'
+      status:
+        type: string
+    type: object
+  pb.ApiResponsePaginationRoleDeleteAt:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/pb.RoleResponseDeleteAt'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/pb.PaginationMeta'
+      status:
+        type: string
+    type: object
+  pb.ApiResponseRefreshToken:
+    properties:
+      data:
+        $ref: '#/definitions/pb.TokenResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseRegister:
+    properties:
+      data:
+        $ref: '#/definitions/pb.UserResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseRole:
+    properties:
+      data:
+        $ref: '#/definitions/pb.RoleResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseRoleAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseTransaction:
+    properties:
+      data:
+        $ref: '#/definitions/pb.TransactionResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseTransactionAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseTransactionDelete:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseUser:
+    properties:
+      data:
+        $ref: '#/definitions/pb.UserResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseUserAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseUserDelete:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseVoucher:
+    properties:
+      data:
+        $ref: '#/definitions/pb.VoucherResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseVoucherAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponseVoucherDelete:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.ApiResponsesUser:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/pb.UserResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  pb.BankResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  pb.CategoryResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  pb.CreateRoleRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  pb.NominalResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  pb.PaginationMeta:
+    properties:
+      current_page:
+        type: integer
+      page_size:
+        type: integer
+      total_pages:
+        type: integer
+      total_records:
+        type: integer
+    type: object
+  pb.RoleResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  pb.RoleResponseDeleteAt:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  pb.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  pb.TransactionResponse:
+    properties:
+      bank_id:
+        type: integer
+      category_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      merchant_id:
+        type: integer
+      nominal_id:
+        type: integer
+      payment_method:
+        type: string
+      status:
+        type: string
+      tax_rate:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+      voucher_id:
+        type: integer
+    type: object
+  pb.UpdateRoleRequest:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  pb.UserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      firstname:
+        type: string
+      id:
+        type: integer
+      lastname:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  pb.VoucherResponse:
+    properties:
+      category_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      image_name:
+        type: string
+      merchant_id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  requests.AuthRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  requests.CreateBankRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  requests.CreateCategoryRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  requests.CreateMerchantRequest:
+    properties:
+      address:
+        type: string
+      contact_email:
+        type: string
+      contact_phone:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - address
+    - contact_email
+    - contact_phone
+    - description
+    - name
+    - status
+    - user_id
+    type: object
+  requests.CreateNominalRequest:
+    properties:
+      name:
+        type: string
+      price:
+        minimum: 0
+        type: number
+      quantity:
+        minimum: 1
+        type: integer
+      voucher_id:
+        minimum: 1
+        type: integer
+    required:
+    - name
+    - price
+    - quantity
+    - voucher_id
+    type: object
+  requests.CreateTransactionRequest:
+    properties:
+      bank_id:
+        minimum: 1
+        type: integer
+      category_id:
+        minimum: 1
+        type: integer
+      merchant_id:
+        minimum: 1
+        type: integer
+      nominal_id:
+        minimum: 1
+        type: integer
+      payment_method:
+        type: string
+      user_id:
+        minimum: 1
+        type: integer
+      voucher_id:
+        type: integer
+    required:
+    - bank_id
+    - category_id
+    - merchant_id
+    - nominal_id
+    - payment_method
+    - user_id
+    type: object
+  requests.CreateUserRequest:
+    properties:
+      confirm_password:
+        type: string
+      email:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - confirm_password
+    - email
+    - firstname
+    - lastname
+    - password
+    type: object
+  requests.CreateVoucherRequest:
+    properties:
+      category_id:
+        minimum: 1
+        type: integer
+      image_name:
+        type: string
+      merchant_id:
+        minimum: 1
+        type: integer
+      name:
+        type: string
+    required:
+    - category_id
+    - image_name
+    - merchant_id
+    - name
+    type: object
+  requests.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        minLength: 1
+        type: string
+    required:
+    - refresh_token
+    type: object
+  requests.UpdateBankRequest:
+    properties:
+      id:
+        minimum: 1
+        type: integer
+      name:
+        type: string
+    required:
+    - id
+    type: object
+  requests.UpdateCategoryRequest:
+    properties:
+      id:
+        minimum: 1
+        type: integer
+      name:
+        type: string
+    required:
+    - id
+    type: object
+  requests.UpdateMerchantRequest:
+    properties:
+      address:
+        type: string
+      contact_email:
+        type: string
+      contact_phone:
+        type: string
+      description:
+        type: string
+      merchant_id:
+        type: integer
+      name:
+        type: string
+      status:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - address
+    - contact_email
+    - contact_phone
+    - description
+    - merchant_id
+    - name
+    - status
+    - user_id
+    type: object
+  requests.UpdateNominalRequest:
+    properties:
+      id:
+        minimum: 1
+        type: integer
+      name:
+        type: string
+      price:
+        minimum: 0
+        type: number
+      quantity:
+        minimum: 1
+        type: integer
+      voucher_id:
+        minimum: 1
+        type: integer
+    required:
+    - id
+    type: object
+  requests.UpdateTransactionRequest:
+    properties:
+      bank_id:
+        minimum: 1
+        type: integer
+      category_id:
+        minimum: 1
+        type: integer
+      id:
+        minimum: 1
+        type: integer
+      merchant_id:
+        minimum: 1
+        type: integer
+      nominal_id:
+        minimum: 1
+        type: integer
+      payment_method:
+        type: string
+      status:
+        type: string
+      user_id:
+        minimum: 1
+        type: integer
+      voucher_id:
+        minimum: 1
+        type: integer
+    required:
+    - id
+    type: object
+  requests.UpdateUserRequest:
+    properties:
+      confirm_password:
+        type: string
+      email:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      user_id:
+        minimum: 1
+        type: integer
+    required:
+    - confirm_password
+    - email
+    - firstname
+    - lastname
+    - password
+    - user_id
+    type: object
+  requests.UpdateVoucherRequest:
+    properties:
+      category_id:
+        minimum: 1
+        type: integer
+      id:
+        minimum: 1
+        type: integer
+      image_name:
+        type: string
+      merchant_id:
+        minimum: 1
+        type: integer
+      name:
+        type: string
+    required:
+    - id
+    type: object
+  response.ApiResponseBank:
+    properties:
+      data:
+        $ref: '#/definitions/response.BankResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseBankDeleteAt:
+    properties:
+      data:
+        $ref: '#/definitions/response.BankResponseDeleteAt'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseCategory:
+    properties:
+      data:
+        $ref: '#/definitions/response.CategoryResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseCategoryDeleteAt:
+    properties:
+      data:
+        $ref: '#/definitions/response.CategoryResponseDeleteAt'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseMerchant:
+    properties:
+      data:
+        $ref: '#/definitions/response.MerchantResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseMerchantAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseMerchantDelete:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseMerchantDeleteAt:
+    properties:
+      data:
+        $ref: '#/definitions/response.MerchantResponseDeleteAt'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseNominal:
+    properties:
+      data:
+        $ref: '#/definitions/response.NominalResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseNominalDeleteAt:
+    properties:
+      data:
+        $ref: '#/definitions/response.NominalResponseDeleteAt'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationBank:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.BankResponse'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationBankDeleteAt:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.BankResponseDeleteAt'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationCategory:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.CategoryResponse'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationCategoryDeleteAt:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.CategoryResponseDeleteAt'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationMerchant:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MerchantResponse'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationNominal:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.NominalResponse'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationNominalDeleteAt:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.NominalResponseDeleteAt'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationTransaction:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.TransactionResponse'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationTransactionDeleteAt:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.TransactionResponseDeleteAt'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationUser:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.UserResponse'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationUserDeleteAt:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.UserResponseDeleteAt'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationVoucher:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.VoucherResponse'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationVoucherDeleteAt:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.VoucherResponseDeleteAt'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponseTransaction:
+    properties:
+      data:
+        $ref: '#/definitions/response.TransactionResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseTransactionDeleteAt:
+    properties:
+      data:
+        $ref: '#/definitions/response.TransactionResponseDeleteAt'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseUser:
+    properties:
+      data:
+        $ref: '#/definitions/response.UserResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseUserDeleteAt:
+    properties:
+      data:
+        $ref: '#/definitions/response.UserResponseDeleteAt'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseVoucher:
+    properties:
+      data:
+        $ref: '#/definitions/response.VoucherResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseVoucherDeleteAt:
+    properties:
+      data:
+        $ref: '#/definitions/response.VoucherResponseDeleteAt'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.BankResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.BankResponseDeleteAt:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.CategoryResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.CategoryResponseDeleteAt:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.ErrorResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.MerchantResponse:
+    properties:
+      address:
+        type: string
+      contact_email:
+        type: string
+      contact_phone:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  response.MerchantResponseDeleteAt:
+    properties:
+      address:
+        type: string
+      contact_email:
+        type: string
+      contact_phone:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  response.NominalResponse:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+      updated_at:
+        type: string
+      voucher_id:
+        type: integer
+    type: object
+  response.NominalResponseDeleteAt:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+      updated_at:
+        type: string
+      voucher_id:
+        type: integer
+    type: object
+  response.PaginationMeta:
+    properties:
+      current_page:
+        type: integer
+      page_size:
+        type: integer
+      total_pages:
+        type: integer
+      total_records:
+        type: integer
+    type: object
+  response.TransactionResponse:
+    properties:
+      bank_id:
+        type: integer
+      category_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      merchant_id:
+        type: integer
+      nominal_id:
+        type: integer
+      payment_method:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+      voucher_id:
+        type: integer
+    type: object
+  response.TransactionResponseDeleteAt:
+    properties:
+      bank_id:
+        type: integer
+      category_id:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      merchant_id:
+        type: integer
+      nominal_id:
+        type: integer
+      payment_method:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+      voucher_id:
+        type: integer
+    type: object
+  response.UserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      firstname:
+        type: string
+      id:
+        type: integer
+      lastname:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.UserResponseDeleteAt:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      email:
+        type: string
+      firstname:
+        type: string
+      id:
+        type: integer
+      lastname:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.VoucherResponse:
+    properties:
+      category_id:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      image_name:
+        type: string
+      merchant_id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.VoucherResponseDeleteAt:
+    properties:
+      category_id:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      image_name:
+        type: string
+      merchant_id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user using the provided email and password.
+      parameters:
+      - description: User login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.AuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/pb.ApiResponseLogin'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Authenticate a user
+      tags:
+      - Auth
+  /api/auth/me:
+    get:
+      description: Retrieves the current user's information using a valid access token
+        from the Authorization header.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/pb.ApiResponseGetMe'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      - BearerToken: []
+      summary: Get current user information
+      tags:
+      - Auth
+  /api/auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Refreshes the access token using a valid refresh token.
+      parameters:
+      - description: Refresh token data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/pb.ApiResponseRefreshToken'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Refresh access token
+      tags:
+      - Auth
+  /api/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user with the provided details.
+      parameters:
+      - description: User registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/pb.ApiResponseRegister'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - Auth
+  /api/bank:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all banks
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of banks
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationBank'
+        "500":
+          description: Failed to retrieve bank data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find all banks
+      tags:
+      - Bank
+  /api/bank/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a bank by ID
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bank data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseBank'
+        "400":
+          description: Invalid bank ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve bank data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find bank by ID
+      tags:
+      - Bank
+  /api/bank/active:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of active banks
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of active banks
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationBankDeleteAt'
+        "500":
+          description: Failed to retrieve bank data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve active banks
+      tags:
+      - Bank
+  /api/bank/create:
+    post:
+      consumes:
+      - application/json
+      description: Create an existing bank record with the provided details
+      parameters:
+      - description: Create bank request
+        in: body
+        name: CreateBankRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateBankRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created bank
+          schema:
+            $ref: '#/definitions/response.ApiResponseBank'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to create bank
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create an existing bank
+      tags:
+      - Bank
+  /api/bank/delete/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete a bank record by its ID.
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted bank record permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseBankDelete'
+        "400":
+          description: 'Bad Request: Invalid ID'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to delete bank
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete a bank
+      tags:
+      - Bank
+  /api/bank/delete/all:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete all trashed bank records.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted all bank records permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseBankDelete'
+        "500":
+          description: Failed to delete banks
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete all trashed banks
+      tags:
+      - Bank
+  /api/bank/restore/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Restore a trashed bank record by its ID.
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored bank
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankDeleteAt'
+        "400":
+          description: Invalid bank ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to restore bank
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore a trashed bank
+      tags:
+      - Bank
+  /api/bank/restore/all:
+    post:
+      consumes:
+      - application/json
+      description: Restore all trashed bank records.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored all banks
+          schema:
+            $ref: '#/definitions/pb.ApiResponseBankAll'
+        "500":
+          description: Failed to restore banks
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore all trashed banks
+      tags:
+      - Bank
+  /api/bank/trashed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of trashed bank records
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of trashed bank data
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationBankDeleteAt'
+        "500":
+          description: Failed to retrieve bank data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve trashed banks
+      tags:
+      - Bank
+  /api/bank/trashed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a trashed bank record by its ID.
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved trashed bank
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankDeleteAt'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve trashed bank
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve a trashed bank
+      tags:
+      - Bank
+  /api/bank/update/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Update an existing bank record with the provided details
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update bank request
+        in: body
+        name: UpdateBankRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateBankRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated bank
+          schema:
+            $ref: '#/definitions/response.ApiResponseBank'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to update bank
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update an existing bank
+      tags:
+      - Bank
+  /api/category:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all Categorys
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of Categorys
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationCategory'
+        "500":
+          description: Failed to retrieve Category data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find all Categorys
+      tags:
+      - Category
+  /api/category/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a Category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseCategory'
+        "400":
+          description: Invalid Category ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve Category data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find Category by ID
+      tags:
+      - Category
+  /api/category/active:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of active Categorys
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of active Categorys
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationCategoryDeleteAt'
+        "500":
+          description: Failed to retrieve Category data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve active Categorys
+      tags:
+      - Category
+  /api/category/create:
+    post:
+      consumes:
+      - application/json
+      description: Create an existing Category record with the provided details
+      parameters:
+      - description: Create Category request
+        in: body
+        name: CreateCategoryRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created Category
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategory'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to create Category
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create an existing Category
+      tags:
+      - Category
+  /api/category/delete/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete a Category record by its ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted Category record permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseCategoryDelete'
+        "400":
+          description: 'Bad Request: Invalid ID'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to delete Category
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete a Category
+      tags:
+      - Category
+  /api/category/delete/all:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete all trashed Category records.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted all Category records permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseCategoryDelete'
+        "500":
+          description: Failed to delete Categorys
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete all trashed Categorys
+      tags:
+      - Category
+  /api/category/restore/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Restore a trashed Category record by its ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored Category
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryDeleteAt'
+        "400":
+          description: Invalid Category ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to restore Category
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore a trashed Category
+      tags:
+      - Category
+  /api/category/restore/all:
+    post:
+      consumes:
+      - application/json
+      description: Restore all trashed Category records.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored all Categorys
+          schema:
+            $ref: '#/definitions/pb.ApiResponseCategoryAll'
+        "500":
+          description: Failed to restore Categorys
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore all trashed Categorys
+      tags:
+      - Category
+  /api/category/trashed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of trashed Category records
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of trashed Category data
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationCategoryDeleteAt'
+        "500":
+          description: Failed to retrieve Category data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve trashed Categorys
+      tags:
+      - Category
+  /api/category/trashed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a trashed Category record by its ID.
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved trashed Category
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryDeleteAt'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve trashed Category
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve a trashed Category
+      tags:
+      - Category
+  /api/category/update/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Update an existing Category record with the provided details
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Category request
+        in: body
+        name: UpdateCategoryRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated Category
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategory'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to update Category
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update an existing Category
+      tags:
+      - Category
+  /api/merchant:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all merchant
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of merchant
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationMerchant'
+        "500":
+          description: Failed to retrieve merchant data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find all merchant
+      tags:
+      - Merchant
+  /api/merchant/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a merchant by ID
+      parameters:
+      - description: merchant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: merchant data
+          schema:
+            $ref: '#/definitions/response.ApiResponseMerchant'
+        "400":
+          description: Invalid merchant ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve merchant data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find merchant by ID
+      tags:
+      - Merchant
+  /api/merchant/active:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of active merchant
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of active merchant
+          schema:
+            $ref: '#/definitions/pb.ApiResponsesUser'
+        "500":
+          description: Failed to retrieve merchant data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve active merchant
+      tags:
+      - Merchant
+  /api/merchant/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new merchant with the provided details
+      parameters:
+      - description: Create merchant request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateMerchantRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created merchant
+          schema:
+            $ref: '#/definitions/response.ApiResponseMerchant'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to create merchant
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a new merchant
+      tags:
+      - Merchant
+  /api/merchant/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Permanently delete a merchant record by its ID.
+      parameters:
+      - description: merchant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted merchant record permanently
+          schema:
+            $ref: '#/definitions/response.ApiResponseMerchantDelete'
+        "400":
+          description: 'Bad Request: Invalid ID'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: 'Failed to delete merchant:'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete a merchant
+      tags:
+      - Merchant
+  /api/merchant/delete/all:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete a merchant record by its ID.
+      parameters:
+      - description: merchant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted merchant record permanently
+          schema:
+            $ref: '#/definitions/response.ApiResponseMerchantAll'
+        "400":
+          description: 'Bad Request: Invalid ID'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: 'Failed to delete merchant:'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete a merchant
+      tags:
+      - Merchant
+  /api/merchant/restore/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Restore a trashed merchant record by its ID.
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored merchant
+          schema:
+            $ref: '#/definitions/response.ApiResponseMerchantDeleteAt'
+        "400":
+          description: Invalid merchant ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to restore merchant
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore a trashed merchant
+      tags:
+      - Merchant
+  /api/merchant/restore/all:
+    post:
+      consumes:
+      - application/json
+      description: Restore a trashed merchant record by its ID.
+      parameters:
+      - description: merchant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored merchant all
+          schema:
+            $ref: '#/definitions/response.ApiResponseMerchantAll'
+        "400":
+          description: Invalid merchant ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to restore merchant
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore a trashed merchant
+      tags:
+      - Merchant
+  /api/merchant/trashed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of trashed merchant records
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of trashed merchant data
+          schema:
+            $ref: '#/definitions/pb.ApiResponsesUser'
+        "500":
+          description: Failed to retrieve merchant data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve trashed merchant
+      tags:
+      - Merchant
+  /api/merchant/trashed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a trashed merchant record by its ID.
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved trashed merchant
+          schema:
+            $ref: '#/definitions/response.ApiResponseMerchantDeleteAt'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve trashed merchant
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve a trashed merchant
+      tags:
+      - Merchant
+  /api/merchant/update:
+    post:
+      consumes:
+      - application/json
+      description: Update an existing merchant record with the provided details
+      parameters:
+      - description: Update merchant request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateMerchantRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated merchant
+          schema:
+            $ref: '#/definitions/response.ApiResponseMerchant'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to update merchant
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update an existing merchant
+      tags:
+      - Merchant
+  /api/nominal:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all Nominals
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of Nominals
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationNominal'
+        "500":
+          description: Failed to retrieve Nominal data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find all Nominals
+      tags:
+      - Nominal
+  /api/nominal/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a Nominal by ID
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Nominal data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseNominal'
+        "400":
+          description: Invalid Nominal ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve Nominal data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find Nominal by ID
+      tags:
+      - Nominal
+  /api/nominal/active:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of active Nominals
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of active Nominals
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationNominalDeleteAt'
+        "500":
+          description: Failed to retrieve Nominal data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve active Nominals
+      tags:
+      - Nominal
+  /api/nominal/create:
+    post:
+      consumes:
+      - application/json
+      description: Create an existing Nominal record with the provided details
+      parameters:
+      - description: Create Nominal request
+        in: body
+        name: CreateNominalRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateNominalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created Nominal
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominal'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to create Nominal
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create an existing Nominal
+      tags:
+      - Nominal
+  /api/nominal/delete/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete a Nominal record by its ID.
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted Nominal record permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseNominalDelete'
+        "400":
+          description: 'Bad Request: Invalid ID'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to delete Nominal
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete a Nominal
+      tags:
+      - Nominal
+  /api/nominal/delete/all:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete all trashed Nominal records.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted all Nominal records permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseNominalDelete'
+        "500":
+          description: Failed to delete Nominals
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete all trashed Nominals
+      tags:
+      - Nominal
+  /api/nominal/restore/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Restore a trashed Nominal record by its ID.
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored Nominal
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalDeleteAt'
+        "400":
+          description: Invalid Nominal ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to restore Nominal
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore a trashed Nominal
+      tags:
+      - Nominal
+  /api/nominal/restore/all:
+    post:
+      consumes:
+      - application/json
+      description: Restore all trashed Nominal records.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored all Nominals
+          schema:
+            $ref: '#/definitions/pb.ApiResponseNominalAll'
+        "500":
+          description: Failed to restore Nominals
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore all trashed Nominals
+      tags:
+      - Nominal
+  /api/nominal/trashed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of trashed Nominal records
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of trashed Nominal data
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationNominalDeleteAt'
+        "500":
+          description: Failed to retrieve Nominal data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve trashed Nominals
+      tags:
+      - Nominal
+  /api/nominal/trashed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a trashed Nominal record by its ID.
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved trashed Nominal
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalDeleteAt'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve trashed Nominal
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve a trashed Nominal
+      tags:
+      - Nominal
+  /api/nominal/update/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Update an existing Nominal record with the provided details
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Nominal request
+        in: body
+        name: UpdateNominalRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateNominalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated Nominal
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominal'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to update Nominal
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update an existing Nominal
+      tags:
+      - Nominal
+  /api/role:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of roles with optional search and pagination
+        parameters.
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 10)'
+        in: query
+        name: page_size
+        type: integer
+      - description: Search keyword
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of roles
+          schema:
+            $ref: '#/definitions/pb.ApiResponsePaginationRole'
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to fetch roles
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get all roles
+      tags:
+      - Role
+    post:
+      consumes:
+      - application/json
+      description: Create a new role with the provided details.
+      parameters:
+      - description: Role data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pb.CreateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Created role data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseRole'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to create role
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a new role
+      tags:
+      - Role
+  /api/role/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft-delete a role by its ID.
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Soft-deleted role data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseRole'
+        "400":
+          description: Invalid role ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to soft-delete role
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Soft-delete a role
+      tags:
+      - Role
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a role by its ID.
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Role data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseRole'
+        "400":
+          description: Invalid role ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to fetch role
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get a role by ID
+      tags:
+      - Role
+    post:
+      consumes:
+      - application/json
+      description: Update an existing role with the provided details.
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Role data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/pb.UpdateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated role data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseRole'
+        "400":
+          description: Invalid role ID or request body
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to update role
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update a role
+      tags:
+      - Role
+  /api/role/active:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of active roles with optional search
+        and pagination parameters.
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 10)'
+        in: query
+        name: page_size
+        type: integer
+      - description: Search keyword
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of active roles
+          schema:
+            $ref: '#/definitions/pb.ApiResponsePaginationRoleDeleteAt'
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to fetch active roles
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get active roles
+      tags:
+      - Role
+  /api/role/permanent-all:
+    delete:
+      consumes:
+      - application/json
+      description: Permanently delete all roles.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Permanently deleted roles data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseRoleAll'
+        "500":
+          description: Failed to delete all roles permanently
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete all roles
+      tags:
+      - Role
+  /api/role/permanent/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Permanently delete a role by its ID.
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Permanently deleted role data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseRole'
+        "400":
+          description: Invalid role ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to delete role permanently
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete a role
+      tags:
+      - Role
+  /api/role/restore-all:
+    put:
+      consumes:
+      - application/json
+      description: Restore all soft-deleted roles.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Restored roles data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseRoleAll'
+        "500":
+          description: Failed to restore all roles
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore all soft-deleted roles
+      tags:
+      - Role
+  /api/role/restore/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Restore a soft-deleted role by its ID.
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Restored role data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseRole'
+        "400":
+          description: Invalid role ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to restore role
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore a soft-deleted role
+      tags:
+      - Role
+  /api/role/trashed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of trashed roles with optional search
+        and pagination parameters.
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 10)'
+        in: query
+        name: page_size
+        type: integer
+      - description: Search keyword
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of trashed roles
+          schema:
+            $ref: '#/definitions/pb.ApiResponsePaginationRoleDeleteAt'
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to fetch trashed roles
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get trashed roles
+      tags:
+      - Role
+  /api/role/user/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a role by the associated user ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Role data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseRole'
+        "400":
+          description: Invalid user ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to fetch role by user ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get role by user ID
+      tags:
+      - Role
+  /api/transaction:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all Transactions
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of Transactions
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationTransaction'
+        "500":
+          description: Failed to retrieve Transaction data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find all Transactions
+      tags:
+      - Transaction
+  /api/transaction/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a Transaction by ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseTransaction'
+        "400":
+          description: Invalid Transaction ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve Transaction data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find Transaction by ID
+      tags:
+      - Transaction
+  /api/transaction/active:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of active Transactions
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of active Transactions
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationTransactionDeleteAt'
+        "500":
+          description: Failed to retrieve Transaction data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve active Transactions
+      tags:
+      - Transaction
+  /api/transaction/create:
+    post:
+      consumes:
+      - application/json
+      description: Create an existing Transaction record with the provided details
+      parameters:
+      - description: Create Transaction request
+        in: body
+        name: CreateTransactionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created Transaction
+          schema:
+            $ref: '#/definitions/response.ApiResponseTransaction'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to create Transaction
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create an existing Transaction
+      tags:
+      - Transaction
+  /api/transaction/delete/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete a Transaction record by its ID.
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted Transaction record permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseTransactionDelete'
+        "400":
+          description: 'Bad Request: Invalid ID'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to delete Transaction
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete a Transaction
+      tags:
+      - Transaction
+  /api/transaction/delete/all:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete all trashed Transaction records.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted all Transaction records permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseTransactionDelete'
+        "500":
+          description: Failed to delete Transactions
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete all trashed Transactions
+      tags:
+      - Transaction
+  /api/transaction/restore/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Restore a trashed Transaction record by its ID.
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored Transaction
+          schema:
+            $ref: '#/definitions/response.ApiResponseTransactionDeleteAt'
+        "400":
+          description: Invalid Transaction ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to restore Transaction
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore a trashed Transaction
+      tags:
+      - Transaction
+  /api/transaction/restore/all:
+    post:
+      consumes:
+      - application/json
+      description: Restore all trashed Transaction records.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored all Transactions
+          schema:
+            $ref: '#/definitions/pb.ApiResponseTransactionAll'
+        "500":
+          description: Failed to restore Transactions
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore all trashed Transactions
+      tags:
+      - Transaction
+  /api/transaction/trashed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of trashed Transaction records
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of trashed Transaction data
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationTransactionDeleteAt'
+        "500":
+          description: Failed to retrieve Transaction data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve trashed Transactions
+      tags:
+      - Transaction
+  /api/transaction/trashed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a trashed Transaction record by its ID.
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved trashed Transaction
+          schema:
+            $ref: '#/definitions/response.ApiResponseTransactionDeleteAt'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve trashed Transaction
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve a trashed Transaction
+      tags:
+      - Transaction
+  /api/transaction/update/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Update an existing Transaction record with the provided details
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Transaction request
+        in: body
+        name: UpdateTransactionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated Transaction
+          schema:
+            $ref: '#/definitions/response.ApiResponseTransaction'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to update Transaction
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update an existing Transaction
+      tags:
+      - Transaction
+  /api/user:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all users
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationUser'
+        "500":
+          description: Failed to retrieve user data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find all users
+      tags:
+      - User
+  /api/user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseUser'
+        "400":
+          description: Invalid user ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve user data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find user by ID
+      tags:
+      - User
+  /api/user/active:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of active users
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of active users
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationUserDeleteAt'
+        "500":
+          description: Failed to retrieve user data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve active users
+      tags:
+      - User
+  /api/user/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the provided details
+      parameters:
+      - description: Create user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created user
+          schema:
+            $ref: '#/definitions/response.ApiResponseUser'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to create user
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a new user
+      tags:
+      - User
+  /api/user/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Permanently delete a user record by its ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted user record permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseUserDelete'
+        "400":
+          description: 'Bad Request: Invalid ID'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: 'Failed to delete user:'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete a user
+      tags:
+      - User
+  /api/user/delete/all:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete a user record by its ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted user record permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseUserDelete'
+        "400":
+          description: 'Bad Request: Invalid ID'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: 'Failed to delete user:'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete a user
+      tags:
+      - User
+  /api/user/restore/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Restore a trashed user record by its ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored user
+          schema:
+            $ref: '#/definitions/response.ApiResponseUserDeleteAt'
+        "400":
+          description: Invalid user ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to restore user
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore a trashed user
+      tags:
+      - User
+  /api/user/restore/all:
+    post:
+      consumes:
+      - application/json
+      description: Restore a trashed user record by its ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored user all
+          schema:
+            $ref: '#/definitions/pb.ApiResponseUserAll'
+        "400":
+          description: Invalid user ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to restore user
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore a trashed user
+      tags:
+      - User
+  /api/user/trashed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of trashed user records
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of trashed user data
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationUserDeleteAt'
+        "500":
+          description: Failed to retrieve user data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve trashed users
+      tags:
+      - User
+  /api/user/trashed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a trashed user record by its ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved trashed user
+          schema:
+            $ref: '#/definitions/response.ApiResponseUserDeleteAt'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve trashed user
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve a trashed user
+      tags:
+      - User
+  /api/user/update/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Update an existing user record with the provided details
+      parameters:
+      - description: Update user request
+        in: body
+        name: UpdateUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated user
+          schema:
+            $ref: '#/definitions/response.ApiResponseUser'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to update user
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update an existing user
+      tags:
+      - User
+  /api/voucher:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all Vouchers
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of Vouchers
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationVoucher'
+        "500":
+          description: Failed to retrieve Voucher data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find all Vouchers
+      tags:
+      - Voucher
+  /api/voucher/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a Voucher by ID
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Voucher data
+          schema:
+            $ref: '#/definitions/pb.ApiResponseVoucher'
+        "400":
+          description: Invalid Voucher ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve Voucher data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find Voucher by ID
+      tags:
+      - Voucher
+  /api/voucher/active:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of active Vouchers
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of active Vouchers
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationVoucherDeleteAt'
+        "500":
+          description: Failed to retrieve Voucher data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve active Vouchers
+      tags:
+      - Voucher
+  /api/voucher/create:
+    post:
+      consumes:
+      - application/json
+      description: Create an existing Voucher record with the provided details
+      parameters:
+      - description: Create Voucher request
+        in: body
+        name: CreateVoucherRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateVoucherRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created Voucher
+          schema:
+            $ref: '#/definitions/response.ApiResponseVoucher'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to create Voucher
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create an existing Voucher
+      tags:
+      - Voucher
+  /api/voucher/delete/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete a Voucher record by its ID.
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted Voucher record permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseVoucherDelete'
+        "400":
+          description: 'Bad Request: Invalid ID'
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to delete Voucher
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete a Voucher
+      tags:
+      - Voucher
+  /api/voucher/delete/all:
+    post:
+      consumes:
+      - application/json
+      description: Permanently delete all trashed Voucher records.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted all Voucher records permanently
+          schema:
+            $ref: '#/definitions/pb.ApiResponseVoucherDelete'
+        "500":
+          description: Failed to delete Vouchers
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Permanently delete all trashed Vouchers
+      tags:
+      - Voucher
+  /api/voucher/restore/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Restore a trashed Voucher record by its ID.
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored Voucher
+          schema:
+            $ref: '#/definitions/response.ApiResponseVoucherDeleteAt'
+        "400":
+          description: Invalid Voucher ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to restore Voucher
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore a trashed Voucher
+      tags:
+      - Voucher
+  /api/voucher/restore/all:
+    post:
+      consumes:
+      - application/json
+      description: Restore all trashed Voucher records.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully restored all Vouchers
+          schema:
+            $ref: '#/definitions/pb.ApiResponseVoucherAll'
+        "500":
+          description: Failed to restore Vouchers
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Restore all trashed Vouchers
+      tags:
+      - Voucher
+  /api/voucher/trashed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of trashed Voucher records
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of trashed Voucher data
+          schema:
+            $ref: '#/definitions/response.ApiResponsePaginationVoucherDeleteAt'
+        "500":
+          description: Failed to retrieve Voucher data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve trashed Vouchers
+      tags:
+      - Voucher
+  /api/voucher/trashed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a trashed Voucher record by its ID.
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved trashed Voucher
+          schema:
+            $ref: '#/definitions/response.ApiResponseVoucherDeleteAt'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve trashed Voucher
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Retrieve a trashed Voucher
+      tags:
+      - Voucher
+  /api/voucher/update/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Update an existing Voucher record with the provided details
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Voucher request
+        in: body
+        name: UpdateVoucherRequest
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateVoucherRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated Voucher
+          schema:
+            $ref: '#/definitions/response.ApiResponseVoucher'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to update Voucher
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update an existing Voucher
+      tags:
+      - Voucher
+  /auth/hello:
+    get:
+      description: Returns a simple "Hello" message for testing purposes.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Hello
+          schema:
+            type: string
+      summary: Returns a "Hello" message
+      tags:
+      - Auth
+swagger: "2.0"

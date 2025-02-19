@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package pb;
+
+import "api.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "topup_game/internal/pb";
+
+message FindAllCategoryRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+    string search = 3;
+}
+
+message FindByIdCategoryRequest {
+    int32 id = 1;
+}
+
+message CreateCategoryRequest {
+    string name = 1;
+}
+
+message UpdateCategoryRequest {
+    int32 category_id = 1;
+    string name = 2;
+}
+
+
+
+message CategoryResponse {
+    int32 id = 1;
+    string name = 2;
+    string created_at = 6;
+    string updated_at = 7;
+}
+  
+message CategoryResponseDeleteAt {
+    int32 id = 1;
+    string name = 2;
+    string created_at = 3;
+    string updated_at = 4;
+    string deleted_at = 5;
+}
+  
+message ApiResponseCategory {
+    string status = 1;
+    string message = 2;
+    CategoryResponse data = 3;
+}
+
+message ApiResponseCategoryDeleteAt {
+    string status = 1;
+    string message = 2;
+    CategoryResponseDeleteAt data = 3;
+}
+  
+message ApiResponsesCategory {
+    string status = 1;
+    string message = 2;
+    repeated CategoryResponse data = 3;
+}
+  
+message ApiResponseCategoryDelete {
+    string status = 1;
+    string message = 2;
+}
+  
+message ApiResponseCategoryAll {
+    string status = 1;
+    string message = 2;
+}
+  
+message ApiResponsePaginationCategoryDeleteAt {
+    string status = 1;
+    string message = 2;
+    repeated CategoryResponseDeleteAt data = 3;
+    PaginationMeta pagination = 4;
+}
+  
+message ApiResponsePaginationCategory {
+    string status = 1;
+    string message = 2;
+    repeated CategoryResponse data = 3;
+    PaginationMeta pagination = 4;
+}
+
+
+service CategoryService {
+    rpc FindAll(FindAllCategoryRequest) returns (ApiResponsePaginationCategory);
+    rpc FindById(FindByIdCategoryRequest) returns (ApiResponseCategory);
+
+    rpc FindByActive(FindAllCategoryRequest) returns (ApiResponsePaginationCategoryDeleteAt) {}
+    rpc FindByTrashed(FindAllCategoryRequest) returns (ApiResponsePaginationCategoryDeleteAt) {}
+
+
+    rpc Create(CreateCategoryRequest) returns (ApiResponseCategory);
+    rpc Update(UpdateCategoryRequest) returns (ApiResponseCategory);
+    rpc Trashed(FindByIdCategoryRequest) returns (ApiResponseCategoryDeleteAt);
+    rpc Restore(FindByIdCategoryRequest) returns (ApiResponseCategoryDeleteAt);
+    rpc DeletePermanent(FindByIdCategoryRequest) returns (ApiResponseCategoryDelete);
+
+    rpc RestoreAll(google.protobuf.Empty) returns (ApiResponseCategoryAll){}
+    rpc DeleteAllPermanent(google.protobuf.Empty) returns (ApiResponseCategoryAll){}
+}
+

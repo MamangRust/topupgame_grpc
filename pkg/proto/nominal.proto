@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package pb;
+
+import "api.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "topup_game/internal/pb";
+
+
+message FindAllNominalRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+    string search = 3;
+}
+
+message FindByIdNominalRequest{
+    int32 nominal_id = 1;
+}
+
+
+message NominalResponse {
+    int32 id = 1;
+    string name = 2;
+    int32 quantity = 3;
+    double price = 4;
+    string created_at = 5;
+    string updated_at = 6;
+}
+
+message NominalResponseDeleteAt {
+    int32 id = 1;
+    string name = 2;
+    int32 quantity = 3;
+    double price = 4;
+    string created_at = 5;
+    string updated_at = 6;
+    string deleted_at = 7;
+
+}
+
+message CreateNominalRequest {
+    int32 voucher_id = 1;
+    string name = 2;
+    int32 quantity = 3;
+    double price = 4;
+}
+  
+message UpdateNominalRequest {
+    int32 id = 1;
+    optional int32 voucher_id = 2;
+    optional string name = 3;
+    optional int32 quantity = 4;
+    optional double price = 5;
+}
+
+message ApiResponseNominal {
+    string status = 1;
+    string message = 2;
+    NominalResponse data = 3;
+}
+
+message ApiResponseNominalDeleteAt {
+    string status = 1;
+    string message = 2;
+    NominalResponseDeleteAt data = 3;
+}
+  
+message ApiResponsesNominal {
+    string status = 1;
+    string message = 2;
+    repeated NominalResponse data = 3;
+}
+  
+message ApiResponseNominalDelete {
+    string status = 1;
+    string message = 2;
+}
+  
+message ApiResponseNominalAll {
+    string status = 1;
+    string message = 2;
+}
+  
+message ApiResponsePaginationNominalDeleteAt {
+    string status = 1;
+    string message = 2;
+    repeated NominalResponseDeleteAt data = 3;
+    PaginationMeta pagination = 4;
+}
+  
+message ApiResponsePaginationNominal {
+    string status = 1;
+    string message = 2;
+    repeated NominalResponse data = 3;
+    PaginationMeta pagination = 4;
+}
+
+service NominalService {
+    rpc FindAll(FindAllNominalRequest) returns (ApiResponsePaginationNominal);
+    rpc FindById(FindByIdNominalRequest) returns (ApiResponseNominal);
+
+    rpc FindByActive(FindAllNominalRequest) returns (ApiResponsePaginationNominalDeleteAt) {}
+    rpc FindByTrashed(FindAllNominalRequest) returns (ApiResponsePaginationNominalDeleteAt) {}
+
+
+    rpc Create(CreateNominalRequest) returns (ApiResponseNominal);
+    rpc Update(UpdateNominalRequest) returns (ApiResponseNominal);
+    rpc Trashed(FindByIdNominalRequest) returns (ApiResponseNominalDeleteAt);
+    rpc Restore(FindByIdNominalRequest) returns (ApiResponseNominalDeleteAt);
+    rpc DeletePermanent(FindByIdNominalRequest) returns (ApiResponseNominalDelete);
+
+    rpc RestoreAll(google.protobuf.Empty) returns (ApiResponseNominalAll){}
+    rpc DeleteAllPermanent(google.protobuf.Empty) returns (ApiResponseNominalAll){}
+}
+

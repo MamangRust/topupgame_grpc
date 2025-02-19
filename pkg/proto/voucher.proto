@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package pb;
+
+import "api.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "topup_game/internal/pb";
+
+message FindAllVoucherRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+    string search = 3;
+}
+
+
+message FindByIdVoucherRequest{
+    int32 Voucher_id = 1;
+}
+
+
+message VoucherResponse {
+    int32 id = 1;
+    int32 merchant_id = 2;
+    int32 category_id = 3;
+    string name = 4;
+    string image_name = 5;
+    string created_at = 6;
+    string updated_at = 7;
+}
+
+message VoucherResponseDeleteAt {
+    int32 id = 1;
+    int32 merchant_id = 2;
+    int32 category_id = 3;
+    string name = 4;
+    string image_name = 5;
+    string created_at = 6;
+    string updated_at = 7;
+    string deleted_at = 8;
+}
+
+message CreateVoucherRequest {
+    int32 merchant_id = 1;
+    int32 category_id = 2;
+    string name = 3;
+    string image_name = 4;
+}
+
+message UpdateVoucherRequest {
+    int32 id = 1;
+    int32 merchant_id = 2; 
+    int32 category_id = 3;
+    string name = 4;
+    string image_name = 5;
+}
+
+message ApiResponseVoucherAll{
+    string status = 1;
+    string message = 2;
+}
+
+message ApiResponseVoucherDelete{
+    string status = 1;
+    string message = 2;
+}
+
+
+message ApiResponseVoucher{
+    string status = 1;
+    string message = 2;
+    VoucherResponse data = 3;
+}
+
+message ApiResponseVoucherDeleteAt{
+    string status = 1;
+    string message = 2;
+    VoucherResponseDeleteAt data = 3;
+}
+
+message ApiResponsesVoucher{
+    string status = 1;
+    string message = 2;
+    repeated VoucherResponse data = 3;
+}
+
+message ApiResponsePaginationVoucher{
+    string status = 1;
+    string message = 2;
+    repeated VoucherResponse data = 3;
+    PaginationMeta pagination = 4;
+}
+
+
+message ApiResponsePaginationVoucherDeleteAt{
+    string status = 1;
+    string message = 2;
+    repeated VoucherResponseDeleteAt data = 3;
+    PaginationMeta pagination = 4;
+}
+
+
+service VoucherService{
+    rpc FindAll(FindAllVoucherRequest) returns(ApiResponsePaginationVoucher){}
+    rpc FindById(FindByIdVoucherRequest) returns(ApiResponseVoucher){}
+
+    rpc FindByActive(FindAllVoucherRequest) returns(ApiResponsePaginationVoucherDeleteAt){}
+    rpc FindByTrashed(FindAllVoucherRequest) returns(ApiResponsePaginationVoucherDeleteAt){}
+
+    rpc Create(CreateVoucherRequest) returns (ApiResponseVoucher) {}
+    rpc Update(UpdateVoucherRequest) returns (ApiResponseVoucher) {}
+    rpc Trashed(FindByIdVoucherRequest) returns (ApiResponseVoucherDeleteAt) {}
+    rpc Restore(FindByIdVoucherRequest) returns (ApiResponseVoucherDeleteAt) {}
+    rpc DeletePermanent(FindByIdVoucherRequest) returns (ApiResponseVoucherDelete) {}
+    rpc RestoreAll(google.protobuf.Empty) returns (ApiResponseVoucherAll){}
+    rpc DeleteAllPermanent(google.protobuf.Empty) returns (ApiResponseVoucherAll){}
+}
