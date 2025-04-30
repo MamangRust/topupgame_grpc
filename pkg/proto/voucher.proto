@@ -18,6 +18,123 @@ message FindByIdVoucherRequest{
     int32 Voucher_id = 1;
 }
 
+message MonthAmountVoucherRequest {
+    int32 year = 1;
+    int32 month = 2;
+}
+
+message YearAmountVoucherRequest {
+    int32 year = 1;
+}
+
+  
+message MonthAmountVoucherByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+    int32 month = 3;
+}
+  
+
+message YearAmountVoucherByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+ 
+
+message MonthMethodVoucherByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+  
+message YearMethodVoucherByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+
+
+
+message MonthAmountVoucherByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+    int32 month = 3;
+}
+  
+
+message YearAmountVoucherByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+  
+
+  
+message MonthMethodVoucherByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+  
+message YearMethodVoucherByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+
+
+message MonthAmountVoucherSuccessResponse {
+    int32 id = 1;
+    string voucher_name = 2;
+    string year = 3;
+    string month = 4;
+    int32 total_success = 5;
+    int32 total_amount = 6;
+  }
+  
+
+message YearAmountVoucherSuccessResponse {
+    int32 id = 1;
+    string voucher_name = 2;
+    string year = 3;
+    int32 total_success = 4;
+    int32 total_amount = 5;
+}
+  
+
+message MonthAmountVoucherFailedResponse {
+    int32 id = 1;
+    string voucher_name = 2;
+    string year = 3;
+    string month = 4;
+    int32 total_failed = 5;
+    int32 total_amount = 6;
+}
+  
+
+message YearAmountVoucherFailedResponse {
+    int32 id = 1;
+    string voucher_name = 2;
+    string year = 3;
+    int32 total_failed = 4;
+    int32 total_amount = 5;
+}
+  
+
+message MonthMethodVoucherResponse {
+    int32 id = 1;
+    string month = 2;
+    string voucher_name = 3;
+    string payment_method = 4;
+    int32 total_transactions = 5;
+    int32 total_amount = 6;
+}
+  
+
+message YearMethodVoucherResponse {
+    int32 id = 1;
+    string year = 2;
+    string voucher_name = 3;
+    string payment_method = 4;
+    int32 total_transactions = 5;
+    int32 total_amount = 6;
+}
+
 
 message VoucherResponse {
     int32 id = 1;
@@ -40,6 +157,7 @@ message VoucherResponseDeleteAt {
     string deleted_at = 8;
 }
 
+
 message CreateVoucherRequest {
     int32 merchant_id = 1;
     int32 category_id = 2;
@@ -54,6 +172,46 @@ message UpdateVoucherRequest {
     string name = 4;
     string image_name = 5;
 }
+
+
+
+message ApiResponseVoucherMonthAmountSuccess {
+    string status = 1;
+    string message = 2;
+    repeated MonthAmountVoucherSuccessResponse data = 3;
+}
+  
+message ApiResponseVoucherYearAmountSuccess {
+    string status = 1;
+    string message = 2;
+    repeated YearAmountVoucherSuccessResponse data = 3;
+}
+  
+message ApiResponseVoucherMonthAmountFailed {
+    string status = 1;
+    string message = 2;
+    repeated MonthAmountVoucherFailedResponse data = 3;
+}
+  
+message ApiResponseVoucherYearAmountFailed {
+    string status = 1;
+    string message = 2;
+    repeated YearAmountVoucherFailedResponse data = 3;
+}
+  
+message ApiResponseVoucherMonthMethod {
+    string status = 1;
+    string message = 2;
+    repeated MonthMethodVoucherResponse data = 3;
+}
+  
+message ApiResponseVoucherYearMethod {
+    string status = 1;
+    string message = 2;
+    repeated YearMethodVoucherResponse data = 3;
+}
+
+
 
 message ApiResponseVoucherAll{
     string status = 1;
@@ -114,4 +272,35 @@ service VoucherService{
     rpc DeletePermanent(FindByIdVoucherRequest) returns (ApiResponseVoucherDelete) {}
     rpc RestoreAll(google.protobuf.Empty) returns (ApiResponseVoucherAll){}
     rpc DeleteAllPermanent(google.protobuf.Empty) returns (ApiResponseVoucherAll){}
+
+    rpc FindMonthAmountVoucherSuccess(MonthAmountVoucherRequest)returns(ApiResponseVoucherMonthAmountSuccess){}
+    rpc FindYearAmountVoucherSuccess(YearAmountVoucherRequest)returns(ApiResponseVoucherYearAmountSuccess){}
+    rpc FindMonthAmountVoucherFailed(MonthAmountVoucherRequest)returns(ApiResponseVoucherMonthAmountFailed){}
+    rpc FindYearAmountVoucherFailed(YearAmountVoucherRequest)returns(ApiResponseVoucherYearAmountFailed){}
+
+    rpc FindMonthMethodVoucherSuccess(YearAmountVoucherRequest)returns(ApiResponseVoucherMonthMethod){}
+    rpc FindYearMethodVoucherSuccess(YearAmountVoucherRequest)returns(ApiResponseVoucherYearMethod){}
+    rpc FindMonthMethodVoucherFailed(YearAmountVoucherRequest)returns(ApiResponseVoucherMonthMethod){}
+    rpc FindYearMethodVoucherFailed(YearAmountVoucherRequest)returns(ApiResponseVoucherYearMethod){}
+
+
+    rpc FindMonthAmountVoucherSuccessById(MonthAmountVoucherByIdRequest)returns(ApiResponseVoucherMonthAmountSuccess){}
+    rpc FindYearAmountVoucherSuccessById(YearAmountVoucherByIdRequest)returns(ApiResponseVoucherYearAmountSuccess){}
+    rpc FindMonthAmountVoucherFailedById(MonthAmountVoucherByIdRequest)returns(ApiResponseVoucherMonthAmountFailed){}
+    rpc FindYearAmountVoucherFailedById(YearAmountVoucherByIdRequest)returns(ApiResponseVoucherYearAmountFailed){}
+
+    rpc FindMonthMethodVoucherSuccessById(MonthMethodVoucherByIdRequest)returns(ApiResponseVoucherMonthMethod){}
+    rpc FindYearMethodVoucherSuccessById(YearMethodVoucherByIdRequest)returns(ApiResponseVoucherYearMethod){}
+    rpc FindMonthMethodVoucherFailedById(MonthMethodVoucherByIdRequest)returns(ApiResponseVoucherMonthMethod){}
+    rpc FindYearMethodVoucherFailedById(YearMethodVoucherByIdRequest)returns(ApiResponseVoucherYearMethod){}
+
+    rpc FindMonthAmountVoucherSuccessByMerchant(MonthAmountVoucherByMerchantRequest)returns(ApiResponseVoucherMonthAmountSuccess){}
+    rpc FindYearAmountVoucherSuccessByMerchant(YearAmountVoucherByMerchantRequest)returns(ApiResponseVoucherYearAmountSuccess){}
+    rpc FindMonthAmountVoucherFailedByMerchant(MonthAmountVoucherByMerchantRequest)returns(ApiResponseVoucherMonthAmountFailed){}
+    rpc FindYearAmountVoucherFailedByMerchant(YearAmountVoucherByMerchantRequest)returns(ApiResponseVoucherYearAmountFailed){}
+
+    rpc FindMonthMethodVoucherSuccessByMerchant(MonthMethodVoucherByMerchantRequest)returns(ApiResponseVoucherMonthMethod){}
+    rpc FindYearMethodVoucherSuccessByMerchant(YearMethodVoucherByMerchantRequest)returns(ApiResponseVoucherYearMethod){}
+    rpc FindMonthMethodVoucherFailedByMerchant(MonthMethodVoucherByMerchantRequest)returns(ApiResponseVoucherMonthMethod){}
+    rpc FindYearMethodVoucherFailedByMerchant(YearMethodVoucherByMerchantRequest)returns(ApiResponseVoucherYearMethod){}
 }

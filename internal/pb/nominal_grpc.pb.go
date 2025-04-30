@@ -20,17 +20,41 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	NominalService_FindAll_FullMethodName            = "/pb.NominalService/FindAll"
-	NominalService_FindById_FullMethodName           = "/pb.NominalService/FindById"
-	NominalService_FindByActive_FullMethodName       = "/pb.NominalService/FindByActive"
-	NominalService_FindByTrashed_FullMethodName      = "/pb.NominalService/FindByTrashed"
-	NominalService_Create_FullMethodName             = "/pb.NominalService/Create"
-	NominalService_Update_FullMethodName             = "/pb.NominalService/Update"
-	NominalService_Trashed_FullMethodName            = "/pb.NominalService/Trashed"
-	NominalService_Restore_FullMethodName            = "/pb.NominalService/Restore"
-	NominalService_DeletePermanent_FullMethodName    = "/pb.NominalService/DeletePermanent"
-	NominalService_RestoreAll_FullMethodName         = "/pb.NominalService/RestoreAll"
-	NominalService_DeleteAllPermanent_FullMethodName = "/pb.NominalService/DeleteAllPermanent"
+	NominalService_FindAll_FullMethodName                                 = "/pb.NominalService/FindAll"
+	NominalService_FindById_FullMethodName                                = "/pb.NominalService/FindById"
+	NominalService_FindByActive_FullMethodName                            = "/pb.NominalService/FindByActive"
+	NominalService_FindByTrashed_FullMethodName                           = "/pb.NominalService/FindByTrashed"
+	NominalService_Create_FullMethodName                                  = "/pb.NominalService/Create"
+	NominalService_Update_FullMethodName                                  = "/pb.NominalService/Update"
+	NominalService_Trashed_FullMethodName                                 = "/pb.NominalService/Trashed"
+	NominalService_Restore_FullMethodName                                 = "/pb.NominalService/Restore"
+	NominalService_DeletePermanent_FullMethodName                         = "/pb.NominalService/DeletePermanent"
+	NominalService_RestoreAll_FullMethodName                              = "/pb.NominalService/RestoreAll"
+	NominalService_DeleteAllPermanent_FullMethodName                      = "/pb.NominalService/DeleteAllPermanent"
+	NominalService_FindMonthAmountNominalSuccess_FullMethodName           = "/pb.NominalService/FindMonthAmountNominalSuccess"
+	NominalService_FindYearAmountNominalSuccess_FullMethodName            = "/pb.NominalService/FindYearAmountNominalSuccess"
+	NominalService_FindMonthAmountNominalFailed_FullMethodName            = "/pb.NominalService/FindMonthAmountNominalFailed"
+	NominalService_FindYearAmountNominalFailed_FullMethodName             = "/pb.NominalService/FindYearAmountNominalFailed"
+	NominalService_FindMonthMethodNominalSuccess_FullMethodName           = "/pb.NominalService/FindMonthMethodNominalSuccess"
+	NominalService_FindYearMethodNominalSuccess_FullMethodName            = "/pb.NominalService/FindYearMethodNominalSuccess"
+	NominalService_FindMonthMethodNominalFailed_FullMethodName            = "/pb.NominalService/FindMonthMethodNominalFailed"
+	NominalService_FindYearMethodNominalFailed_FullMethodName             = "/pb.NominalService/FindYearMethodNominalFailed"
+	NominalService_FindMonthAmountNominalSuccessById_FullMethodName       = "/pb.NominalService/FindMonthAmountNominalSuccessById"
+	NominalService_FindYearAmountNominalSuccessById_FullMethodName        = "/pb.NominalService/FindYearAmountNominalSuccessById"
+	NominalService_FindMonthAmountNominalFailedById_FullMethodName        = "/pb.NominalService/FindMonthAmountNominalFailedById"
+	NominalService_FindYearAmountNominalFailedById_FullMethodName         = "/pb.NominalService/FindYearAmountNominalFailedById"
+	NominalService_FindMonthMethodNominalSuccessById_FullMethodName       = "/pb.NominalService/FindMonthMethodNominalSuccessById"
+	NominalService_FindYearMethodNominalSuccessById_FullMethodName        = "/pb.NominalService/FindYearMethodNominalSuccessById"
+	NominalService_FindMonthMethodNominalFailedById_FullMethodName        = "/pb.NominalService/FindMonthMethodNominalFailedById"
+	NominalService_FindYearMethodNominalFailedById_FullMethodName         = "/pb.NominalService/FindYearMethodNominalFailedById"
+	NominalService_FindMonthAmountNominalSuccessByMerchant_FullMethodName = "/pb.NominalService/FindMonthAmountNominalSuccessByMerchant"
+	NominalService_FindYearAmountNominalSuccessByMerchant_FullMethodName  = "/pb.NominalService/FindYearAmountNominalSuccessByMerchant"
+	NominalService_FindMonthAmountNominalFailedByMerchant_FullMethodName  = "/pb.NominalService/FindMonthAmountNominalFailedByMerchant"
+	NominalService_FindYearAmountNominalFailedByMerchant_FullMethodName   = "/pb.NominalService/FindYearAmountNominalFailedByMerchant"
+	NominalService_FindMonthMethodNominalSuccessByMerchant_FullMethodName = "/pb.NominalService/FindMonthMethodNominalSuccessByMerchant"
+	NominalService_FindYearMethodNominalSuccessByMerchant_FullMethodName  = "/pb.NominalService/FindYearMethodNominalSuccessByMerchant"
+	NominalService_FindMonthMethodNominalFailedByMerchant_FullMethodName  = "/pb.NominalService/FindMonthMethodNominalFailedByMerchant"
+	NominalService_FindYearMethodNominalFailedByMerchant_FullMethodName   = "/pb.NominalService/FindYearMethodNominalFailedByMerchant"
 )
 
 // NominalServiceClient is the client API for NominalService service.
@@ -48,6 +72,30 @@ type NominalServiceClient interface {
 	DeletePermanent(ctx context.Context, in *FindByIdNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalDelete, error)
 	RestoreAll(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ApiResponseNominalAll, error)
 	DeleteAllPermanent(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ApiResponseNominalAll, error)
+	FindMonthAmountNominalSuccess(ctx context.Context, in *MonthAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountSuccess, error)
+	FindYearAmountNominalSuccess(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountSuccess, error)
+	FindMonthAmountNominalFailed(ctx context.Context, in *MonthAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountFailed, error)
+	FindYearAmountNominalFailed(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountFailed, error)
+	FindMonthMethodNominalSuccess(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalSuccess(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error)
+	FindMonthMethodNominalFailed(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalFailed(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error)
+	FindMonthAmountNominalSuccessById(ctx context.Context, in *MonthAmountNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountSuccess, error)
+	FindYearAmountNominalSuccessById(ctx context.Context, in *YearAmountNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountSuccess, error)
+	FindMonthAmountNominalFailedById(ctx context.Context, in *MonthAmountNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountFailed, error)
+	FindYearAmountNominalFailedById(ctx context.Context, in *YearAmountNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountFailed, error)
+	FindMonthMethodNominalSuccessById(ctx context.Context, in *MonthMethodNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalSuccessById(ctx context.Context, in *YearMethodNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error)
+	FindMonthMethodNominalFailedById(ctx context.Context, in *MonthMethodNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalFailedById(ctx context.Context, in *YearMethodNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error)
+	FindMonthAmountNominalSuccessByMerchant(ctx context.Context, in *MonthAmountNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountSuccess, error)
+	FindYearAmountNominalSuccessByMerchant(ctx context.Context, in *YearAmountNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountSuccess, error)
+	FindMonthAmountNominalFailedByMerchant(ctx context.Context, in *MonthAmountNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountFailed, error)
+	FindYearAmountNominalFailedByMerchant(ctx context.Context, in *YearAmountNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountFailed, error)
+	FindMonthMethodNominalSuccessByMerchant(ctx context.Context, in *MonthMethodNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalSuccessByMerchant(ctx context.Context, in *YearMethodNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error)
+	FindMonthMethodNominalFailedByMerchant(ctx context.Context, in *MonthMethodNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalFailedByMerchant(ctx context.Context, in *YearMethodNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error)
 }
 
 type nominalServiceClient struct {
@@ -168,6 +216,246 @@ func (c *nominalServiceClient) DeleteAllPermanent(ctx context.Context, in *empty
 	return out, nil
 }
 
+func (c *nominalServiceClient) FindMonthAmountNominalSuccess(ctx context.Context, in *MonthAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthAmountNominalSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearAmountNominalSuccess(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearAmountSuccess)
+	err := c.cc.Invoke(ctx, NominalService_FindYearAmountNominalSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindMonthAmountNominalFailed(ctx context.Context, in *MonthAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthAmountFailed)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthAmountNominalFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearAmountNominalFailed(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearAmountFailed)
+	err := c.cc.Invoke(ctx, NominalService_FindYearAmountNominalFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindMonthMethodNominalSuccess(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthMethodNominalSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearMethodNominalSuccess(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindYearMethodNominalSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindMonthMethodNominalFailed(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthMethodNominalFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearMethodNominalFailed(ctx context.Context, in *YearAmountNominalRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindYearMethodNominalFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindMonthAmountNominalSuccessById(ctx context.Context, in *MonthAmountNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthAmountNominalSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearAmountNominalSuccessById(ctx context.Context, in *YearAmountNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearAmountSuccess)
+	err := c.cc.Invoke(ctx, NominalService_FindYearAmountNominalSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindMonthAmountNominalFailedById(ctx context.Context, in *MonthAmountNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthAmountFailed)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthAmountNominalFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearAmountNominalFailedById(ctx context.Context, in *YearAmountNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearAmountFailed)
+	err := c.cc.Invoke(ctx, NominalService_FindYearAmountNominalFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindMonthMethodNominalSuccessById(ctx context.Context, in *MonthMethodNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthMethodNominalSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearMethodNominalSuccessById(ctx context.Context, in *YearMethodNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindYearMethodNominalSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindMonthMethodNominalFailedById(ctx context.Context, in *MonthMethodNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthMethodNominalFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearMethodNominalFailedById(ctx context.Context, in *YearMethodNominalByIdRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindYearMethodNominalFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindMonthAmountNominalSuccessByMerchant(ctx context.Context, in *MonthAmountNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthAmountNominalSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearAmountNominalSuccessByMerchant(ctx context.Context, in *YearAmountNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearAmountSuccess)
+	err := c.cc.Invoke(ctx, NominalService_FindYearAmountNominalSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindMonthAmountNominalFailedByMerchant(ctx context.Context, in *MonthAmountNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthAmountFailed)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthAmountNominalFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearAmountNominalFailedByMerchant(ctx context.Context, in *YearAmountNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearAmountFailed)
+	err := c.cc.Invoke(ctx, NominalService_FindYearAmountNominalFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindMonthMethodNominalSuccessByMerchant(ctx context.Context, in *MonthMethodNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthMethodNominalSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearMethodNominalSuccessByMerchant(ctx context.Context, in *YearMethodNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindYearMethodNominalSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindMonthMethodNominalFailedByMerchant(ctx context.Context, in *MonthMethodNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalMonthMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindMonthMethodNominalFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nominalServiceClient) FindYearMethodNominalFailedByMerchant(ctx context.Context, in *YearMethodNominalByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseNominalYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseNominalYearMethod)
+	err := c.cc.Invoke(ctx, NominalService_FindYearMethodNominalFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NominalServiceServer is the server API for NominalService service.
 // All implementations must embed UnimplementedNominalServiceServer
 // for forward compatibility.
@@ -183,6 +471,30 @@ type NominalServiceServer interface {
 	DeletePermanent(context.Context, *FindByIdNominalRequest) (*ApiResponseNominalDelete, error)
 	RestoreAll(context.Context, *emptypb.Empty) (*ApiResponseNominalAll, error)
 	DeleteAllPermanent(context.Context, *emptypb.Empty) (*ApiResponseNominalAll, error)
+	FindMonthAmountNominalSuccess(context.Context, *MonthAmountNominalRequest) (*ApiResponseNominalMonthAmountSuccess, error)
+	FindYearAmountNominalSuccess(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalYearAmountSuccess, error)
+	FindMonthAmountNominalFailed(context.Context, *MonthAmountNominalRequest) (*ApiResponseNominalMonthAmountFailed, error)
+	FindYearAmountNominalFailed(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalYearAmountFailed, error)
+	FindMonthMethodNominalSuccess(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalSuccess(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalYearMethod, error)
+	FindMonthMethodNominalFailed(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalFailed(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalYearMethod, error)
+	FindMonthAmountNominalSuccessById(context.Context, *MonthAmountNominalByIdRequest) (*ApiResponseNominalMonthAmountSuccess, error)
+	FindYearAmountNominalSuccessById(context.Context, *YearAmountNominalByIdRequest) (*ApiResponseNominalYearAmountSuccess, error)
+	FindMonthAmountNominalFailedById(context.Context, *MonthAmountNominalByIdRequest) (*ApiResponseNominalMonthAmountFailed, error)
+	FindYearAmountNominalFailedById(context.Context, *YearAmountNominalByIdRequest) (*ApiResponseNominalYearAmountFailed, error)
+	FindMonthMethodNominalSuccessById(context.Context, *MonthMethodNominalByIdRequest) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalSuccessById(context.Context, *YearMethodNominalByIdRequest) (*ApiResponseNominalYearMethod, error)
+	FindMonthMethodNominalFailedById(context.Context, *MonthMethodNominalByIdRequest) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalFailedById(context.Context, *YearMethodNominalByIdRequest) (*ApiResponseNominalYearMethod, error)
+	FindMonthAmountNominalSuccessByMerchant(context.Context, *MonthAmountNominalByMerchantRequest) (*ApiResponseNominalMonthAmountSuccess, error)
+	FindYearAmountNominalSuccessByMerchant(context.Context, *YearAmountNominalByMerchantRequest) (*ApiResponseNominalYearAmountSuccess, error)
+	FindMonthAmountNominalFailedByMerchant(context.Context, *MonthAmountNominalByMerchantRequest) (*ApiResponseNominalMonthAmountFailed, error)
+	FindYearAmountNominalFailedByMerchant(context.Context, *YearAmountNominalByMerchantRequest) (*ApiResponseNominalYearAmountFailed, error)
+	FindMonthMethodNominalSuccessByMerchant(context.Context, *MonthMethodNominalByMerchantRequest) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalSuccessByMerchant(context.Context, *YearMethodNominalByMerchantRequest) (*ApiResponseNominalYearMethod, error)
+	FindMonthMethodNominalFailedByMerchant(context.Context, *MonthMethodNominalByMerchantRequest) (*ApiResponseNominalMonthMethod, error)
+	FindYearMethodNominalFailedByMerchant(context.Context, *YearMethodNominalByMerchantRequest) (*ApiResponseNominalYearMethod, error)
 	mustEmbedUnimplementedNominalServiceServer()
 }
 
@@ -225,6 +537,78 @@ func (UnimplementedNominalServiceServer) RestoreAll(context.Context, *emptypb.Em
 }
 func (UnimplementedNominalServiceServer) DeleteAllPermanent(context.Context, *emptypb.Empty) (*ApiResponseNominalAll, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAllPermanent not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthAmountNominalSuccess(context.Context, *MonthAmountNominalRequest) (*ApiResponseNominalMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountNominalSuccess not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearAmountNominalSuccess(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountNominalSuccess not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthAmountNominalFailed(context.Context, *MonthAmountNominalRequest) (*ApiResponseNominalMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountNominalFailed not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearAmountNominalFailed(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountNominalFailed not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthMethodNominalSuccess(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodNominalSuccess not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearMethodNominalSuccess(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodNominalSuccess not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthMethodNominalFailed(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodNominalFailed not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearMethodNominalFailed(context.Context, *YearAmountNominalRequest) (*ApiResponseNominalYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodNominalFailed not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthAmountNominalSuccessById(context.Context, *MonthAmountNominalByIdRequest) (*ApiResponseNominalMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountNominalSuccessById not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearAmountNominalSuccessById(context.Context, *YearAmountNominalByIdRequest) (*ApiResponseNominalYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountNominalSuccessById not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthAmountNominalFailedById(context.Context, *MonthAmountNominalByIdRequest) (*ApiResponseNominalMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountNominalFailedById not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearAmountNominalFailedById(context.Context, *YearAmountNominalByIdRequest) (*ApiResponseNominalYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountNominalFailedById not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthMethodNominalSuccessById(context.Context, *MonthMethodNominalByIdRequest) (*ApiResponseNominalMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodNominalSuccessById not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearMethodNominalSuccessById(context.Context, *YearMethodNominalByIdRequest) (*ApiResponseNominalYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodNominalSuccessById not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthMethodNominalFailedById(context.Context, *MonthMethodNominalByIdRequest) (*ApiResponseNominalMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodNominalFailedById not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearMethodNominalFailedById(context.Context, *YearMethodNominalByIdRequest) (*ApiResponseNominalYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodNominalFailedById not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthAmountNominalSuccessByMerchant(context.Context, *MonthAmountNominalByMerchantRequest) (*ApiResponseNominalMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountNominalSuccessByMerchant not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearAmountNominalSuccessByMerchant(context.Context, *YearAmountNominalByMerchantRequest) (*ApiResponseNominalYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountNominalSuccessByMerchant not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthAmountNominalFailedByMerchant(context.Context, *MonthAmountNominalByMerchantRequest) (*ApiResponseNominalMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountNominalFailedByMerchant not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearAmountNominalFailedByMerchant(context.Context, *YearAmountNominalByMerchantRequest) (*ApiResponseNominalYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountNominalFailedByMerchant not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthMethodNominalSuccessByMerchant(context.Context, *MonthMethodNominalByMerchantRequest) (*ApiResponseNominalMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodNominalSuccessByMerchant not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearMethodNominalSuccessByMerchant(context.Context, *YearMethodNominalByMerchantRequest) (*ApiResponseNominalYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodNominalSuccessByMerchant not implemented")
+}
+func (UnimplementedNominalServiceServer) FindMonthMethodNominalFailedByMerchant(context.Context, *MonthMethodNominalByMerchantRequest) (*ApiResponseNominalMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodNominalFailedByMerchant not implemented")
+}
+func (UnimplementedNominalServiceServer) FindYearMethodNominalFailedByMerchant(context.Context, *YearMethodNominalByMerchantRequest) (*ApiResponseNominalYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodNominalFailedByMerchant not implemented")
 }
 func (UnimplementedNominalServiceServer) mustEmbedUnimplementedNominalServiceServer() {}
 func (UnimplementedNominalServiceServer) testEmbeddedByValue()                        {}
@@ -445,6 +829,438 @@ func _NominalService_DeleteAllPermanent_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NominalService_FindMonthAmountNominalSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountNominalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthAmountNominalSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthAmountNominalSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthAmountNominalSuccess(ctx, req.(*MonthAmountNominalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearAmountNominalSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountNominalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearAmountNominalSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearAmountNominalSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearAmountNominalSuccess(ctx, req.(*YearAmountNominalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindMonthAmountNominalFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountNominalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthAmountNominalFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthAmountNominalFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthAmountNominalFailed(ctx, req.(*MonthAmountNominalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearAmountNominalFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountNominalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearAmountNominalFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearAmountNominalFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearAmountNominalFailed(ctx, req.(*YearAmountNominalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindMonthMethodNominalSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountNominalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthMethodNominalSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthMethodNominalSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthMethodNominalSuccess(ctx, req.(*YearAmountNominalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearMethodNominalSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountNominalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearMethodNominalSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearMethodNominalSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearMethodNominalSuccess(ctx, req.(*YearAmountNominalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindMonthMethodNominalFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountNominalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthMethodNominalFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthMethodNominalFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthMethodNominalFailed(ctx, req.(*YearAmountNominalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearMethodNominalFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountNominalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearMethodNominalFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearMethodNominalFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearMethodNominalFailed(ctx, req.(*YearAmountNominalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindMonthAmountNominalSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountNominalByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthAmountNominalSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthAmountNominalSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthAmountNominalSuccessById(ctx, req.(*MonthAmountNominalByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearAmountNominalSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountNominalByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearAmountNominalSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearAmountNominalSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearAmountNominalSuccessById(ctx, req.(*YearAmountNominalByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindMonthAmountNominalFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountNominalByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthAmountNominalFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthAmountNominalFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthAmountNominalFailedById(ctx, req.(*MonthAmountNominalByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearAmountNominalFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountNominalByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearAmountNominalFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearAmountNominalFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearAmountNominalFailedById(ctx, req.(*YearAmountNominalByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindMonthMethodNominalSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodNominalByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthMethodNominalSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthMethodNominalSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthMethodNominalSuccessById(ctx, req.(*MonthMethodNominalByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearMethodNominalSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodNominalByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearMethodNominalSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearMethodNominalSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearMethodNominalSuccessById(ctx, req.(*YearMethodNominalByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindMonthMethodNominalFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodNominalByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthMethodNominalFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthMethodNominalFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthMethodNominalFailedById(ctx, req.(*MonthMethodNominalByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearMethodNominalFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodNominalByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearMethodNominalFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearMethodNominalFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearMethodNominalFailedById(ctx, req.(*YearMethodNominalByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindMonthAmountNominalSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountNominalByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthAmountNominalSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthAmountNominalSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthAmountNominalSuccessByMerchant(ctx, req.(*MonthAmountNominalByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearAmountNominalSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountNominalByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearAmountNominalSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearAmountNominalSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearAmountNominalSuccessByMerchant(ctx, req.(*YearAmountNominalByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindMonthAmountNominalFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountNominalByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthAmountNominalFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthAmountNominalFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthAmountNominalFailedByMerchant(ctx, req.(*MonthAmountNominalByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearAmountNominalFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountNominalByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearAmountNominalFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearAmountNominalFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearAmountNominalFailedByMerchant(ctx, req.(*YearAmountNominalByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindMonthMethodNominalSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodNominalByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthMethodNominalSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthMethodNominalSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthMethodNominalSuccessByMerchant(ctx, req.(*MonthMethodNominalByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearMethodNominalSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodNominalByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearMethodNominalSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearMethodNominalSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearMethodNominalSuccessByMerchant(ctx, req.(*YearMethodNominalByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindMonthMethodNominalFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodNominalByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindMonthMethodNominalFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindMonthMethodNominalFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindMonthMethodNominalFailedByMerchant(ctx, req.(*MonthMethodNominalByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NominalService_FindYearMethodNominalFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodNominalByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NominalServiceServer).FindYearMethodNominalFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NominalService_FindYearMethodNominalFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NominalServiceServer).FindYearMethodNominalFailedByMerchant(ctx, req.(*YearMethodNominalByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NominalService_ServiceDesc is the grpc.ServiceDesc for NominalService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -495,6 +1311,102 @@ var NominalService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAllPermanent",
 			Handler:    _NominalService_DeleteAllPermanent_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountNominalSuccess",
+			Handler:    _NominalService_FindMonthAmountNominalSuccess_Handler,
+		},
+		{
+			MethodName: "FindYearAmountNominalSuccess",
+			Handler:    _NominalService_FindYearAmountNominalSuccess_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountNominalFailed",
+			Handler:    _NominalService_FindMonthAmountNominalFailed_Handler,
+		},
+		{
+			MethodName: "FindYearAmountNominalFailed",
+			Handler:    _NominalService_FindYearAmountNominalFailed_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodNominalSuccess",
+			Handler:    _NominalService_FindMonthMethodNominalSuccess_Handler,
+		},
+		{
+			MethodName: "FindYearMethodNominalSuccess",
+			Handler:    _NominalService_FindYearMethodNominalSuccess_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodNominalFailed",
+			Handler:    _NominalService_FindMonthMethodNominalFailed_Handler,
+		},
+		{
+			MethodName: "FindYearMethodNominalFailed",
+			Handler:    _NominalService_FindYearMethodNominalFailed_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountNominalSuccessById",
+			Handler:    _NominalService_FindMonthAmountNominalSuccessById_Handler,
+		},
+		{
+			MethodName: "FindYearAmountNominalSuccessById",
+			Handler:    _NominalService_FindYearAmountNominalSuccessById_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountNominalFailedById",
+			Handler:    _NominalService_FindMonthAmountNominalFailedById_Handler,
+		},
+		{
+			MethodName: "FindYearAmountNominalFailedById",
+			Handler:    _NominalService_FindYearAmountNominalFailedById_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodNominalSuccessById",
+			Handler:    _NominalService_FindMonthMethodNominalSuccessById_Handler,
+		},
+		{
+			MethodName: "FindYearMethodNominalSuccessById",
+			Handler:    _NominalService_FindYearMethodNominalSuccessById_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodNominalFailedById",
+			Handler:    _NominalService_FindMonthMethodNominalFailedById_Handler,
+		},
+		{
+			MethodName: "FindYearMethodNominalFailedById",
+			Handler:    _NominalService_FindYearMethodNominalFailedById_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountNominalSuccessByMerchant",
+			Handler:    _NominalService_FindMonthAmountNominalSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearAmountNominalSuccessByMerchant",
+			Handler:    _NominalService_FindYearAmountNominalSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountNominalFailedByMerchant",
+			Handler:    _NominalService_FindMonthAmountNominalFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearAmountNominalFailedByMerchant",
+			Handler:    _NominalService_FindYearAmountNominalFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodNominalSuccessByMerchant",
+			Handler:    _NominalService_FindMonthMethodNominalSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearMethodNominalSuccessByMerchant",
+			Handler:    _NominalService_FindYearMethodNominalSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodNominalFailedByMerchant",
+			Handler:    _NominalService_FindMonthMethodNominalFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearMethodNominalFailedByMerchant",
+			Handler:    _NominalService_FindYearMethodNominalFailedByMerchant_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

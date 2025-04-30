@@ -365,30 +365,48 @@ func (q *Queries) RestoreAllRoles(ctx context.Context) error {
 	return err
 }
 
-const restoreRole = `-- name: RestoreRole :exec
+const restoreRole = `-- name: RestoreRole :one
 UPDATE roles
 SET
     deleted_at = NULL
 WHERE
     role_id = $1
+RETURNING role_id, role_name, created_at, updated_at, deleted_at
 `
 
-func (q *Queries) RestoreRole(ctx context.Context, roleID int32) error {
-	_, err := q.db.ExecContext(ctx, restoreRole, roleID)
-	return err
+func (q *Queries) RestoreRole(ctx context.Context, roleID int32) (*Role, error) {
+	row := q.db.QueryRowContext(ctx, restoreRole, roleID)
+	var i Role
+	err := row.Scan(
+		&i.RoleID,
+		&i.RoleName,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return &i, err
 }
 
-const trashRole = `-- name: TrashRole :exec
+const trashRole = `-- name: TrashRole :one
 UPDATE roles
 SET
     deleted_at = current_timestamp
 WHERE
     role_id = $1
+RETURNING role_id, role_name, created_at, updated_at, deleted_at
 `
 
-func (q *Queries) TrashRole(ctx context.Context, roleID int32) error {
-	_, err := q.db.ExecContext(ctx, trashRole, roleID)
-	return err
+func (q *Queries) TrashRole(ctx context.Context, roleID int32) (*Role, error) {
+	row := q.db.QueryRowContext(ctx, trashRole, roleID)
+	var i Role
+	err := row.Scan(
+		&i.RoleID,
+		&i.RoleName,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return &i, err
 }
 
 const updateRole = `-- name: UpdateRole :one

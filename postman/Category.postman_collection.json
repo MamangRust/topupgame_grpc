@@ -1,0 +1,1194 @@
+{
+	"info": {
+		"_postman_id": "117eeed9-4880-43b9-9a31-9b92217496f1",
+		"name": "Category",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12455638"
+	},
+	"item": [
+		{
+			"name": "Merchant",
+			"item": [
+				{
+					"name": "Monthly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/merchant/monthly-amount-success/456?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"merchant",
+								"monthly-amount-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/merchant/monthly-amount-success/456?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\"\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/merchant/yearly-amount-success/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"merchant",
+								"yearly-amount-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/merchant/yearly-amount-success/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/merchant/monthly-amount-failed/456?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"merchant",
+								"monthly-amount-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/merchant/monthly-amount-failed/456?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/merchant/yearly-amount-failed/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"merchant",
+								"yearly-amount-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/merchant/yearly-amount-failed/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\"\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/merchant/monthly-method-success/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"merchant",
+								"monthly-method-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/merchant/monthly-method-success/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/merchant/yearly-method-success/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"merchant",
+								"yearly-method-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/merchant/yearly-method-success/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\"\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/merchant/monthly-method-failed/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"merchant",
+								"monthly-method-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/merchant/monthly-method-failed/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/merchant/yearly-method-failed/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"merchant",
+								"yearly-method-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/merchant/yearly-method-failed/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Find Id",
+			"item": [
+				{
+					"name": "Monthly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/mycategory/monthly-amount-success/123?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"mycategory",
+								"monthly-amount-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/mycategory/monthly-amount-success/123?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/mycategory/yearly-amount-success/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"mycategory",
+								"yearly-amount-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/mycategory/yearly-amount-success/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/mycategory/monthly-amount-failed/123?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"mycategory",
+								"monthly-amount-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/mycategory/monthly-amount-failed/123?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/mycategory/yearly-amount-failed/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"mycategory",
+								"yearly-amount-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/mycategory/yearly-amount-failed/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/mycategory/monthly-method-success/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"mycategory",
+								"monthly-method-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/mycategory/monthly-method-success/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/mycategory/yearly-method-success/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"mycategory",
+								"yearly-method-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/mycategory/yearly-method-success/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/mycategory/monthly-method-failed/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"mycategory",
+								"monthly-method-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/mycategory/monthly-method-failed/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/category/mycategory/yearly-method-failed/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"category",
+								"mycategory",
+								"yearly-method-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/mycategory/yearly-method-failed/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Monthly Amount Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/monthly-amount-success?year=2024&month=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"monthly-amount-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						},
+						{
+							"key": "month",
+							"value": "3"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/monthly-amount-success?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Amount Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/yearly-amount-success?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"yearly-amount-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/yearly-amount-success?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Monthly Amount Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/monthly-amount-failed?year=2024&month=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"monthly-amount-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						},
+						{
+							"key": "month",
+							"value": "3"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/monthly-amount-failed?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Amount Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/yearly-amount-failed?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"yearly-amount-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/yearly-amount-failed?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Monthly Method Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/monthly-method-success?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"monthly-method-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/monthly-method-success?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Method Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/yearly-method-success?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"yearly-method-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/yearly-method-success?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Monthly Method Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/monthly-method-failed?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"monthly-method-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/monthly-method-failed?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Method Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/yearly-method-failed?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"yearly-method-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/category/yearly-method-failed?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Find All",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/category \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Find Id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/category/1 \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Find Active",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/active",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"active"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/category/active \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Find Trashed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/trashed",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"trashed"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/category/trashed \\\n  -H \"Authorization: Bearer {{secret_key}}\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Category",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\": \"Kategori A\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/category/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"create"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:5000/api/category/create \\\n  -H \"Authorization: Bearer {{secret_key}}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"name\": \"Kategori A\"}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Category",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\": \"Kategori A Diperbarui\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/category/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:5000/api/category/1 \\\n  -H \"Authorization: Bearer {{secret_key}}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"name\": \"Kategori A Diperbarui\"}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Trashed Category",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X DELETE http://localhost:5000/api/category/1 \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Restore",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/restore/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"restore",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X PUT http://localhost:5000/api/category/restore/1 \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Permanent",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/permanent/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"permanent",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X DELETE http://localhost:5000/api/category/permanent/1 \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Restore All",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/restore/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"restore",
+						"all"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:5000/api/category/restore/all \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Permanent All",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/category/permanent/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"category",
+						"permanent",
+						"all"
+					]
+				},
+				"description": "Generated from cURL: curl -X DELETE http://localhost:5000/api/category/permanent/all \\\n  -H \"Authorization: Bearer {{secret_key}}\"\n"
+			},
+			"response": []
+		}
+	]
+}

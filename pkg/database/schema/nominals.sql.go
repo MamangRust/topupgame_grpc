@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createNominal = `-- name: CreateNominal :one
@@ -79,6 +80,1510 @@ DELETE FROM nominals WHERE nominal_id = $1 AND deleted_at IS NOT NULL
 func (q *Queries) DeleteNominalPermanently(ctx context.Context, nominalID int32) error {
 	_, err := q.db.ExecContext(ctx, deleteNominalPermanently, nominalID)
 	return err
+}
+
+const getMonthAmountNominalsFailed = `-- name: GetMonthAmountNominalsFailed :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    active_nominals AS (
+        SELECT nominal_id, name AS nominal_name
+        FROM nominals
+        WHERE deleted_at IS NULL
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_nominal_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            an.nominal_id,
+            an.nominal_name
+        FROM report_months rm
+        CROSS JOIN active_nominals an
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(n.price * n.quantity), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    mnc.nominal_id,
+    mnc.nominal_name,
+    mnc.year::text,
+    TO_CHAR(TO_DATE(mnc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_failed, 0) AS total_failed,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_nominal_combos mnc
+LEFT JOIN monthly_transactions mt ON
+    mnc.year = mt.year AND
+    mnc.month = mt.month AND
+    mnc.nominal_id = mt.nominal_id
+ORDER BY 
+    mnc.nominal_name ASC,
+    mnc.year DESC,
+    mnc.month DESC
+`
+
+type GetMonthAmountNominalsFailedParams struct {
+	Column1 time.Time `json:"column_1"`
+	Column2 time.Time `json:"column_2"`
+	Column3 time.Time `json:"column_3"`
+	Column4 time.Time `json:"column_4"`
+}
+
+type GetMonthAmountNominalsFailedRow struct {
+	NominalID   int32  `json:"nominal_id"`
+	NominalName string `json:"nominal_name"`
+	MncYear     string `json:"mnc_year"`
+	Month       string `json:"month"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountNominalsFailed(ctx context.Context, arg GetMonthAmountNominalsFailedParams) ([]*GetMonthAmountNominalsFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountNominalsFailed,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountNominalsFailedRow
+	for rows.Next() {
+		var i GetMonthAmountNominalsFailedRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.MncYear,
+			&i.Month,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountNominalsFailedById = `-- name: GetMonthAmountNominalsFailedById :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    target_nominal AS (
+        SELECT nominal_id, name AS nominal_name
+        FROM nominals
+        WHERE 
+            deleted_at IS NULL
+            AND nominals.nominal_id = $5 
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_nominal_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            tn.nominal_id,
+            tn.nominal_name
+        FROM report_months rm
+        CROSS JOIN target_nominal tn
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(n.price * n.quantity), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND n.nominal_id = $5  
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    mnc.nominal_id,
+    mnc.nominal_name,
+    mnc.year::text,
+    TO_CHAR(TO_DATE(mnc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_failed, 0) AS total_failed,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_nominal_combos mnc
+LEFT JOIN monthly_transactions mt ON
+    mnc.year = mt.year AND
+    mnc.month = mt.month AND
+    mnc.nominal_id = mt.nominal_id
+ORDER BY 
+    mnc.year DESC,
+    mnc.month DESC
+`
+
+type GetMonthAmountNominalsFailedByIdParams struct {
+	Column1   time.Time `json:"column_1"`
+	Column2   time.Time `json:"column_2"`
+	Column3   time.Time `json:"column_3"`
+	Column4   time.Time `json:"column_4"`
+	NominalID int32     `json:"nominal_id"`
+}
+
+type GetMonthAmountNominalsFailedByIdRow struct {
+	NominalID   int32  `json:"nominal_id"`
+	NominalName string `json:"nominal_name"`
+	MncYear     string `json:"mnc_year"`
+	Month       string `json:"month"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountNominalsFailedById(ctx context.Context, arg GetMonthAmountNominalsFailedByIdParams) ([]*GetMonthAmountNominalsFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountNominalsFailedById,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.NominalID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountNominalsFailedByIdRow
+	for rows.Next() {
+		var i GetMonthAmountNominalsFailedByIdRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.MncYear,
+			&i.Month,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountNominalsFailedByMerchant = `-- name: GetMonthAmountNominalsFailedByMerchant :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    target_nominals AS (
+        SELECT DISTINCT n.nominal_id, n.name AS nominal_name
+        FROM nominals n
+        JOIN transactions t ON t.nominal_id = n.nominal_id
+        WHERE 
+            n.deleted_at IS NULL
+            AND t.deleted_at IS NULL
+            AND t.merchant_id = $5
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_nominal_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            tn.nominal_id,
+            tn.nominal_name
+        FROM report_months rm
+        CROSS JOIN target_nominals tn
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end)
+            OR (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.merchant_id = $5
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    mnc.nominal_id,
+    mnc.nominal_name,
+    mnc.year::text AS year,
+    TO_CHAR(TO_DATE(mnc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_failed, 0) AS total_failed,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_nominal_combos mnc
+LEFT JOIN monthly_transactions mt 
+    ON mnc.year = mt.year
+    AND mnc.month = mt.month
+    AND mnc.nominal_id = mt.nominal_id
+ORDER BY 
+    mnc.year DESC,
+    mnc.month DESC
+`
+
+type GetMonthAmountNominalsFailedByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	Column2    time.Time     `json:"column_2"`
+	Column3    time.Time     `json:"column_3"`
+	Column4    time.Time     `json:"column_4"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthAmountNominalsFailedByMerchantRow struct {
+	NominalID   int32  `json:"nominal_id"`
+	NominalName string `json:"nominal_name"`
+	Year        string `json:"year"`
+	Month       string `json:"month"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountNominalsFailedByMerchant(ctx context.Context, arg GetMonthAmountNominalsFailedByMerchantParams) ([]*GetMonthAmountNominalsFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountNominalsFailedByMerchant,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.MerchantID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountNominalsFailedByMerchantRow
+	for rows.Next() {
+		var i GetMonthAmountNominalsFailedByMerchantRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.Year,
+			&i.Month,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountNominalsSuccess = `-- name: GetMonthAmountNominalsSuccess :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    active_nominals AS (
+        SELECT nominal_id, name AS nominal_name
+        FROM nominals
+        WHERE deleted_at IS NULL
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_nominal_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            an.nominal_id,
+            an.nominal_name
+        FROM report_months rm
+        CROSS JOIN active_nominals an
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(n.price * n.quantity), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    mnc.nominal_id,
+    mnc.nominal_name,
+    mnc.year::text,
+    TO_CHAR(TO_DATE(mnc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_success, 0) AS total_success,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_nominal_combos mnc
+LEFT JOIN monthly_transactions mt ON
+    mnc.year = mt.year AND
+    mnc.month = mt.month AND
+    mnc.nominal_id = mt.nominal_id
+ORDER BY 
+    mnc.nominal_name ASC,
+    mnc.year DESC,
+    mnc.month DESC
+`
+
+type GetMonthAmountNominalsSuccessParams struct {
+	Column1 time.Time `json:"column_1"`
+	Column2 time.Time `json:"column_2"`
+	Column3 time.Time `json:"column_3"`
+	Column4 time.Time `json:"column_4"`
+}
+
+type GetMonthAmountNominalsSuccessRow struct {
+	NominalID    int32  `json:"nominal_id"`
+	NominalName  string `json:"nominal_name"`
+	MncYear      string `json:"mnc_year"`
+	Month        string `json:"month"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountNominalsSuccess(ctx context.Context, arg GetMonthAmountNominalsSuccessParams) ([]*GetMonthAmountNominalsSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountNominalsSuccess,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountNominalsSuccessRow
+	for rows.Next() {
+		var i GetMonthAmountNominalsSuccessRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.MncYear,
+			&i.Month,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountNominalsSuccessById = `-- name: GetMonthAmountNominalsSuccessById :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    target_nominal AS (
+        SELECT 
+            n.nominal_id,
+            n.name AS nominal_name
+        FROM nominals n
+        WHERE 
+            n.deleted_at IS NULL
+            AND n.nominal_id = $5  
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_nominal_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            tn.nominal_id,
+            tn.nominal_name
+        FROM report_months rm
+        CROSS JOIN target_nominal tn
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(n.price * n.quantity), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+            AND n.nominal_id = $5  
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    mnc.nominal_id,
+    mnc.nominal_name,
+    mnc.year::text,
+    TO_CHAR(TO_DATE(mnc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_success, 0) AS total_success,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_nominal_combos mnc
+LEFT JOIN monthly_transactions mt ON
+    mnc.year = mt.year AND
+    mnc.month = mt.month AND
+    mnc.nominal_id = mt.nominal_id
+ORDER BY 
+    mnc.year DESC,
+    mnc.month DESC
+`
+
+type GetMonthAmountNominalsSuccessByIdParams struct {
+	Column1   time.Time `json:"column_1"`
+	Column2   time.Time `json:"column_2"`
+	Column3   time.Time `json:"column_3"`
+	Column4   time.Time `json:"column_4"`
+	NominalID int32     `json:"nominal_id"`
+}
+
+type GetMonthAmountNominalsSuccessByIdRow struct {
+	NominalID    int32  `json:"nominal_id"`
+	NominalName  string `json:"nominal_name"`
+	MncYear      string `json:"mnc_year"`
+	Month        string `json:"month"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountNominalsSuccessById(ctx context.Context, arg GetMonthAmountNominalsSuccessByIdParams) ([]*GetMonthAmountNominalsSuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountNominalsSuccessById,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.NominalID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountNominalsSuccessByIdRow
+	for rows.Next() {
+		var i GetMonthAmountNominalsSuccessByIdRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.MncYear,
+			&i.Month,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountNominalsSuccessByMerchant = `-- name: GetMonthAmountNominalsSuccessByMerchant :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    target_nominals AS (
+        SELECT DISTINCT n.nominal_id, n.name AS nominal_name
+        FROM nominals n
+        JOIN transactions t ON t.nominal_id = n.nominal_id
+        WHERE 
+            n.deleted_at IS NULL
+            AND t.deleted_at IS NULL
+            AND t.merchant_id = $5
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_nominal_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            tn.nominal_id,
+            tn.nominal_name
+        FROM report_months rm
+        CROSS JOIN target_nominals tn
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end)
+            OR (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.merchant_id = $5
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    mnc.nominal_id,
+    mnc.nominal_name,
+    mnc.year::text AS year,
+    TO_CHAR(TO_DATE(mnc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_success, 0) AS total_success,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_nominal_combos mnc
+LEFT JOIN monthly_transactions mt 
+    ON mnc.year = mt.year
+    AND mnc.month = mt.month
+    AND mnc.nominal_id = mt.nominal_id
+ORDER BY 
+    mnc.year DESC,
+    mnc.month DESC
+`
+
+type GetMonthAmountNominalsSuccessByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	Column2    time.Time     `json:"column_2"`
+	Column3    time.Time     `json:"column_3"`
+	Column4    time.Time     `json:"column_4"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthAmountNominalsSuccessByMerchantRow struct {
+	NominalID    int32  `json:"nominal_id"`
+	NominalName  string `json:"nominal_name"`
+	Year         string `json:"year"`
+	Month        string `json:"month"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountNominalsSuccessByMerchant(ctx context.Context, arg GetMonthAmountNominalsSuccessByMerchantParams) ([]*GetMonthAmountNominalsSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountNominalsSuccessByMerchant,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.MerchantID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountNominalsSuccessByMerchantRow
+	for rows.Next() {
+		var i GetMonthAmountNominalsSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.Year,
+			&i.Month,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodNominalsFailed = `-- name: GetMonthMethodNominalsFailed :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    active_nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed' 
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            anm.nominal_id,
+            anm.nominal_name,
+            anm.payment_method
+        FROM all_months am
+        CROSS JOIN active_nominal_methods anm
+    ),
+    monthly_stats AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(ms.total_transactions, 0) AS total_transactions,
+    COALESCE(ms.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_stats ms ON 
+    ac.activity_month = ms.activity_month AND
+    ac.nominal_id = ms.nominal_id AND
+    ac.payment_method = ms.payment_method
+ORDER BY 
+    ac.activity_month,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetMonthMethodNominalsFailedRow struct {
+	Month             string  `json:"month"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodNominalsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetMonthMethodNominalsFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodNominalsFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodNominalsFailedRow
+	for rows.Next() {
+		var i GetMonthMethodNominalsFailedRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodNominalsFailedById = `-- name: GetMonthMethodNominalsFailedById :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND n.nominal_id = $2 
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            nm.nominal_id,
+            nm.nominal_name,
+            nm.payment_method
+        FROM all_months am
+        CROSS JOIN nominal_methods nm
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND n.nominal_id = $2  
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_transactions mt ON 
+    ac.activity_month = mt.activity_month AND
+    ac.nominal_id = mt.nominal_id AND
+    ac.payment_method = mt.payment_method
+ORDER BY 
+    ac.activity_month,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetMonthMethodNominalsFailedByIdParams struct {
+	Column1   time.Time `json:"column_1"`
+	NominalID int32     `json:"nominal_id"`
+}
+
+type GetMonthMethodNominalsFailedByIdRow struct {
+	Month             string  `json:"month"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodNominalsFailedById(ctx context.Context, arg GetMonthMethodNominalsFailedByIdParams) ([]*GetMonthMethodNominalsFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodNominalsFailedById, arg.Column1, arg.NominalID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodNominalsFailedByIdRow
+	for rows.Next() {
+		var i GetMonthMethodNominalsFailedByIdRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodNominalsFailedByMerchant = `-- name: GetMonthMethodNominalsFailedByMerchant :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND n.nominal_id = $2
+            AND t.merchant_id = $3
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            nm.nominal_id,
+            nm.nominal_name,
+            nm.payment_method
+        FROM all_months am
+        CROSS JOIN nominal_methods nm
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND n.nominal_id = $2
+            AND t.merchant_id = $3
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_transactions mt ON 
+    ac.activity_month = mt.activity_month AND
+    ac.nominal_id = mt.nominal_id AND
+    ac.payment_method = mt.payment_method
+ORDER BY 
+    ac.activity_month,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetMonthMethodNominalsFailedByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	NominalID  int32         `json:"nominal_id"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthMethodNominalsFailedByMerchantRow struct {
+	Month             string  `json:"month"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodNominalsFailedByMerchant(ctx context.Context, arg GetMonthMethodNominalsFailedByMerchantParams) ([]*GetMonthMethodNominalsFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodNominalsFailedByMerchant, arg.Column1, arg.NominalID, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodNominalsFailedByMerchantRow
+	for rows.Next() {
+		var i GetMonthMethodNominalsFailedByMerchantRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodNominalsSuccess = `-- name: GetMonthMethodNominalsSuccess :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    active_nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success' 
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            anm.nominal_id,
+            anm.nominal_name,
+            anm.payment_method
+        FROM all_months am
+        CROSS JOIN active_nominal_methods anm
+    ),
+    monthly_stats AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(ms.total_transactions, 0) AS total_transactions,
+    COALESCE(ms.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_stats ms ON 
+    ac.activity_month = ms.activity_month AND
+    ac.nominal_id = ms.nominal_id AND
+    ac.payment_method = ms.payment_method
+ORDER BY 
+    ac.activity_month,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetMonthMethodNominalsSuccessRow struct {
+	Month             string  `json:"month"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodNominalsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetMonthMethodNominalsSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodNominalsSuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodNominalsSuccessRow
+	for rows.Next() {
+		var i GetMonthMethodNominalsSuccessRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodNominalsSuccessById = `-- name: GetMonthMethodNominalsSuccessById :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND n.nominal_id = $2 
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            nm.nominal_id,
+            nm.nominal_name,
+            nm.payment_method
+        FROM all_months am
+        CROSS JOIN nominal_methods nm
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+            AND n.nominal_id = $2  
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_transactions mt ON 
+    ac.activity_month = mt.activity_month AND
+    ac.nominal_id = mt.nominal_id AND
+    ac.payment_method = mt.payment_method
+ORDER BY 
+    ac.activity_month,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetMonthMethodNominalsSuccessByIdParams struct {
+	Column1   time.Time `json:"column_1"`
+	NominalID int32     `json:"nominal_id"`
+}
+
+type GetMonthMethodNominalsSuccessByIdRow struct {
+	Month             string  `json:"month"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodNominalsSuccessById(ctx context.Context, arg GetMonthMethodNominalsSuccessByIdParams) ([]*GetMonthMethodNominalsSuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodNominalsSuccessById, arg.Column1, arg.NominalID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodNominalsSuccessByIdRow
+	for rows.Next() {
+		var i GetMonthMethodNominalsSuccessByIdRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodNominalsSuccessByMerchant = `-- name: GetMonthMethodNominalsSuccessByMerchant :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND n.nominal_id = $2
+            AND t.merchant_id = $3
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            nm.nominal_id,
+            nm.nominal_name,
+            nm.payment_method
+        FROM all_months am
+        CROSS JOIN nominal_methods nm
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+            AND n.nominal_id = $2
+            AND t.merchant_id = $3
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_transactions mt ON 
+    ac.activity_month = mt.activity_month AND
+    ac.nominal_id = mt.nominal_id AND
+    ac.payment_method = mt.payment_method
+ORDER BY 
+    ac.activity_month,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetMonthMethodNominalsSuccessByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	NominalID  int32         `json:"nominal_id"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthMethodNominalsSuccessByMerchantRow struct {
+	Month             string  `json:"month"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodNominalsSuccessByMerchant(ctx context.Context, arg GetMonthMethodNominalsSuccessByMerchantParams) ([]*GetMonthMethodNominalsSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodNominalsSuccessByMerchant, arg.Column1, arg.NominalID, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodNominalsSuccessByMerchantRow
+	for rows.Next() {
+		var i GetMonthMethodNominalsSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getNominalByID = `-- name: GetNominalByID :one
@@ -280,6 +1785,1304 @@ func (q *Queries) GetNominalsTrashed(ctx context.Context, arg GetNominalsTrashed
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.TotalCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountNominalsFailed = `-- name: GetYearAmountNominalsFailed :many
+WITH
+    active_nominals AS (
+        SELECT nominal_id, name AS nominal_name
+        FROM nominals
+        WHERE deleted_at IS NULL
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_nominal_combos AS (
+        SELECT
+            ry.year,
+            an.nominal_id,
+            an.nominal_name
+        FROM report_years ry
+        CROSS JOIN active_nominals an
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(n.price * n.quantity), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    ync.nominal_id,
+    ync.nominal_name,
+    ync.year::text,
+    COALESCE(yt.total_failed, 0) AS total_failed,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_nominal_combos ync
+LEFT JOIN yearly_transactions yt ON
+    ync.year = yt.year AND
+    ync.nominal_id = yt.nominal_id
+ORDER BY 
+    ync.nominal_name ASC,
+    ync.year DESC
+`
+
+type GetYearAmountNominalsFailedRow struct {
+	NominalID   int32  `json:"nominal_id"`
+	NominalName string `json:"nominal_name"`
+	YncYear     string `json:"ync_year"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountNominalsFailed(ctx context.Context, dollar_1 int32) ([]*GetYearAmountNominalsFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountNominalsFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountNominalsFailedRow
+	for rows.Next() {
+		var i GetYearAmountNominalsFailedRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.YncYear,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountNominalsFailedById = `-- name: GetYearAmountNominalsFailedById :many
+WITH
+    target_nominal AS (
+        SELECT nominal_id, name AS nominal_name
+        FROM nominals
+        WHERE 
+            deleted_at IS NULL
+            AND nominals.nominal_id = $2  
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_nominal_combos AS (
+        SELECT
+            ry.year,
+            tn.nominal_id,
+            tn.nominal_name
+        FROM report_years ry
+        CROSS JOIN target_nominal tn
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(n.price * n.quantity), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+            AND n.nominal_id = $2  
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    ync.nominal_id,
+    ync.nominal_name,
+    ync.year::text,
+    COALESCE(yt.total_failed, 0) AS total_failed,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_nominal_combos ync
+LEFT JOIN yearly_transactions yt ON
+    ync.year = yt.year AND
+    ync.nominal_id = yt.nominal_id
+ORDER BY 
+    ync.year DESC
+`
+
+type GetYearAmountNominalsFailedByIdParams struct {
+	Column1   int32 `json:"column_1"`
+	NominalID int32 `json:"nominal_id"`
+}
+
+type GetYearAmountNominalsFailedByIdRow struct {
+	NominalID   int32  `json:"nominal_id"`
+	NominalName string `json:"nominal_name"`
+	YncYear     string `json:"ync_year"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountNominalsFailedById(ctx context.Context, arg GetYearAmountNominalsFailedByIdParams) ([]*GetYearAmountNominalsFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountNominalsFailedById, arg.Column1, arg.NominalID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountNominalsFailedByIdRow
+	for rows.Next() {
+		var i GetYearAmountNominalsFailedByIdRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.YncYear,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountNominalsFailedByMerchant = `-- name: GetYearAmountNominalsFailedByMerchant :many
+WITH
+    target_nominals AS (
+        SELECT DISTINCT n.nominal_id, n.name AS nominal_name
+        FROM nominals n
+        JOIN transactions t ON t.nominal_id = n.nominal_id
+        WHERE 
+            n.deleted_at IS NULL
+            AND t.deleted_at IS NULL
+            AND t.merchant_id = $2
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT ($1::integer - 1) AS year
+    ),
+    year_nominal_combos AS (
+        SELECT
+            ry.year,
+            tn.nominal_id,
+            tn.nominal_name
+        FROM report_years ry
+        CROSS JOIN target_nominals tn
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.merchant_id = $2
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, ($1::integer - 1))
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    ync.nominal_id,
+    ync.nominal_name,
+    ync.year::text AS year,
+    COALESCE(yt.total_failed, 0) AS total_failed,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_nominal_combos ync
+LEFT JOIN yearly_transactions yt
+    ON ync.year = yt.year
+    AND ync.nominal_id = yt.nominal_id
+ORDER BY 
+    ync.year DESC
+`
+
+type GetYearAmountNominalsFailedByMerchantParams struct {
+	Column1    int32         `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearAmountNominalsFailedByMerchantRow struct {
+	NominalID   int32  `json:"nominal_id"`
+	NominalName string `json:"nominal_name"`
+	Year        string `json:"year"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountNominalsFailedByMerchant(ctx context.Context, arg GetYearAmountNominalsFailedByMerchantParams) ([]*GetYearAmountNominalsFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountNominalsFailedByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountNominalsFailedByMerchantRow
+	for rows.Next() {
+		var i GetYearAmountNominalsFailedByMerchantRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.Year,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountNominalsSuccess = `-- name: GetYearAmountNominalsSuccess :many
+WITH
+    active_nominals AS (
+        SELECT nominal_id, name AS nominal_name
+        FROM nominals
+        WHERE deleted_at IS NULL
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_nominal_combos AS (
+        SELECT
+            ry.year,
+            an.nominal_id,
+            an.nominal_name
+        FROM report_years ry
+        CROSS JOIN active_nominals an
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(n.price * n.quantity), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    ync.nominal_id,
+    ync.nominal_name,
+    ync.year::text,
+    COALESCE(yt.total_success, 0) AS total_success,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_nominal_combos ync
+LEFT JOIN yearly_transactions yt ON
+    ync.year = yt.year AND
+    ync.nominal_id = yt.nominal_id
+ORDER BY 
+    ync.nominal_name ASC,
+    ync.year DESC
+`
+
+type GetYearAmountNominalsSuccessRow struct {
+	NominalID    int32  `json:"nominal_id"`
+	NominalName  string `json:"nominal_name"`
+	YncYear      string `json:"ync_year"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountNominalsSuccess(ctx context.Context, dollar_1 int32) ([]*GetYearAmountNominalsSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountNominalsSuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountNominalsSuccessRow
+	for rows.Next() {
+		var i GetYearAmountNominalsSuccessRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.YncYear,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountNominalsSuccessById = `-- name: GetYearAmountNominalsSuccessById :many
+WITH
+    target_nominal AS (
+        SELECT nominal_id, name AS nominal_name
+        FROM nominals
+        WHERE 
+            deleted_at IS NULL
+            AND nominals.nominal_id = $2  
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_nominal_combos AS (
+        SELECT
+            ry.year,
+            tn.nominal_id,
+            tn.nominal_name
+        FROM report_years ry
+        CROSS JOIN target_nominal tn
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(n.price * n.quantity), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+            AND n.nominal_id = $2 
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    ync.nominal_id,
+    ync.nominal_name,
+    ync.year::text,
+    COALESCE(yt.total_success, 0) AS total_success,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_nominal_combos ync
+LEFT JOIN yearly_transactions yt ON
+    ync.year = yt.year AND
+    ync.nominal_id = yt.nominal_id
+ORDER BY 
+    ync.year DESC
+`
+
+type GetYearAmountNominalsSuccessByIdParams struct {
+	Column1   int32 `json:"column_1"`
+	NominalID int32 `json:"nominal_id"`
+}
+
+type GetYearAmountNominalsSuccessByIdRow struct {
+	NominalID    int32  `json:"nominal_id"`
+	NominalName  string `json:"nominal_name"`
+	YncYear      string `json:"ync_year"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountNominalsSuccessById(ctx context.Context, arg GetYearAmountNominalsSuccessByIdParams) ([]*GetYearAmountNominalsSuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountNominalsSuccessById, arg.Column1, arg.NominalID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountNominalsSuccessByIdRow
+	for rows.Next() {
+		var i GetYearAmountNominalsSuccessByIdRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.YncYear,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountNominalsSuccessByMerchant = `-- name: GetYearAmountNominalsSuccessByMerchant :many
+WITH
+    target_nominals AS (
+        SELECT DISTINCT n.nominal_id, n.name AS nominal_name
+        FROM nominals n
+        JOIN transactions t ON t.nominal_id = n.nominal_id
+        WHERE 
+            n.deleted_at IS NULL
+            AND t.deleted_at IS NULL
+            AND t.merchant_id = $2
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT ($1::integer - 1) AS year
+    ),
+    year_nominal_combos AS (
+        SELECT
+            ry.year,
+            tn.nominal_id,
+            tn.nominal_name
+        FROM report_years ry
+        CROSS JOIN target_nominals tn
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.merchant_id = $2
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, ($1::integer - 1))
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name
+    )
+SELECT
+    ync.nominal_id,
+    ync.nominal_name,
+    ync.year::text AS year,
+    COALESCE(yt.total_success, 0) AS total_success,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_nominal_combos ync
+LEFT JOIN yearly_transactions yt
+    ON ync.year = yt.year
+    AND ync.nominal_id = yt.nominal_id
+ORDER BY 
+    ync.year DESC
+`
+
+type GetYearAmountNominalsSuccessByMerchantParams struct {
+	Column1    int32         `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearAmountNominalsSuccessByMerchantRow struct {
+	NominalID    int32  `json:"nominal_id"`
+	NominalName  string `json:"nominal_name"`
+	Year         string `json:"year"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountNominalsSuccessByMerchant(ctx context.Context, arg GetYearAmountNominalsSuccessByMerchantParams) ([]*GetYearAmountNominalsSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountNominalsSuccessByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountNominalsSuccessByMerchantRow
+	for rows.Next() {
+		var i GetYearAmountNominalsSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.NominalID,
+			&i.NominalName,
+			&i.Year,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodNominalsFailed = `-- name: GetYearMethodNominalsFailed :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    active_nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'  
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            anm.nominal_id,
+            anm.nominal_name,
+            anm.payment_method
+        FROM all_years ay
+        CROSS JOIN active_nominal_methods anm
+    ),
+    yearly_stats AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(ys.total_transactions, 0) AS total_transactions,
+    COALESCE(ys.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_stats ys ON 
+    ac.year = ys.year AND
+    ac.nominal_id = ys.nominal_id AND
+    ac.payment_method = ys.payment_method
+ORDER BY 
+    ac.year DESC,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetYearMethodNominalsFailedRow struct {
+	Year              string  `json:"year"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodNominalsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetYearMethodNominalsFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodNominalsFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodNominalsFailedRow
+	for rows.Next() {
+		var i GetYearMethodNominalsFailedRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodNominalsFailedById = `-- name: GetYearMethodNominalsFailedById :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND n.nominal_id = $2 
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            nm.nominal_id,
+            nm.nominal_name,
+            nm.payment_method
+        FROM all_years ay
+        CROSS JOIN nominal_methods nm
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND n.nominal_id = $2 
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_transactions yt ON 
+    ac.year = yt.year AND
+    ac.nominal_id = yt.nominal_id AND
+    ac.payment_method = yt.payment_method
+ORDER BY 
+    ac.year DESC,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetYearMethodNominalsFailedByIdParams struct {
+	Column1   time.Time `json:"column_1"`
+	NominalID int32     `json:"nominal_id"`
+}
+
+type GetYearMethodNominalsFailedByIdRow struct {
+	Year              string  `json:"year"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodNominalsFailedById(ctx context.Context, arg GetYearMethodNominalsFailedByIdParams) ([]*GetYearMethodNominalsFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodNominalsFailedById, arg.Column1, arg.NominalID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodNominalsFailedByIdRow
+	for rows.Next() {
+		var i GetYearMethodNominalsFailedByIdRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodNominalsFailedByMerchant = `-- name: GetYearMethodNominalsFailedByMerchant :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND n.nominal_id = $2
+            AND t.merchant_id = $3
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            nm.nominal_id,
+            nm.nominal_name,
+            nm.payment_method
+        FROM all_years ay
+        CROSS JOIN nominal_methods nm
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND n.nominal_id = $2
+            AND t.merchant_id = $3
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_transactions yt ON 
+    ac.year = yt.year AND
+    ac.nominal_id = yt.nominal_id AND
+    ac.payment_method = yt.payment_method
+ORDER BY 
+    ac.year DESC,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetYearMethodNominalsFailedByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	NominalID  int32         `json:"nominal_id"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearMethodNominalsFailedByMerchantRow struct {
+	Year              string  `json:"year"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodNominalsFailedByMerchant(ctx context.Context, arg GetYearMethodNominalsFailedByMerchantParams) ([]*GetYearMethodNominalsFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodNominalsFailedByMerchant, arg.Column1, arg.NominalID, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodNominalsFailedByMerchantRow
+	for rows.Next() {
+		var i GetYearMethodNominalsFailedByMerchantRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodNominalsSuccess = `-- name: GetYearMethodNominalsSuccess :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    active_nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'  
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            anm.nominal_id,
+            anm.nominal_name,
+            anm.payment_method
+        FROM all_years ay
+        CROSS JOIN active_nominal_methods anm
+    ),
+    yearly_stats AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id 
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(ys.total_transactions, 0) AS total_transactions,
+    COALESCE(ys.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_stats ys ON 
+    ac.year = ys.year AND
+    ac.nominal_id = ys.nominal_id AND
+    ac.payment_method = ys.payment_method
+ORDER BY 
+    ac.year DESC,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetYearMethodNominalsSuccessRow struct {
+	Year              string  `json:"year"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodNominalsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetYearMethodNominalsSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodNominalsSuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodNominalsSuccessRow
+	for rows.Next() {
+		var i GetYearMethodNominalsSuccessRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodNominalsSuccessById = `-- name: GetYearMethodNominalsSuccessById :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND n.nominal_id = $2 
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            nm.nominal_id,
+            nm.nominal_name,
+            nm.payment_method
+        FROM all_years ay
+        CROSS JOIN nominal_methods nm
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+            AND n.nominal_id = $2 
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_transactions yt ON 
+    ac.year = yt.year AND
+    ac.nominal_id = yt.nominal_id AND
+    ac.payment_method = yt.payment_method
+ORDER BY 
+    ac.year DESC,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetYearMethodNominalsSuccessByIdParams struct {
+	Column1   time.Time `json:"column_1"`
+	NominalID int32     `json:"nominal_id"`
+}
+
+type GetYearMethodNominalsSuccessByIdRow struct {
+	Year              string  `json:"year"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodNominalsSuccessById(ctx context.Context, arg GetYearMethodNominalsSuccessByIdParams) ([]*GetYearMethodNominalsSuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodNominalsSuccessById, arg.Column1, arg.NominalID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodNominalsSuccessByIdRow
+	for rows.Next() {
+		var i GetYearMethodNominalsSuccessByIdRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodNominalsSuccessByMerchant = `-- name: GetYearMethodNominalsSuccessByMerchant :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    nominal_methods AS (
+        SELECT DISTINCT
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND n.nominal_id = $2
+            AND t.merchant_id = $3
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            nm.nominal_id,
+            nm.nominal_name,
+            nm.payment_method
+        FROM all_years ay
+        CROSS JOIN nominal_methods nm
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            n.nominal_id,
+            n.name AS nominal_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(n.price * n.quantity), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN nominals n ON t.nominal_id = n.nominal_id  
+        WHERE
+            t.deleted_at IS NULL
+            AND n.deleted_at IS NULL
+            AND t.status = 'success'
+            AND n.nominal_id = $2
+            AND t.merchant_id = $3
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            n.nominal_id,
+            n.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.nominal_id,
+    ac.nominal_name,
+    ac.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_transactions yt ON 
+    ac.year = yt.year AND
+    ac.nominal_id = yt.nominal_id AND
+    ac.payment_method = yt.payment_method
+ORDER BY 
+    ac.year DESC,
+    ac.nominal_name,
+    ac.payment_method
+`
+
+type GetYearMethodNominalsSuccessByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	NominalID  int32         `json:"nominal_id"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearMethodNominalsSuccessByMerchantRow struct {
+	Year              string  `json:"year"`
+	NominalID         int32   `json:"nominal_id"`
+	NominalName       string  `json:"nominal_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodNominalsSuccessByMerchant(ctx context.Context, arg GetYearMethodNominalsSuccessByMerchantParams) ([]*GetYearMethodNominalsSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodNominalsSuccessByMerchant, arg.Column1, arg.NominalID, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodNominalsSuccessByMerchantRow
+	for rows.Next() {
+		var i GetYearMethodNominalsSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.NominalID,
+			&i.NominalName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
 		); err != nil {
 			return nil, err
 		}

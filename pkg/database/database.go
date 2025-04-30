@@ -6,6 +6,7 @@ import (
 	"time"
 	"topup_game/pkg/logger"
 
+	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )

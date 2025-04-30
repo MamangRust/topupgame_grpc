@@ -1,381 +1,4 @@
 definitions:
-  pb.ApiResponseBank:
-    properties:
-      data:
-        $ref: '#/definitions/pb.BankResponse'
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseBankAll:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseBankDelete:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseCategory:
-    properties:
-      data:
-        $ref: '#/definitions/pb.CategoryResponse'
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseCategoryAll:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseCategoryDelete:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseGetMe:
-    properties:
-      data:
-        $ref: '#/definitions/pb.UserResponse'
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseLogin:
-    properties:
-      data:
-        $ref: '#/definitions/pb.TokenResponse'
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseNominal:
-    properties:
-      data:
-        $ref: '#/definitions/pb.NominalResponse'
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseNominalAll:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseNominalDelete:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponsePaginationRole:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/pb.RoleResponse'
-        type: array
-      message:
-        type: string
-      pagination:
-        $ref: '#/definitions/pb.PaginationMeta'
-      status:
-        type: string
-    type: object
-  pb.ApiResponsePaginationRoleDeleteAt:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/pb.RoleResponseDeleteAt'
-        type: array
-      message:
-        type: string
-      pagination:
-        $ref: '#/definitions/pb.PaginationMeta'
-      status:
-        type: string
-    type: object
-  pb.ApiResponseRefreshToken:
-    properties:
-      data:
-        $ref: '#/definitions/pb.TokenResponse'
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseRegister:
-    properties:
-      data:
-        $ref: '#/definitions/pb.UserResponse'
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseRole:
-    properties:
-      data:
-        $ref: '#/definitions/pb.RoleResponse'
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseRoleAll:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseTransaction:
-    properties:
-      data:
-        $ref: '#/definitions/pb.TransactionResponse'
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseTransactionAll:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseTransactionDelete:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseUser:
-    properties:
-      data:
-        $ref: '#/definitions/pb.UserResponse'
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseUserAll:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseUserDelete:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseVoucher:
-    properties:
-      data:
-        $ref: '#/definitions/pb.VoucherResponse'
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseVoucherAll:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponseVoucherDelete:
-    properties:
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.ApiResponsesUser:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/pb.UserResponse'
-        type: array
-      message:
-        type: string
-      status:
-        type: string
-    type: object
-  pb.BankResponse:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  pb.CategoryResponse:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  pb.CreateRoleRequest:
-    properties:
-      name:
-        type: string
-    type: object
-  pb.NominalResponse:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      price:
-        type: number
-      quantity:
-        type: integer
-      updated_at:
-        type: string
-    type: object
-  pb.PaginationMeta:
-    properties:
-      current_page:
-        type: integer
-      page_size:
-        type: integer
-      total_pages:
-        type: integer
-      total_records:
-        type: integer
-    type: object
-  pb.RoleResponse:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  pb.RoleResponseDeleteAt:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  pb.TokenResponse:
-    properties:
-      access_token:
-        type: string
-      refresh_token:
-        type: string
-    type: object
-  pb.TransactionResponse:
-    properties:
-      bank_id:
-        type: integer
-      category_id:
-        type: integer
-      created_at:
-        type: string
-      id:
-        type: integer
-      merchant_id:
-        type: integer
-      nominal_id:
-        type: integer
-      payment_method:
-        type: string
-      status:
-        type: string
-      tax_rate:
-        type: string
-      updated_at:
-        type: string
-      user_id:
-        type: integer
-      voucher_id:
-        type: integer
-    type: object
-  pb.UpdateRoleRequest:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  pb.UserResponse:
-    properties:
-      created_at:
-        type: string
-      email:
-        type: string
-      firstname:
-        type: string
-      id:
-        type: integer
-      lastname:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  pb.VoucherResponse:
-    properties:
-      category_id:
-        type: integer
-      created_at:
-        type: string
-      id:
-        type: integer
-      image_name:
-        type: string
-      merchant_id:
-        type: integer
-      name:
-        type: string
-      updated_at:
-        type: string
-    type: object
   requests.AuthRequest:
     properties:
       email:
@@ -445,8 +68,17 @@ definitions:
     - quantity
     - voucher_id
     type: object
+  requests.CreateRoleRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
   requests.CreateTransactionRequest:
     properties:
+      amount:
+        type: integer
       bank_id:
         minimum: 1
         type: integer
@@ -493,24 +125,6 @@ definitions:
     - firstname
     - lastname
     - password
-    type: object
-  requests.CreateVoucherRequest:
-    properties:
-      category_id:
-        minimum: 1
-        type: integer
-      image_name:
-        type: string
-      merchant_id:
-        minimum: 1
-        type: integer
-      name:
-        type: string
-    required:
-    - category_id
-    - image_name
-    - merchant_id
-    - name
     type: object
   requests.RefreshTokenRequest:
     properties:
@@ -587,8 +201,21 @@ definitions:
     required:
     - id
     type: object
+  requests.UpdateRoleRequest:
+    properties:
+      id:
+        minimum: 1
+        type: integer
+      name:
+        type: string
+    required:
+    - id
+    - name
+    type: object
   requests.UpdateTransactionRequest:
     properties:
+      amount:
+        type: integer
       bank_id:
         minimum: 1
         type: integer
@@ -641,28 +268,24 @@ definitions:
     - password
     - user_id
     type: object
-  requests.UpdateVoucherRequest:
-    properties:
-      category_id:
-        minimum: 1
-        type: integer
-      id:
-        minimum: 1
-        type: integer
-      image_name:
-        type: string
-      merchant_id:
-        minimum: 1
-        type: integer
-      name:
-        type: string
-    required:
-    - id
-    type: object
   response.ApiResponseBank:
     properties:
       data:
         $ref: '#/definitions/response.BankResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseBankAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseBankDelete:
+    properties:
       message:
         type: string
       status:
@@ -677,10 +300,90 @@ definitions:
       status:
         type: string
     type: object
+  response.ApiResponseBankMonthAmountFailed:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthAmountBankFailedResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseBankMonthAmountSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthAmountBankSuccessResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseBankMonthMethod:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthMethodBankResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseBankYearAmountFailed:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearAmountBankFailedResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseBankYearAmountSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearAmountBankSuccessResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseBankYearMethod:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearMethodBankResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   response.ApiResponseCategory:
     properties:
       data:
         $ref: '#/definitions/response.CategoryResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseCategoryAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseCategoryDelete:
+    properties:
       message:
         type: string
       status:
@@ -691,6 +394,90 @@ definitions:
       data:
         $ref: '#/definitions/response.CategoryResponseDeleteAt'
       message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseCategoryMonthAmountFailed:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthAmountCategoryFailedResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseCategoryMonthAmountSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthAmountCategorySuccessResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseCategoryMonthMethod:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthMethodCategoryResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseCategoryYearAmountFailed:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearAmountCategoryFailedResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseCategoryYearAmountSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearAmountCategorySuccessResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseCategoryYearMethod:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearMethodCategoryResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseGetMe:
+    properties:
+      data:
+        $ref: '#/definitions/response.UserResponse'
+      messsage:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseLogin:
+    properties:
+      data:
+        $ref: '#/definitions/response.TokenResponse'
+      messsage:
         type: string
       status:
         type: string
@@ -736,10 +523,90 @@ definitions:
       status:
         type: string
     type: object
+  response.ApiResponseNominalAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseNominalDelete:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   response.ApiResponseNominalDeleteAt:
     properties:
       data:
         $ref: '#/definitions/response.NominalResponseDeleteAt'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseNominalMonthAmountFailed:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthAmountNominalFailedResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseNominalMonthAmountSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthAmountNominalSuccessResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseNominalMonthMethod:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthMethodNominalResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseNominalYearAmountFailed:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearAmountNominalFailedResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseNominalYearAmountSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearAmountNominalSuccessResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseNominalYearMethod:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearMethodNominalResponse'
+        type: array
       message:
         type: string
       status:
@@ -810,6 +677,19 @@ definitions:
       status:
         type: string
     type: object
+  response.ApiResponsePaginationMerchantDeleteAt:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MerchantResponseDeleteAt'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
   response.ApiResponsePaginationNominal:
     properties:
       data:
@@ -828,6 +708,32 @@ definitions:
       data:
         items:
           $ref: '#/definitions/response.NominalResponseDeleteAt'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationRole:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.RoleResponse'
+        type: array
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/response.PaginationMeta'
+      status:
+        type: string
+    type: object
+  response.ApiResponsePaginationRoleDeleteAt:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.RoleResponseDeleteAt'
         type: array
       message:
         type: string
@@ -914,10 +820,58 @@ definitions:
       status:
         type: string
     type: object
+  response.ApiResponseRefreshToken:
+    properties:
+      data:
+        $ref: '#/definitions/response.TokenResponse'
+      messsage:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseRegister:
+    properties:
+      data:
+        $ref: '#/definitions/response.UserResponse'
+      messsage:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseRole:
+    properties:
+      data:
+        $ref: '#/definitions/response.RoleResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseRoleAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   response.ApiResponseTransaction:
     properties:
       data:
         $ref: '#/definitions/response.TransactionResponse'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseTransactionAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseTransactionDelete:
+    properties:
       message:
         type: string
       status:
@@ -941,6 +895,20 @@ definitions:
       status:
         type: string
     type: object
+  response.ApiResponseUserAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseUserDelete:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   response.ApiResponseUserDeleteAt:
     properties:
       data:
@@ -959,10 +927,156 @@ definitions:
       status:
         type: string
     type: object
+  response.ApiResponseVoucherAll:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponseVoucherDelete:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   response.ApiResponseVoucherDeleteAt:
     properties:
       data:
         $ref: '#/definitions/response.VoucherResponseDeleteAt'
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesTransactionMonthFailed:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthAmountTransactionFailedResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesTransactionMonthMethod:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthMethodTransactionResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesTransactionMonthSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthAmountTransactionSuccessResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesTransactionYearFailed:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearAmountTransactionFailedResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesTransactionYearMethod:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearMethodTransactionResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesTransactionYearSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearAmountTransactionSuccessResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesVoucherMonthFailed:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthAmountVoucherFailedResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesVoucherMonthMethod:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthMethodVoucherResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesVoucherMonthSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.MonthAmountVoucherSuccessResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesVoucherYearFailed:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearAmountVoucherFailedResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesVoucherYearMethod:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearMethodVoucherResponse'
+        type: array
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  response.ApiResponsesVoucherYearSuccess:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.YearAmountVoucherSuccessResponse'
+        type: array
       message:
         type: string
       status:
@@ -1018,6 +1132,8 @@ definitions:
     type: object
   response.ErrorResponse:
     properties:
+      code:
+        type: integer
       message:
         type: string
       status:
@@ -1071,6 +1187,219 @@ definitions:
       user_id:
         type: integer
     type: object
+  response.MonthAmountBankFailedResponse:
+    properties:
+      bank_name:
+        type: string
+      id:
+        type: integer
+      month:
+        type: string
+      total_amount:
+        type: integer
+      total_failed:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.MonthAmountBankSuccessResponse:
+    properties:
+      bank_name:
+        type: string
+      id:
+        type: integer
+      month:
+        type: string
+      total_amount:
+        type: integer
+      total_success:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.MonthAmountCategoryFailedResponse:
+    properties:
+      category_name:
+        type: string
+      id:
+        type: integer
+      month:
+        type: string
+      total_amount:
+        type: integer
+      total_failed:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.MonthAmountCategorySuccessResponse:
+    properties:
+      category_name:
+        type: string
+      id:
+        type: integer
+      month:
+        type: string
+      total_amount:
+        type: integer
+      total_success:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.MonthAmountNominalFailedResponse:
+    properties:
+      id:
+        type: integer
+      month:
+        type: string
+      nominal_name:
+        type: string
+      total_amount:
+        type: integer
+      total_failed:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.MonthAmountNominalSuccessResponse:
+    properties:
+      id:
+        type: integer
+      mnc_year:
+        type: string
+      month:
+        type: string
+      nominal_name:
+        type: string
+      total_amount:
+        type: integer
+      total_success:
+        type: integer
+    type: object
+  response.MonthAmountTransactionFailedResponse:
+    properties:
+      month:
+        type: string
+      total_amount:
+        type: integer
+      total_failed:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.MonthAmountTransactionSuccessResponse:
+    properties:
+      month:
+        type: string
+      total_amount:
+        type: integer
+      total_success:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.MonthAmountVoucherFailedResponse:
+    properties:
+      id:
+        type: integer
+      month:
+        type: string
+      total_amount:
+        type: integer
+      total_failed:
+        type: integer
+      voucher_name:
+        type: string
+      year:
+        type: string
+    type: object
+  response.MonthAmountVoucherSuccessResponse:
+    properties:
+      id:
+        type: integer
+      month:
+        type: string
+      total_amount:
+        type: integer
+      total_success:
+        type: integer
+      voucher_name:
+        type: string
+      year:
+        type: string
+    type: object
+  response.MonthMethodBankResponse:
+    properties:
+      bank_name:
+        type: string
+      id:
+        type: integer
+      month:
+        type: string
+      payment_method:
+        type: string
+      total_amount:
+        type: integer
+      total_transactions:
+        type: integer
+    type: object
+  response.MonthMethodCategoryResponse:
+    properties:
+      category_name:
+        type: string
+      id:
+        type: integer
+      month:
+        type: string
+      payment_method:
+        type: string
+      total_amount:
+        type: integer
+      total_transactions:
+        type: integer
+    type: object
+  response.MonthMethodNominalResponse:
+    properties:
+      id:
+        type: integer
+      month:
+        type: string
+      nominal_name:
+        type: string
+      payment_method:
+        type: string
+      total_amount:
+        type: integer
+      total_transactions:
+        type: integer
+    type: object
+  response.MonthMethodTransactionResponse:
+    properties:
+      month:
+        type: string
+      payment_method:
+        type: string
+      total_amount:
+        type: integer
+      total_transactions:
+        type: integer
+    type: object
+  response.MonthMethodVoucherResponse:
+    properties:
+      id:
+        type: integer
+      month:
+        type: string
+      payment_method:
+        type: string
+      total_amount:
+        type: integer
+      total_transactions:
+        type: integer
+      voucher_name:
+        type: string
+    type: object
   response.NominalResponse:
     properties:
       created_at:
@@ -1119,6 +1448,37 @@ definitions:
         type: integer
       total_records:
         type: integer
+    type: object
+  response.RoleResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.RoleResponseDeleteAt:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
     type: object
   response.TransactionResponse:
     properties:
@@ -1242,9 +1602,215 @@ definitions:
       updated_at:
         type: string
     type: object
+  response.YearAmountBankFailedResponse:
+    properties:
+      bank_name:
+        type: string
+      id:
+        type: integer
+      total_amount:
+        type: integer
+      total_failed:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearAmountBankSuccessResponse:
+    properties:
+      bank_name:
+        type: string
+      id:
+        type: integer
+      total_amount:
+        type: integer
+      total_success:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearAmountCategoryFailedResponse:
+    properties:
+      category_name:
+        type: string
+      id:
+        type: integer
+      total_amount:
+        type: integer
+      total_failed:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearAmountCategorySuccessResponse:
+    properties:
+      category_name:
+        type: string
+      id:
+        type: integer
+      total_amount:
+        type: integer
+      total_success:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearAmountNominalFailedResponse:
+    properties:
+      id:
+        type: integer
+      nominal_name:
+        type: string
+      total_amount:
+        type: integer
+      total_failed:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearAmountNominalSuccessResponse:
+    properties:
+      id:
+        type: integer
+      nominal_name:
+        type: string
+      total_amount:
+        type: integer
+      total_success:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearAmountTransactionFailedResponse:
+    properties:
+      total_amount:
+        type: integer
+      total_failed:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearAmountTransactionSuccessResponse:
+    properties:
+      total_amount:
+        type: integer
+      total_success:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearAmountVoucherFailedResponse:
+    properties:
+      id:
+        type: integer
+      total_amount:
+        type: integer
+      total_failed:
+        type: integer
+      voucher_name:
+        type: string
+      year:
+        type: string
+    type: object
+  response.YearAmountVoucherSuccessResponse:
+    properties:
+      id:
+        type: integer
+      total_amount:
+        type: integer
+      total_success:
+        type: integer
+      voucher_name:
+        type: string
+      year:
+        type: string
+    type: object
+  response.YearMethodBankResponse:
+    properties:
+      bank_name:
+        type: string
+      id:
+        type: integer
+      payment_method:
+        type: string
+      total_amount:
+        type: integer
+      total_transactions:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearMethodCategoryResponse:
+    properties:
+      category_name:
+        type: string
+      id:
+        type: integer
+      payment_method:
+        type: string
+      total_amount:
+        type: integer
+      total_transactions:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearMethodNominalResponse:
+    properties:
+      id:
+        type: integer
+      nominal_name:
+        type: string
+      payment_method:
+        type: string
+      total_amount:
+        type: integer
+      total_transactions:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearMethodTransactionResponse:
+    properties:
+      payment_method:
+        type: string
+      total_amount:
+        type: integer
+      total_transactions:
+        type: integer
+      year:
+        type: string
+    type: object
+  response.YearMethodVoucherResponse:
+    properties:
+      id:
+        type: integer
+      payment_method:
+        type: string
+      total_amount:
+        type: integer
+      total_transactions:
+        type: integer
+      voucher_name:
+        type: string
+      year:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
+  /api/auth/hello:
+    get:
+      description: Returns a simple "Hello" message for testing purposes.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Hello
+          schema:
+            type: string
+      summary: Returns a "Hello" message
+      tags:
+      - Auth
   /api/auth/login:
     post:
       consumes:
@@ -1263,7 +1829,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/pb.ApiResponseLogin'
+            $ref: '#/definitions/response.ApiResponseLogin'
         "400":
           description: Bad Request
           schema:
@@ -1285,7 +1851,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/pb.ApiResponseGetMe'
+            $ref: '#/definitions/response.ApiResponseGetMe'
         "401":
           description: Unauthorized
           schema:
@@ -1318,7 +1884,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/pb.ApiResponseRefreshToken'
+            $ref: '#/definitions/response.ApiResponseRefreshToken'
         "400":
           description: Bad Request
           schema:
@@ -1350,7 +1916,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/pb.ApiResponseRegister'
+            $ref: '#/definitions/response.ApiResponseRegister'
         "400":
           description: Bad Request
           schema:
@@ -1415,7 +1981,7 @@ paths:
         "200":
           description: Bank data
           schema:
-            $ref: '#/definitions/pb.ApiResponseBank'
+            $ref: '#/definitions/response.ApiResponseBank'
         "400":
           description: Invalid bank ID
           schema:
@@ -1514,7 +2080,7 @@ paths:
         "200":
           description: Successfully deleted bank record permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseBankDelete'
+            $ref: '#/definitions/response.ApiResponseBankDelete'
         "400":
           description: 'Bad Request: Invalid ID'
           schema:
@@ -1539,7 +2105,7 @@ paths:
         "200":
           description: Successfully deleted all bank records permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseBankDelete'
+            $ref: '#/definitions/response.ApiResponseBankDelete'
         "500":
           description: Failed to delete banks
           schema:
@@ -1547,6 +2113,736 @@ paths:
       security:
       - Bearer: []
       summary: Permanently delete all trashed banks
+      tags:
+      - Bank
+  /api/bank/merchant/monthly-amount-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank failed amounts by merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthAmountFailed'
+        "400":
+          description: Invalid merchant ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank failed amounts by merchant
+      tags:
+      - Bank
+  /api/bank/merchant/monthly-amount-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank success amounts by merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthAmountSuccess'
+        "400":
+          description: Invalid merchant ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank success amounts by merchant
+      tags:
+      - Bank
+  /api/bank/merchant/monthly-method-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank failed methods by merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank failed methods by merchant
+      tags:
+      - Bank
+  /api/bank/merchant/monthly-method-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank success methods by merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank success methods by merchant
+      tags:
+      - Bank
+  /api/bank/merchant/yearly-amount-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank failed amounts by merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearAmountFailed'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank failed amounts by merchant
+      tags:
+      - Bank
+  /api/bank/merchant/yearly-amount-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank success amounts by merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearAmountSuccess'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank success amounts by merchant
+      tags:
+      - Bank
+  /api/bank/merchant/yearly-method-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank failed methods by merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank failed methods by merchant
+      tags:
+      - Bank
+  /api/bank/merchant/yearly-method-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank success methods by merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank success methods by merchant
+      tags:
+      - Bank
+  /api/bank/monthly-amount-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank failed amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthAmountFailed'
+        "400":
+          description: Invalid year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank failed amounts
+      tags:
+      - Bank
+  /api/bank/monthly-amount-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank success amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthAmountSuccess'
+        "400":
+          description: Invalid year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank success amounts
+      tags:
+      - Bank
+  /api/bank/monthly-method-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank failed methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank failed methods
+      tags:
+      - Bank
+  /api/bank/monthly-method-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank success methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank success methods
+      tags:
+      - Bank
+  /api/bank/mycategory/monthly-amount-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank failed amounts by bank ID
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthAmountFailed'
+        "400":
+          description: Invalid bank ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank failed amounts by ID
+      tags:
+      - Bank
+  /api/bank/mycategory/monthly-amount-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank success amounts by bank ID
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthAmountSuccess'
+        "400":
+          description: Invalid bank ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank success amounts by ID
+      tags:
+      - Bank
+  /api/bank/mycategory/monthly-method-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank failed methods by bank ID
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthMethod'
+        "400":
+          description: Invalid bank ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank failed methods by ID
+      tags:
+      - Bank
+  /api/bank/mycategory/monthly-method-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly bank success methods by bank ID
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankMonthMethod'
+        "400":
+          description: Invalid bank ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly bank success methods by ID
+      tags:
+      - Bank
+  /api/bank/mycategory/yearly-amount-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank failed amounts by bank ID
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearAmountFailed'
+        "400":
+          description: Invalid bank ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank failed amounts by ID
+      tags:
+      - Bank
+  /api/bank/mycategory/yearly-amount-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank success amounts by bank ID
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearAmountSuccess'
+        "400":
+          description: Invalid bank ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank success amounts by ID
+      tags:
+      - Bank
+  /api/bank/mycategory/yearly-method-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank failed methods by bank ID
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearMethod'
+        "400":
+          description: Invalid bank ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank failed methods by ID
+      tags:
+      - Bank
+  /api/bank/mycategory/yearly-method-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank success methods by bank ID
+      parameters:
+      - description: Bank ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearMethod'
+        "400":
+          description: Invalid bank ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank success methods by ID
       tags:
       - Bank
   /api/bank/restore/{id}:
@@ -1591,7 +2887,7 @@ paths:
         "200":
           description: Successfully restored all banks
           schema:
-            $ref: '#/definitions/pb.ApiResponseBankAll'
+            $ref: '#/definitions/response.ApiResponseBankAll'
         "500":
           description: Failed to restore banks
           schema:
@@ -1705,6 +3001,130 @@ paths:
       summary: Update an existing bank
       tags:
       - Bank
+  /api/bank/yearly-amount-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank failed amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearAmountFailed'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank failed amounts
+      tags:
+      - Bank
+  /api/bank/yearly-amount-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank success amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearAmountSuccess'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank success amounts
+      tags:
+      - Bank
+  /api/bank/yearly-method-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank failed methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank failed methods
+      tags:
+      - Bank
+  /api/bank/yearly-method-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly bank success methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseBankYearMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly bank success methods
+      tags:
+      - Bank
   /api/category:
     get:
       consumes:
@@ -1758,7 +3178,7 @@ paths:
         "200":
           description: Category data
           schema:
-            $ref: '#/definitions/pb.ApiResponseCategory'
+            $ref: '#/definitions/response.ApiResponseCategory'
         "400":
           description: Invalid Category ID
           schema:
@@ -1857,7 +3277,7 @@ paths:
         "200":
           description: Successfully deleted Category record permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseCategoryDelete'
+            $ref: '#/definitions/response.ApiResponseCategoryDelete'
         "400":
           description: 'Bad Request: Invalid ID'
           schema:
@@ -1882,7 +3302,7 @@ paths:
         "200":
           description: Successfully deleted all Category records permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseCategoryDelete'
+            $ref: '#/definitions/response.ApiResponseCategoryDelete'
         "500":
           description: Failed to delete Categorys
           schema:
@@ -1890,6 +3310,736 @@ paths:
       security:
       - Bearer: []
       summary: Permanently delete all trashed Categorys
+      tags:
+      - Category
+  /api/category/merchant/monthly-amount-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category failed amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthAmountFailed'
+        "400":
+          description: Invalid merchant ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category failed amounts by merchant
+      tags:
+      - Category
+  /api/category/merchant/monthly-amount-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category success amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthAmountSuccess'
+        "400":
+          description: Invalid merchant ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category success amounts by merchant
+      tags:
+      - Category
+  /api/category/merchant/monthly-method-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category failed methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category failed methods by merchant
+      tags:
+      - Category
+  /api/category/merchant/monthly-method-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category success methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category success methods by merchant
+      tags:
+      - Category
+  /api/category/merchant/yearly-amount-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category failed amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearAmountFailed'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category failed amounts by merchant
+      tags:
+      - Category
+  /api/category/merchant/yearly-amount-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category success amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearAmountSuccess'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category success amounts by merchant
+      tags:
+      - Category
+  /api/category/merchant/yearly-method-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category failed methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category failed methods by merchant
+      tags:
+      - Category
+  /api/category/merchant/yearly-method-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category success methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category success methods by merchant
+      tags:
+      - Category
+  /api/category/monthly-amount-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category failed amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthAmountFailed'
+        "400":
+          description: Invalid year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category failed amounts
+      tags:
+      - Category
+  /api/category/monthly-amount-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category success amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthAmountSuccess'
+        "400":
+          description: Invalid year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category success amounts
+      tags:
+      - Category
+  /api/category/monthly-method-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category failed methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category failed methods
+      tags:
+      - Category
+  /api/category/monthly-method-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category success methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category success methods
+      tags:
+      - Category
+  /api/category/mycategory/monthly-amount-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category failed amounts by category ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthAmountFailed'
+        "400":
+          description: Invalid category ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category failed amounts by ID
+      tags:
+      - Category
+  /api/category/mycategory/monthly-amount-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category success amounts by category ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthAmountSuccess'
+        "400":
+          description: Invalid category ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category success amounts by ID
+      tags:
+      - Category
+  /api/category/mycategory/monthly-method-category/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category failed methods by category ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthMethod'
+        "400":
+          description: Invalid category ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category failed methods by ID
+      tags:
+      - Category
+  /api/category/mycategory/monthly-method-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly category success methods by category ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryMonthMethod'
+        "400":
+          description: Invalid category ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly category success methods by ID
+      tags:
+      - Category
+  /api/category/mycategory/yearly-amount-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category failed amounts by category ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearAmountFailed'
+        "400":
+          description: Invalid category ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category failed amounts by ID
+      tags:
+      - Category
+  /api/category/mycategory/yearly-amount-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category success amounts by category ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearAmountSuccess'
+        "400":
+          description: Invalid category ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category success amounts by ID
+      tags:
+      - Category
+  /api/category/mycategory/yearly-method-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category failed methods by category ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearMethod'
+        "400":
+          description: Invalid category ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category failed methods by ID
+      tags:
+      - Category
+  /api/category/mycategory/yearly-method-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category success methods by category ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearMethod'
+        "400":
+          description: Invalid category ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category success methods by ID
       tags:
       - Category
   /api/category/restore/{id}:
@@ -1934,7 +4084,7 @@ paths:
         "200":
           description: Successfully restored all Categorys
           schema:
-            $ref: '#/definitions/pb.ApiResponseCategoryAll'
+            $ref: '#/definitions/response.ApiResponseCategoryAll'
         "500":
           description: Failed to restore Categorys
           schema:
@@ -2048,6 +4198,130 @@ paths:
       summary: Update an existing Category
       tags:
       - Category
+  /api/category/yearly-amount-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category failed amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearAmountFailed'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category failed amounts
+      tags:
+      - Category
+  /api/category/yearly-amount-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category success amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearAmountSuccess'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category success amounts
+      tags:
+      - Category
+  /api/category/yearly-method-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category failed methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category failed methods
+      tags:
+      - Category
+  /api/category/yearly-method-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly category success methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseCategoryYearMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly category success methods
+      tags:
+      - Category
   /api/merchant:
     get:
       consumes:
@@ -2126,7 +4400,7 @@ paths:
         "200":
           description: List of active merchant
           schema:
-            $ref: '#/definitions/pb.ApiResponsesUser'
+            $ref: '#/definitions/response.ApiResponsePaginationMerchantDeleteAt'
         "500":
           description: Failed to retrieve merchant data
           schema:
@@ -2303,7 +4577,7 @@ paths:
         "200":
           description: List of trashed merchant data
           schema:
-            $ref: '#/definitions/pb.ApiResponsesUser'
+            $ref: '#/definitions/response.ApiResponsePaginationMerchantDeleteAt'
         "500":
           description: Failed to retrieve merchant data
           schema:
@@ -2429,7 +4703,7 @@ paths:
         "200":
           description: Nominal data
           schema:
-            $ref: '#/definitions/pb.ApiResponseNominal'
+            $ref: '#/definitions/response.ApiResponseNominal'
         "400":
           description: Invalid Nominal ID
           schema:
@@ -2528,7 +4802,7 @@ paths:
         "200":
           description: Successfully deleted Nominal record permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseNominalDelete'
+            $ref: '#/definitions/response.ApiResponseNominalDelete'
         "400":
           description: 'Bad Request: Invalid ID'
           schema:
@@ -2553,7 +4827,7 @@ paths:
         "200":
           description: Successfully deleted all Nominal records permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseNominalDelete'
+            $ref: '#/definitions/response.ApiResponseNominalDelete'
         "500":
           description: Failed to delete Nominals
           schema:
@@ -2561,6 +4835,736 @@ paths:
       security:
       - Bearer: []
       summary: Permanently delete all trashed Nominals
+      tags:
+      - Nominal
+  /api/nominal/merchant/monthly-amount-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal failed amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthAmountFailed'
+        "400":
+          description: Invalid merchant ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal failed amounts by merchant
+      tags:
+      - Nominal
+  /api/nominal/merchant/monthly-amount-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal success amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthAmountSuccess'
+        "400":
+          description: Invalid merchant ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal success amounts by merchant
+      tags:
+      - Nominal
+  /api/nominal/merchant/monthly-method-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal failed methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal failed methods by merchant
+      tags:
+      - Nominal
+  /api/nominal/merchant/monthly-method-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal success methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal success methods by merchant
+      tags:
+      - Nominal
+  /api/nominal/merchant/yearly-amount-failed/{merchant_is}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal failed amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearAmountFailed'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal failed amounts by merchant
+      tags:
+      - Nominal
+  /api/nominal/merchant/yearly-amount-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal success amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearAmountSuccess'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal success amounts by merchant
+      tags:
+      - Nominal
+  /api/nominal/merchant/yearly-method-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal failed methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal failed methods by merchant
+      tags:
+      - Nominal
+  /api/nominal/merchant/yearly-method-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal success methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal success methods by merchant
+      tags:
+      - Nominal
+  /api/nominal/monthly/failed/amount:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal failed amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthAmountFailed'
+        "400":
+          description: Invalid year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal failed amounts
+      tags:
+      - Nominal
+  /api/nominal/monthly/failed/method:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal failed methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal failed methods
+      tags:
+      - Nominal
+  /api/nominal/monthly/success/amount:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal success amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthAmountSuccess'
+        "400":
+          description: Invalid year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal success amounts
+      tags:
+      - Nominal
+  /api/nominal/monthly/success/method:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal success methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal success methods
+      tags:
+      - Nominal
+  /api/nominal/mynominal/monthly-amount-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal failed amounts by nominal ID
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthAmountFailed'
+        "400":
+          description: Invalid nominal ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal failed amounts by ID
+      tags:
+      - Nominal
+  /api/nominal/mynominal/monthly-amount-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal success amounts by nominal ID
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthAmountSuccess'
+        "400":
+          description: Invalid nominal ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal success amounts by ID
+      tags:
+      - Nominal
+  /api/nominal/mynominal/monthly-method-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal failed methods by nominal ID
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthMethod'
+        "400":
+          description: Invalid nominal ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal failed methods by ID
+      tags:
+      - Nominal
+  /api/nominal/mynominal/monthly-method-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly nominal success methods by nominal ID
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalMonthMethod'
+        "400":
+          description: Invalid nominal ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly nominal success methods by ID
+      tags:
+      - Nominal
+  /api/nominal/mynominal/yearly-amount-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal failed amounts by nominal ID
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearAmountFailed'
+        "400":
+          description: Invalid nominal ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal failed amounts by ID
+      tags:
+      - Nominal
+  /api/nominal/mynominal/yearly-amount-nominal/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal success amounts by nominal ID
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearAmountSuccess'
+        "400":
+          description: Invalid nominal ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal success amounts by ID
+      tags:
+      - Nominal
+  /api/nominal/mynominal/yearly-method-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal failed methods by nominal ID
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearMethod'
+        "400":
+          description: Invalid nominal ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal failed methods by ID
+      tags:
+      - Nominal
+  /api/nominal/mynominal/yearly-method-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal success methods by nominal ID
+      parameters:
+      - description: Nominal ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearMethod'
+        "400":
+          description: Invalid nominal ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal success methods by ID
       tags:
       - Nominal
   /api/nominal/restore/{id}:
@@ -2605,7 +5609,7 @@ paths:
         "200":
           description: Successfully restored all Nominals
           schema:
-            $ref: '#/definitions/pb.ApiResponseNominalAll'
+            $ref: '#/definitions/response.ApiResponseNominalAll'
         "500":
           description: Failed to restore Nominals
           schema:
@@ -2719,6 +5723,130 @@ paths:
       summary: Update an existing Nominal
       tags:
       - Nominal
+  /api/nominal/yearly/failed/amount:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal failed amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearAmountFailed'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal failed amounts
+      tags:
+      - Nominal
+  /api/nominal/yearly/failed/method:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal failed methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal failed methods
+      tags:
+      - Nominal
+  /api/nominal/yearly/success/amount:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal success amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearAmountSuccess'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal success amounts
+      tags:
+      - Nominal
+  /api/nominal/yearly/success/method:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly nominal success methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponseNominalYearMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly nominal success methods
+      tags:
+      - Nominal
   /api/role:
     get:
       consumes:
@@ -2744,7 +5872,7 @@ paths:
         "200":
           description: List of roles
           schema:
-            $ref: '#/definitions/pb.ApiResponsePaginationRole'
+            $ref: '#/definitions/response.ApiResponsePaginationRole'
         "400":
           description: Invalid query parameters
           schema:
@@ -2768,14 +5896,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/pb.CreateRoleRequest'
+          $ref: '#/definitions/requests.CreateRoleRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Created role data
           schema:
-            $ref: '#/definitions/pb.ApiResponseRole'
+            $ref: '#/definitions/response.ApiResponseRole'
         "400":
           description: Invalid request body
           schema:
@@ -2806,7 +5934,7 @@ paths:
         "200":
           description: Soft-deleted role data
           schema:
-            $ref: '#/definitions/pb.ApiResponseRole'
+            $ref: '#/definitions/response.ApiResponseRole'
         "400":
           description: Invalid role ID
           schema:
@@ -2836,7 +5964,7 @@ paths:
         "200":
           description: Role data
           schema:
-            $ref: '#/definitions/pb.ApiResponseRole'
+            $ref: '#/definitions/response.ApiResponseRole'
         "400":
           description: Invalid role ID
           schema:
@@ -2865,14 +5993,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/pb.UpdateRoleRequest'
+          $ref: '#/definitions/requests.UpdateRoleRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Updated role data
           schema:
-            $ref: '#/definitions/pb.ApiResponseRole'
+            $ref: '#/definitions/response.ApiResponseRole'
         "400":
           description: Invalid role ID or request body
           schema:
@@ -2911,7 +6039,7 @@ paths:
         "200":
           description: List of active roles
           schema:
-            $ref: '#/definitions/pb.ApiResponsePaginationRoleDeleteAt'
+            $ref: '#/definitions/response.ApiResponsePaginationRoleDeleteAt'
         "400":
           description: Invalid query parameters
           schema:
@@ -2936,7 +6064,7 @@ paths:
         "200":
           description: Permanently deleted roles data
           schema:
-            $ref: '#/definitions/pb.ApiResponseRoleAll'
+            $ref: '#/definitions/response.ApiResponseRoleAll'
         "500":
           description: Failed to delete all roles permanently
           schema:
@@ -2963,7 +6091,7 @@ paths:
         "200":
           description: Permanently deleted role data
           schema:
-            $ref: '#/definitions/pb.ApiResponseRole'
+            $ref: '#/definitions/response.ApiResponseRole'
         "400":
           description: Invalid role ID
           schema:
@@ -2988,7 +6116,7 @@ paths:
         "200":
           description: Restored roles data
           schema:
-            $ref: '#/definitions/pb.ApiResponseRoleAll'
+            $ref: '#/definitions/response.ApiResponseRoleAll'
         "500":
           description: Failed to restore all roles
           schema:
@@ -3015,7 +6143,7 @@ paths:
         "200":
           description: Restored role data
           schema:
-            $ref: '#/definitions/pb.ApiResponseRole'
+            $ref: '#/definitions/response.ApiResponseRole'
         "400":
           description: Invalid role ID
           schema:
@@ -3054,7 +6182,7 @@ paths:
         "200":
           description: List of trashed roles
           schema:
-            $ref: '#/definitions/pb.ApiResponsePaginationRoleDeleteAt'
+            $ref: '#/definitions/response.ApiResponsePaginationRoleDeleteAt'
         "400":
           description: Invalid query parameters
           schema:
@@ -3085,7 +6213,7 @@ paths:
         "200":
           description: Role data
           schema:
-            $ref: '#/definitions/pb.ApiResponseRole'
+            $ref: '#/definitions/response.ApiResponseRole'
         "400":
           description: Invalid user ID
           schema:
@@ -3152,7 +6280,7 @@ paths:
         "200":
           description: Transaction data
           schema:
-            $ref: '#/definitions/pb.ApiResponseTransaction'
+            $ref: '#/definitions/response.ApiResponseTransaction'
         "400":
           description: Invalid Transaction ID
           schema:
@@ -3251,7 +6379,7 @@ paths:
         "200":
           description: Successfully deleted Transaction record permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseTransactionDelete'
+            $ref: '#/definitions/response.ApiResponseTransactionDelete'
         "400":
           description: 'Bad Request: Invalid ID'
           schema:
@@ -3276,7 +6404,7 @@ paths:
         "200":
           description: Successfully deleted all Transaction records permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseTransactionDelete'
+            $ref: '#/definitions/response.ApiResponseTransactionDelete'
         "500":
           description: Failed to delete Transactions
           schema:
@@ -3284,6 +6412,438 @@ paths:
       security:
       - Bearer: []
       summary: Permanently delete all trashed Transactions
+      tags:
+      - Transaction
+  /api/transaction/merchant/monthly-amount-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly transaction failed amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionMonthFailed'
+        "400":
+          description: Invalid merchant ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly transaction failed amounts by merchant
+      tags:
+      - Transaction
+  /api/transaction/merchant/monthly-amount-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly transaction success amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionMonthSuccess'
+        "400":
+          description: Invalid merchant ID, year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly transaction success amounts by merchant
+      tags:
+      - Transaction
+  /api/transaction/merchant/monthly-method-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly transaction failed methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionMonthMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly transaction failed methods by merchant
+      tags:
+      - Transaction
+  /api/transaction/merchant/monthly-method-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly transaction success methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionMonthMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly transaction success methods by merchant
+      tags:
+      - Transaction
+  /api/transaction/merchant/yearly-amount-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly transaction failed amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionYearFailed'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly transaction failed amounts by merchant
+      tags:
+      - Transaction
+  /api/transaction/merchant/yearly-method-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly transaction failed methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionYearMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly transaction failed methods by merchant
+      tags:
+      - Transaction
+  /api/transaction/merchant/yearly-method-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly transaction success methods by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionYearMethod'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly transaction success methods by merchant
+      tags:
+      - Transaction
+  /api/transaction/merchant/yearly-success-amount/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly transaction success amounts by merchant ID
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionYearSuccess'
+        "400":
+          description: Invalid merchant ID or year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly transaction success amounts by merchant
+      tags:
+      - Transaction
+  /api/transaction/monthly-amount-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly transaction failed amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionMonthFailed'
+        "400":
+          description: Invalid year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly transaction failed amounts
+      tags:
+      - Transaction
+  /api/transaction/monthly-amount-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly transaction success amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionMonthSuccess'
+        "400":
+          description: Invalid year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly transaction success amounts
+      tags:
+      - Transaction
+  /api/transaction/monthly-method-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly transaction failed methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionMonthMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly transaction failed methods
+      tags:
+      - Transaction
+  /api/transaction/monthly-method-successs:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly transaction success methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionMonthMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly transaction success methods
       tags:
       - Transaction
   /api/transaction/restore/{id}:
@@ -3328,7 +6888,7 @@ paths:
         "200":
           description: Successfully restored all Transactions
           schema:
-            $ref: '#/definitions/pb.ApiResponseTransactionAll'
+            $ref: '#/definitions/response.ApiResponseTransactionAll'
         "500":
           description: Failed to restore Transactions
           schema:
@@ -3442,6 +7002,130 @@ paths:
       summary: Update an existing Transaction
       tags:
       - Transaction
+  /api/transaction/yearly-amount-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly transaction failed amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionYearFailed'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly transaction failed amounts
+      tags:
+      - Transaction
+  /api/transaction/yearly-amount-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly transaction success amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionYearSuccess'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly transaction success amounts
+      tags:
+      - Transaction
+  /api/transaction/yearly-method-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly transaction failed methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionYearMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly transaction failed methods
+      tags:
+      - Transaction
+  /api/transaction/yearly-method-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly transaction success methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesTransactionYearMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly transaction success methods
+      tags:
+      - Transaction
   /api/user:
     get:
       consumes:
@@ -3495,7 +7179,7 @@ paths:
         "200":
           description: User data
           schema:
-            $ref: '#/definitions/pb.ApiResponseUser'
+            $ref: '#/definitions/response.ApiResponseUser'
         "400":
           description: Invalid user ID
           schema:
@@ -3594,7 +7278,7 @@ paths:
         "200":
           description: Successfully deleted user record permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseUserDelete'
+            $ref: '#/definitions/response.ApiResponseUserDelete'
         "400":
           description: 'Bad Request: Invalid ID'
           schema:
@@ -3625,7 +7309,7 @@ paths:
         "200":
           description: Successfully deleted user record permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseUserDelete'
+            $ref: '#/definitions/response.ApiResponseUserDelete'
         "400":
           description: 'Bad Request: Invalid ID'
           schema:
@@ -3687,7 +7371,7 @@ paths:
         "200":
           description: Successfully restored user all
           schema:
-            $ref: '#/definitions/pb.ApiResponseUserAll'
+            $ref: '#/definitions/response.ApiResponseUserAll'
         "400":
           description: Invalid user ID
           schema:
@@ -3853,7 +7537,7 @@ paths:
         "200":
           description: Voucher data
           schema:
-            $ref: '#/definitions/pb.ApiResponseVoucher'
+            $ref: '#/definitions/response.ApiResponseVoucher'
         "400":
           description: Invalid Voucher ID
           schema:
@@ -3906,15 +7590,29 @@ paths:
   /api/voucher/create:
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Create an existing Voucher record with the provided details
       parameters:
-      - description: Create Voucher request
-        in: body
-        name: CreateVoucherRequest
+      - description: Merchant ID
+        in: formData
+        name: merchant_id
         required: true
-        schema:
-          $ref: '#/definitions/requests.CreateVoucherRequest'
+        type: string
+      - description: Category ID
+        in: formData
+        name: category_id
+        required: true
+        type: string
+      - description: Product name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Product image file
+        in: formData
+        name: image_path
+        required: true
+        type: file
       produces:
       - application/json
       responses:
@@ -3952,7 +7650,7 @@ paths:
         "200":
           description: Successfully deleted Voucher record permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseVoucherDelete'
+            $ref: '#/definitions/response.ApiResponseVoucherDelete'
         "400":
           description: 'Bad Request: Invalid ID'
           schema:
@@ -3977,7 +7675,7 @@ paths:
         "200":
           description: Successfully deleted all Voucher records permanently
           schema:
-            $ref: '#/definitions/pb.ApiResponseVoucherDelete'
+            $ref: '#/definitions/response.ApiResponseVoucherDelete'
         "500":
           description: Failed to delete Vouchers
           schema:
@@ -3985,6 +7683,736 @@ paths:
       security:
       - Bearer: []
       summary: Permanently delete all trashed Vouchers
+      tags:
+      - Voucher
+  /api/voucher/merchant/monthly-amount-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly failed amounts for a specific Merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monthly failed amounts
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthFailed'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get monthly failed amounts by Merchant ID
+      tags:
+      - Voucher
+  /api/voucher/merchant/monthly-amount-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly success amounts for a specific Merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monthly success amounts
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthSuccess'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get monthly success amounts by Merchant ID
+      tags:
+      - Voucher
+  /api/voucher/merchant/monthly-method-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly failed methods for a specific Merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monthly failed methods
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthMethod'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get monthly failed methods by Merchant ID
+      tags:
+      - Voucher
+  /api/voucher/merchant/monthly-method-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly success methods for a specific Merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monthly success methods
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthMethod'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get monthly success methods by Merchant ID
+      tags:
+      - Voucher
+  /api/voucher/merchant/yearly-amount-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly failed amounts for a specific Merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Yearly failed amounts
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherYearFailed'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get yearly failed amounts by Merchant ID
+      tags:
+      - Voucher
+  /api/voucher/merchant/yearly-amount-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly success amounts for a specific Merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Yearly success amounts
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherYearSuccess'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get yearly success amounts by Merchant ID
+      tags:
+      - Voucher
+  /api/voucher/merchant/yearly-method-failed/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly failed methods for a specific Merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Yearly failed methods
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherYearMethod'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get yearly failed methods by Merchant ID
+      tags:
+      - Voucher
+  /api/voucher/merchant/yearly-method-success/{merchant_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly success methods for a specific Merchant
+      parameters:
+      - description: Merchant ID
+        in: path
+        name: merchant_id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Yearly success methods
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherYearMethod'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get yearly success methods by Merchant ID
+      tags:
+      - Voucher
+  /api/voucher/monhtly-amount-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly voucher success amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthSuccess'
+        "400":
+          description: Invalid year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly voucher success amounts
+      tags:
+      - Voucher
+  /api/voucher/monhtly-method-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly voucher success methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly voucher success methods
+      tags:
+      - Voucher
+  /api/voucher/monthly-amount-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly voucher failed amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthFailed'
+        "400":
+          description: Invalid year or month
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly voucher failed amounts
+      tags:
+      - Voucher
+  /api/voucher/monthly-method-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly voucher failed methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find monthly voucher failed methods
+      tags:
+      - Voucher
+  /api/voucher/myvoucher/monhtly-amount-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly success amounts for a specific Voucher
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monthly success amounts
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthSuccess'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get monthly success amounts by Voucher ID
+      tags:
+      - Voucher
+  /api/voucher/myvoucher/monthly-amount-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly failed amounts for a specific Voucher
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: Month
+        in: query
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monthly failed amounts
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthFailed'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get monthly failed amounts by Voucher ID
+      tags:
+      - Voucher
+  /api/voucher/myvoucher/monthly-method-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly failed methods for a specific Voucher
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monthly failed methods
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthMethod'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get monthly failed methods by Voucher ID
+      tags:
+      - Voucher
+  /api/voucher/myvoucher/monthly-method-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve monthly success methods for a specific Voucher
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monthly success methods
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherMonthMethod'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get monthly success methods by Voucher ID
+      tags:
+      - Voucher
+  /api/voucher/myvoucher/yearly-amount-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly failed amounts for a specific Voucher
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Yearly failed amounts
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherYearFailed'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get yearly failed amounts by Voucher ID
+      tags:
+      - Voucher
+  /api/voucher/myvoucher/yearly-amount-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly success amounts for a specific Voucher
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Yearly success amounts
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherYearSuccess'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get yearly success amounts by Voucher ID
+      tags:
+      - Voucher
+  /api/voucher/myvoucher/yearly-method-failed/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly failed methods for a specific Voucher
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Yearly failed methods
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherYearMethod'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get yearly failed methods by Voucher ID
+      tags:
+      - Voucher
+  /api/voucher/myvoucher/yearly-method-success/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly success methods for a specific Voucher
+      parameters:
+      - description: Voucher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Yearly success methods
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherYearMethod'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get yearly success methods by Voucher ID
       tags:
       - Voucher
   /api/voucher/restore/{id}:
@@ -4029,7 +8457,7 @@ paths:
         "200":
           description: Successfully restored all Vouchers
           schema:
-            $ref: '#/definitions/pb.ApiResponseVoucherAll'
+            $ref: '#/definitions/response.ApiResponseVoucherAll'
         "500":
           description: Failed to restore Vouchers
           schema:
@@ -4109,7 +8537,7 @@ paths:
   /api/voucher/update/{id}:
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Update an existing Voucher record with the provided details
       parameters:
       - description: Voucher ID
@@ -4117,12 +8545,26 @@ paths:
         name: id
         required: true
         type: integer
-      - description: Update Voucher request
-        in: body
-        name: UpdateVoucherRequest
+      - description: Merchant ID
+        in: formData
+        name: merchant_id
         required: true
-        schema:
-          $ref: '#/definitions/requests.UpdateVoucherRequest'
+        type: string
+      - description: Category ID
+        in: formData
+        name: category_id
+        required: true
+        type: string
+      - description: Product name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Product image file
+        in: formData
+        name: image_path
+        required: true
+        type: file
       produces:
       - application/json
       responses:
@@ -4143,17 +8585,128 @@ paths:
       summary: Update an existing Voucher
       tags:
       - Voucher
-  /auth/hello:
+  /api/voucher/yearly-amount-failed:
     get:
-      description: Returns a simple "Hello" message for testing purposes.
+      consumes:
+      - application/json
+      description: Retrieve yearly voucher failed amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: Hello
+          description: OK
           schema:
-            type: string
-      summary: Returns a "Hello" message
+            $ref: '#/definitions/response.ApiResponsesVoucherYearFailed'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly voucher failed amounts
       tags:
-      - Auth
+      - Voucher
+  /api/voucher/yearly-amount-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly voucher success amounts
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherYearSuccess'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly voucher success amounts
+      tags:
+      - Voucher
+  /api/voucher/yearly-method-failed:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly voucher failed methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherYearMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly voucher failed methods
+      tags:
+      - Voucher
+  /api/voucher/yearly-method-success:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve yearly voucher success methods
+      parameters:
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponsesVoucherYearMethod'
+        "400":
+          description: Invalid year
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve data
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Find yearly voucher success methods
+      tags:
+      - Voucher
 swagger: "2.0"

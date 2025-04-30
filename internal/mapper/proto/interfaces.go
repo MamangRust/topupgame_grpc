@@ -39,6 +39,12 @@ type BankProtoMapper interface {
 	ToProtoResponsesBank(status string, message string, pbResponse []*response.BankResponse) *pb.ApiResponsesBank
 	ToProtoResponsePaginationBank(pagination *pb.PaginationMeta, status string, message string, pbResponse []*response.BankResponse) *pb.ApiResponsePaginationBank
 	ToProtoResponsePaginationBankDeleteAt(pagination *pb.PaginationMeta, status string, message string, pbResponse []*response.BankResponseDeleteAt) *pb.ApiResponsePaginationBankDeleteAt
+	ToProtoResponsesMonthAmountSuccess(status string, message string, pbResponse []*response.MonthAmountBankSuccessResponse) *pb.ApiResponseBankMonthAmountSuccess
+	ToProtoResponseYearAmountSuccess(status string, message string, pbResponse []*response.YearAmountBankSuccessResponse) *pb.ApiResponseBankYearAmountSuccess
+	ToProtoResponsesMonthAmountFailed(status string, message string, pbResponse []*response.MonthAmountBankFailedResponse) *pb.ApiResponseBankMonthAmountFailed
+	ToProtoResponseYearAmountFailed(status string, message string, pbResponse []*response.YearAmountBankFailedResponse) *pb.ApiResponseBankYearAmountFailed
+	ToProtoResponsesMonthMethod(status string, message string, pbResponse []*response.MonthMethodBankResponse) *pb.ApiResponseBankMonthMethod
+	ToProtoResponseYearMethod(status string, message string, pbResponse []*response.YearMethodBankResponse) *pb.ApiResponseBankYearMethod
 }
 
 type CategoryProtoMapper interface {
@@ -49,6 +55,12 @@ type CategoryProtoMapper interface {
 	ToProtoResponsesCategory(status string, message string, pbResponse []*response.CategoryResponse) *pb.ApiResponsesCategory
 	ToProtoResponsePaginationCategory(pagination *pb.PaginationMeta, status string, message string, pbResponse []*response.CategoryResponse) *pb.ApiResponsePaginationCategory
 	ToProtoResponsePaginationCategoryDeleteAt(pagination *pb.PaginationMeta, status string, message string, pbResponse []*response.CategoryResponseDeleteAt) *pb.ApiResponsePaginationCategoryDeleteAt
+	ToProtoResponsesMonthAmountSuccess(status string, message string, pbResponse []*response.MonthAmountCategorySuccessResponse) *pb.ApiResponseCategoryMonthAmountSuccess
+	ToProtoResponseYearAmountSuccess(status string, message string, pbResponse []*response.YearAmountCategorySuccessResponse) *pb.ApiResponseCategoryYearAmountSuccess
+	ToProtoResponsesMonthAmountFailed(status string, message string, pbResponse []*response.MonthAmountCategoryFailedResponse) *pb.ApiResponseCategoryMonthAmountFailed
+	ToProtoResponseYearAmountFailed(status string, message string, pbResponse []*response.YearAmountCategoryFailedResponse) *pb.ApiResponseCategoryYearAmountFailed
+	ToProtoResponsesMonthMethod(status string, message string, pbResponse []*response.MonthMethodCategoryResponse) *pb.ApiResponseCategoryMonthMethod
+	ToProtoResponseYearMethod(status string, message string, pbResponse []*response.YearMethodCategoryResponse) *pb.ApiResponseCategoryYearMethod
 }
 
 type MerchantProtoMapper interface {
@@ -70,6 +82,12 @@ type NominalProtoMapper interface {
 	ToProtoResponsesNominal(status string, message string, pbResponse []*response.NominalResponse) *pb.ApiResponsesNominal
 	ToProtoResponsePaginationNominal(pagination *pb.PaginationMeta, status string, message string, pbResponse []*response.NominalResponse) *pb.ApiResponsePaginationNominal
 	ToProtoResponsePaginationNominalDeleteAt(pagination *pb.PaginationMeta, status string, message string, pbResponse []*response.NominalResponseDeleteAt) *pb.ApiResponsePaginationNominalDeleteAt
+	ToProtoResponsesMonthAmountSuccess(status string, message string, pbResponse []*response.MonthAmountNominalSuccessResponse) *pb.ApiResponseNominalMonthAmountSuccess
+	ToProtoResponseYearAmountSuccess(status string, message string, pbResponse []*response.YearAmountNominalSuccessResponse) *pb.ApiResponseNominalYearAmountSuccess
+	ToProtoResponsesMonthAmountFailed(status string, message string, pbResponse []*response.MonthAmountNominalFailedResponse) *pb.ApiResponseNominalMonthAmountFailed
+	ToProtoResponseYearAmountFailed(status string, message string, pbResponse []*response.YearAmountNominalFailedResponse) *pb.ApiResponseNominalYearAmountFailed
+	ToProtoResponsesMonthMethod(status string, message string, pbResponse []*response.MonthMethodNominalResponse) *pb.ApiResponseNominalMonthMethod
+	ToProtoResponseYearMethod(status string, message string, pbResponse []*response.YearMethodNominalResponse) *pb.ApiResponseNominalYearMethod
 }
 
 type TransactionProtoMapper interface {
@@ -80,6 +98,13 @@ type TransactionProtoMapper interface {
 	ToProtoResponseTransactionDeleteAt(status string, message string, pbResponse *response.TransactionResponseDeleteAt) *pb.ApiResponseTransactionDeleteAt
 	ToProtoResponsePaginationTransaction(pagination *pb.PaginationMeta, status string, message string, pbResponse []*response.TransactionResponse) *pb.ApiResponsePaginationTransaction
 	ToProtoResponsePaginationTransactionDeleteAt(pagination *pb.PaginationMeta, status string, message string, pbResponse []*response.TransactionResponseDeleteAt) *pb.ApiResponsePaginationTransactionDeleteAt
+
+	ToProtoResponsesMonthAmountSuccess(status string, message string, pbResponse []*response.MonthAmountTransactionSuccessResponse) *pb.ApiResponseTransactionMonthAmountSuccess
+	ToProtoResponseYearAmountSuccess(status string, message string, pbResponse []*response.YearAmountTransactionSuccessResponse) *pb.ApiResponseTransactionYearAmountSuccess
+	ToProtoResponsesMonthAmountFailed(status string, message string, pbResponse []*response.MonthAmountTransactionFailedResponse) *pb.ApiResponseTransactionMonthAmountFailed
+	ToProtoResponseYearAmountFailed(status string, message string, pbResponse []*response.YearAmountTransactionFailedResponse) *pb.ApiResponseTransactionYearAmountFailed
+	ToProtoResponsesMonthMethod(status string, message string, pbResponse []*response.MonthMethodTransactionResponse) *pb.ApiResponseTransactionMonthMethod
+	ToProtoResponseYearMethod(status string, message string, pbResponse []*response.YearMethodTransactionResponse) *pb.ApiResponseTransactionYearMethod
 }
 
 type VoucherProtoMapper interface {
@@ -90,4 +115,10 @@ type VoucherProtoMapper interface {
 	ToProtoResponsesVoucher(status string, message string, pbResponse []*response.VoucherResponse) *pb.ApiResponsesVoucher
 	ToProtoResponsePaginationVoucher(pagination *pb.PaginationMeta, status string, message string, pbResponse []*response.VoucherResponse) *pb.ApiResponsePaginationVoucher
 	ToProtoResponsePaginationVoucherDeleteAt(pagination *pb.PaginationMeta, status string, message string, pbResponse []*response.VoucherResponseDeleteAt) *pb.ApiResponsePaginationVoucherDeleteAt
+	ToProtoResponsesMonthAmountSuccess(status string, message string, pbResponse []*response.MonthAmountVoucherSuccessResponse) *pb.ApiResponseVoucherMonthAmountSuccess
+	ToProtoResponsesYearAmountSuccess(status string, message string, pbResponse []*response.YearAmountVoucherSuccessResponse) *pb.ApiResponseVoucherYearAmountSuccess
+	ToProtoResponsesMonthAmountFailed(status string, message string, pbResponse []*response.MonthAmountVoucherFailedResponse) *pb.ApiResponseVoucherMonthAmountFailed
+	ToProtoResponsesYearAmountFailed(status string, message string, pbResponse []*response.YearAmountVoucherFailedResponse) *pb.ApiResponseVoucherYearAmountFailed
+	ToProtoResponsesMonthMethod(status string, message string, pbResponse []*response.MonthMethodVoucherResponse) *pb.ApiResponseVoucherMonthMethod
+	ToProtoResponsesYearMethod(status string, message string, pbResponse []*response.YearMethodVoucherResponse) *pb.ApiResponseVoucherYearMethod
 }

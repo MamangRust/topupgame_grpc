@@ -5,6 +5,7 @@ import (
 	"topup_game/internal/domain/response"
 	response_service "topup_game/internal/mapper/response/service"
 	"topup_game/internal/repository"
+	"topup_game/pkg/errors/role_errors"
 	"topup_game/pkg/logger"
 
 	"go.uber.org/zap"
@@ -24,7 +25,11 @@ func NewRoleService(roleRepository repository.RoleRepository, logger logger.Logg
 	}
 }
 
-func (s *roleService) FindAll(page int, pageSize int, search string) ([]*response.RoleResponse, int, *response.ErrorResponse) {
+func (s *roleService) FindAll(request *requests.FindAllRoles) ([]*response.RoleResponse, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
 	s.logger.Debug("Fetching role",
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize),
@@ -37,7 +42,7 @@ func (s *roleService) FindAll(page int, pageSize int, search string) ([]*respons
 		pageSize = 10
 	}
 
-	res, totalRecords, err := s.roleRepository.FindAllRoles(page, pageSize, search)
+	res, totalRecords, err := s.roleRepository.FindAllRoles(request)
 	if err != nil {
 		s.logger.Error("Failed to fetch role",
 			zap.Error(err),
@@ -45,14 +50,11 @@ func (s *roleService) FindAll(page int, pageSize int, search string) ([]*respons
 			zap.Int("pageSize", pageSize),
 			zap.String("search", search))
 
-		return nil, 0, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch role records",
-		}
+		return nil, nil, role_errors.ErrFailedFindAll
 	}
 
 	s.logger.Debug("Successfully fetched role",
-		zap.Int("totalRecords", totalRecords),
+		zap.Int("totalRecords", *totalRecords),
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize))
 
@@ -69,10 +71,7 @@ func (s *roleService) FindById(id int) (*response.RoleResponse, *response.ErrorR
 	if err != nil {
 		s.logger.Error("Failed to fetch role record by ID", zap.Error(err))
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch role record by ID",
-		}
+		return nil, role_errors.ErrRoleNotFoundRes
 	}
 
 	s.logger.Debug("Successfully fetched role", zap.Int("id", id))
@@ -90,10 +89,7 @@ func (s *roleService) FindByUserId(id int) ([]*response.RoleResponse, *response.
 	if err != nil {
 		s.logger.Error("Failed to fetch role record by ID", zap.Error(err))
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch role record by ID",
-		}
+		return nil, role_errors.ErrRoleNotFoundRes
 	}
 
 	s.logger.Debug("Successfully fetched role by user ID", zap.Int("id", id))
@@ -103,7 +99,11 @@ func (s *roleService) FindByUserId(id int) ([]*response.RoleResponse, *response.
 	return so, nil
 }
 
-func (s *roleService) FindByActive(page int, pageSize int, search string) ([]*response.RoleResponseDeleteAt, int, *response.ErrorResponse) {
+func (s *roleService) FindByActive(request *requests.FindAllRoles) ([]*response.RoleResponseDeleteAt, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
 	s.logger.Debug("Fetching active role",
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize),
@@ -116,7 +116,7 @@ func (s *roleService) FindByActive(page int, pageSize int, search string) ([]*re
 		pageSize = 10
 	}
 
-	res, totalRecords, err := s.roleRepository.FindByActiveRole(page, pageSize, search)
+	res, totalRecords, err := s.roleRepository.FindByActiveRole(request)
 	if err != nil {
 		s.logger.Error("Failed to fetch active role",
 			zap.Error(err),
@@ -124,14 +124,11 @@ func (s *roleService) FindByActive(page int, pageSize int, search string) ([]*re
 			zap.Int("pageSize", pageSize),
 			zap.String("search", search))
 
-		return nil, 0, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch role records",
-		}
+		return nil, nil, role_errors.ErrFailedFindActive
 	}
 
 	s.logger.Debug("Successfully fetched active role",
-		zap.Int("totalRecords", totalRecords),
+		zap.Int("totalRecords", *totalRecords),
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize))
 
@@ -140,7 +137,11 @@ func (s *roleService) FindByActive(page int, pageSize int, search string) ([]*re
 	return so, totalRecords, nil
 }
 
-func (s *roleService) FindByTrashed(page int, pageSize int, search string) ([]*response.RoleResponseDeleteAt, int, *response.ErrorResponse) {
+func (s *roleService) FindByTrashed(request *requests.FindAllRoles) ([]*response.RoleResponseDeleteAt, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
 	s.logger.Debug("Fetching trashed role",
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize),
@@ -153,7 +154,7 @@ func (s *roleService) FindByTrashed(page int, pageSize int, search string) ([]*r
 		pageSize = 10
 	}
 
-	res, totalRecords, err := s.roleRepository.FindByTrashedRole(page, pageSize, search)
+	res, totalRecords, err := s.roleRepository.FindByTrashedRole(request)
 
 	if err != nil {
 		s.logger.Error("Failed to fetch trashed role",
@@ -162,14 +163,11 @@ func (s *roleService) FindByTrashed(page int, pageSize int, search string) ([]*r
 			zap.Int("pageSize", pageSize),
 			zap.String("search", search))
 
-		return nil, 0, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch role records",
-		}
+		return nil, nil, role_errors.ErrFailedFindTrashed
 	}
 
 	s.logger.Debug("Successfully fetched trashed role",
-		zap.Int("totalRecords", totalRecords),
+		zap.Int("totalRecords", *totalRecords),
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize))
 
@@ -191,10 +189,7 @@ func (s *roleService) Create(request *requests.CreateRoleRequest) (*response.Rol
 			zap.Error(err),
 		)
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to create role record",
-		}
+		return nil, role_errors.ErrFailedCreateRole
 	}
 
 	so := s.mapping.ToRoleResponse(res)
@@ -221,10 +216,7 @@ func (s *roleService) Update(request *requests.UpdateRoleRequest) (*response.Rol
 			zap.String("newRoleName", request.Name),
 			zap.Error(err))
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to update role record",
-		}
+		return nil, role_errors.ErrFailedUpdateRole
 	}
 
 	so := s.mapping.ToRoleResponse(res)
@@ -249,10 +241,7 @@ func (s *roleService) Trashed(id int) (*response.RoleResponse, *response.ErrorRe
 			zap.Int("roleID", id),
 			zap.Error(err))
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to trashed role record",
-		}
+		return nil, role_errors.ErrFailedTrashedRole
 	}
 
 	so := s.mapping.ToRoleResponse(res)
@@ -274,10 +263,7 @@ func (s *roleService) Restore(id int) (*response.RoleResponse, *response.ErrorRe
 	if err != nil {
 		s.logger.Error("Failed to restore role", zap.Error(err))
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to restore role record",
-		}
+		return nil, role_errors.ErrFailedRestoreRole
 	}
 
 	so := s.mapping.ToRoleResponse(res)
@@ -302,10 +288,7 @@ func (s *roleService) DeletePermanent(id int) (bool, *response.ErrorResponse) {
 			zap.Error(err),
 		)
 
-		return false, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to delete role record",
-		}
+		return false, role_errors.ErrFailedDeletePermanent
 	}
 
 	s.logger.Debug("DeleteRolePermanent process completed",
@@ -322,10 +305,7 @@ func (s *roleService) RestoreAll() (bool, *response.ErrorResponse) {
 
 	if err != nil {
 		s.logger.Error("Failed to restore all roles", zap.Error(err))
-		return false, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to restore all roles: " + err.Error(),
-		}
+		return false, role_errors.ErrFailedRestoreAll
 	}
 
 	s.logger.Debug("Successfully restored all roles")
@@ -339,10 +319,7 @@ func (s *roleService) DeleteAllPermanent() (bool, *response.ErrorResponse) {
 
 	if err != nil {
 		s.logger.Error("Failed to permanently delete all roles", zap.Error(err))
-		return false, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to permanently delete all roles: " + err.Error(),
-		}
+		return false, role_errors.ErrFailedDeletePermanent
 	}
 
 	s.logger.Debug("Successfully deleted all roles permanently")

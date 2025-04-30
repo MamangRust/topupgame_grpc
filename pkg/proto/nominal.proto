@@ -19,6 +19,67 @@ message FindByIdNominalRequest{
 }
 
 
+message MonthAmountNominalRequest {
+    int32 year = 1;
+    int32 month = 2;
+}
+
+message YearAmountNominalRequest {
+    int32 year = 1;
+}
+
+  
+message MonthAmountNominalByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+    int32 month = 3;
+}
+  
+
+
+message YearAmountNominalByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+
+message MonthMethodNominalByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+  
+message YearMethodNominalByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+  
+
+
+message MonthAmountNominalByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+    int32 month = 3;
+}
+  
+
+
+message YearAmountNominalByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+  
+
+message MonthMethodNominalByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+  
+message YearMethodNominalByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+
+
+
 message NominalResponse {
     int32 id = 1;
     string name = 2;
@@ -39,6 +100,103 @@ message NominalResponseDeleteAt {
 
 }
 
+
+
+
+message MonthAmountNominalSuccessResponse {
+    int32 id = 1;
+    string nominal_name = 2;
+    string year = 3;
+    string month = 4;
+    int32 total_success = 5;
+    int32 total_amount = 6;
+}
+  
+
+message YearAmountNominalSuccessResponse {
+    int32 id = 1;
+    string nominal_name = 2;
+    string year = 3;
+    int32 total_success = 4;
+    int32 total_amount = 5;
+}
+  
+
+message MonthAmountNominalFailedResponse {
+    int32 id = 1;
+    string nominal_name = 2;
+    string year = 3;
+    string month = 4;
+    int32 total_failed = 5;
+    int32 total_amount = 6;
+}
+  
+
+message YearAmountNominalFailedResponse {
+    int32 id = 1;
+    string nominal_name = 2;
+    string year = 3;
+    int32 total_failed = 4;
+    int32 total_amount = 5;
+}
+  
+
+message MonthMethodNominalResponse {
+    int32 id = 1;
+    string month = 2;
+    string nominal_name = 3;
+    string payment_method = 4;
+    int32 total_transactions = 5;
+    int32 total_amount = 6;
+}
+  
+
+message YearMethodNominalResponse {
+    int32 id = 1;
+    string year = 2;
+    string nominal_name = 3;
+    string payment_method = 4;
+    int32 total_transactions = 5;
+    int32 total_amount = 6;
+}
+  
+  
+message ApiResponseNominalMonthAmountSuccess {
+    string status = 1;
+    string message = 2;
+    repeated MonthAmountNominalSuccessResponse data = 3;
+}
+  
+message ApiResponseNominalYearAmountSuccess {
+    string status = 1;
+    string message = 2;
+    repeated YearAmountNominalSuccessResponse data = 3;
+}
+  
+message ApiResponseNominalMonthAmountFailed {
+    string status = 1;
+    string message = 2;
+    repeated MonthAmountNominalFailedResponse data = 3;
+}
+  
+message ApiResponseNominalYearAmountFailed {
+    string status = 1;
+    string message = 2;
+    repeated YearAmountNominalFailedResponse data = 3;
+}
+  
+message ApiResponseNominalMonthMethod {
+    string status = 1;
+    string message = 2;
+    repeated MonthMethodNominalResponse data = 3;
+}
+  
+message ApiResponseNominalYearMethod {
+    string status = 1;
+    string message = 2;
+    repeated YearMethodNominalResponse data = 3;
+}
+
 message CreateNominalRequest {
     int32 voucher_id = 1;
     string name = 2;
@@ -48,10 +206,10 @@ message CreateNominalRequest {
   
 message UpdateNominalRequest {
     int32 id = 1;
-    optional int32 voucher_id = 2;
-    optional string name = 3;
-    optional int32 quantity = 4;
-    optional double price = 5;
+    int32 voucher_id = 2;
+    string name = 3;
+    int32 quantity = 4;
+    double price = 5;
 }
 
 message ApiResponseNominal {
@@ -112,5 +270,36 @@ service NominalService {
 
     rpc RestoreAll(google.protobuf.Empty) returns (ApiResponseNominalAll){}
     rpc DeleteAllPermanent(google.protobuf.Empty) returns (ApiResponseNominalAll){}
+
+    rpc FindMonthAmountNominalSuccess(MonthAmountNominalRequest)returns(ApiResponseNominalMonthAmountSuccess){}
+    rpc FindYearAmountNominalSuccess(YearAmountNominalRequest)returns(ApiResponseNominalYearAmountSuccess){}
+    rpc FindMonthAmountNominalFailed(MonthAmountNominalRequest)returns(ApiResponseNominalMonthAmountFailed){}
+    rpc FindYearAmountNominalFailed(YearAmountNominalRequest)returns(ApiResponseNominalYearAmountFailed){}
+
+    rpc FindMonthMethodNominalSuccess(YearAmountNominalRequest)returns(ApiResponseNominalMonthMethod){}
+    rpc FindYearMethodNominalSuccess(YearAmountNominalRequest)returns(ApiResponseNominalYearMethod){}
+    rpc FindMonthMethodNominalFailed(YearAmountNominalRequest)returns(ApiResponseNominalMonthMethod){}
+    rpc FindYearMethodNominalFailed(YearAmountNominalRequest)returns(ApiResponseNominalYearMethod){}
+
+
+    rpc FindMonthAmountNominalSuccessById(MonthAmountNominalByIdRequest)returns(ApiResponseNominalMonthAmountSuccess){}
+    rpc FindYearAmountNominalSuccessById(YearAmountNominalByIdRequest)returns(ApiResponseNominalYearAmountSuccess){}
+    rpc FindMonthAmountNominalFailedById(MonthAmountNominalByIdRequest)returns(ApiResponseNominalMonthAmountFailed){}
+    rpc FindYearAmountNominalFailedById(YearAmountNominalByIdRequest)returns(ApiResponseNominalYearAmountFailed){}
+
+    rpc FindMonthMethodNominalSuccessById(MonthMethodNominalByIdRequest)returns(ApiResponseNominalMonthMethod){}
+    rpc FindYearMethodNominalSuccessById(YearMethodNominalByIdRequest)returns(ApiResponseNominalYearMethod){}
+    rpc FindMonthMethodNominalFailedById(MonthMethodNominalByIdRequest)returns(ApiResponseNominalMonthMethod){}
+    rpc FindYearMethodNominalFailedById(YearMethodNominalByIdRequest)returns(ApiResponseNominalYearMethod){}
+
+    rpc FindMonthAmountNominalSuccessByMerchant(MonthAmountNominalByMerchantRequest)returns(ApiResponseNominalMonthAmountSuccess){}
+    rpc FindYearAmountNominalSuccessByMerchant(YearAmountNominalByMerchantRequest)returns(ApiResponseNominalYearAmountSuccess){}
+    rpc FindMonthAmountNominalFailedByMerchant(MonthAmountNominalByMerchantRequest)returns(ApiResponseNominalMonthAmountFailed){}
+    rpc FindYearAmountNominalFailedByMerchant(YearAmountNominalByMerchantRequest)returns(ApiResponseNominalYearAmountFailed){}
+
+    rpc FindMonthMethodNominalSuccessByMerchant(MonthMethodNominalByMerchantRequest)returns(ApiResponseNominalMonthMethod){}
+    rpc FindYearMethodNominalSuccessByMerchant(YearMethodNominalByMerchantRequest)returns(ApiResponseNominalYearMethod){}
+    rpc FindMonthMethodNominalFailedByMerchant(MonthMethodNominalByMerchantRequest)returns(ApiResponseNominalMonthMethod){}
+    rpc FindYearMethodNominalFailedByMerchant(YearMethodNominalByMerchantRequest)returns(ApiResponseNominalYearMethod){}
 }
 

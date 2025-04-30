@@ -7,6 +7,7 @@ import (
 	protomapper "topup_game/internal/mapper/proto"
 	"topup_game/internal/pb"
 	"topup_game/internal/service"
+	"topup_game/pkg/errors/merchant_errors"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -41,22 +42,25 @@ func (s *merchantHandleGrpc) FindAll(ctx context.Context, request *pb.FindAllMer
 		pageSize = 10
 	}
 
-	merchant, totalRecords, err := s.merchantService.FindAll(page, pageSize, search)
-
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch merchant: ",
-		})
+	reqService := requests.FindAllMerchants{
+		Page:     page,
+		PageSize: pageSize,
+		Search:   search,
 	}
 
-	totalPages := int(math.Ceil(float64(totalRecords) / float64(pageSize)))
+	merchant, totalRecords, err := s.merchantService.FindAll(&reqService)
+
+	if err != nil {
+		return nil, merchant_errors.ErrGrpcFailedFindAll
+	}
+
+	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
 
 	paginationMeta := &pb.PaginationMeta{
 		CurrentPage:  int32(page),
 		PageSize:     int32(pageSize),
 		TotalPages:   int32(totalPages),
-		TotalRecords: int32(totalRecords),
+		TotalRecords: int32(*totalRecords),
 	}
 
 	so := s.mapping.ToProtoResponsePaginationMerchant(paginationMeta, "success", "Successfully fetched merchant", merchant)
@@ -65,19 +69,13 @@ func (s *merchantHandleGrpc) FindAll(ctx context.Context, request *pb.FindAllMer
 
 func (s *merchantHandleGrpc) FindById(ctx context.Context, request *pb.FindByIdMerchantRequest) (*pb.ApiResponseMerchant, error) {
 	if request.GetId() == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid merchant id",
-		})
+		return nil, merchant_errors.ErrGrpcMerchantInvalidId
 	}
 
 	merchant, err := s.merchantService.FindById(int(request.GetId()))
 
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch merchant: " + err.Message,
-		})
+		return nil, merchant_errors.ErrGrpcMerchantNotFound
 	}
 
 	so := s.mapping.ToProtoResponseMerchant("success", "Successfully fetched categories", merchant)
@@ -98,22 +96,25 @@ func (s *merchantHandleGrpc) FindByActive(ctx context.Context, request *pb.FindA
 		pageSize = 10
 	}
 
-	merchant, totalRecords, err := s.merchantService.FindByActive(search, page, pageSize)
-
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch active merchant: " + err.Message,
-		})
+	reqService := requests.FindAllMerchants{
+		Page:     page,
+		PageSize: pageSize,
+		Search:   search,
 	}
 
-	totalPages := int(math.Ceil(float64(totalRecords) / float64(pageSize)))
+	merchant, totalRecords, err := s.merchantService.FindByActive(&reqService)
+
+	if err != nil {
+		return nil, merchant_errors.ErrGrpcFailedFindActive
+	}
+
+	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
 
 	paginationMeta := &pb.PaginationMeta{
 		CurrentPage:  int32(page),
 		PageSize:     int32(pageSize),
 		TotalPages:   int32(totalPages),
-		TotalRecords: int32(0),
+		TotalRecords: int32(*totalRecords),
 	}
 	so := s.mapping.ToProtoResponsePaginationMerchantDeleteAt(paginationMeta, "success", "Successfully fetched active merchant", merchant)
 
@@ -132,22 +133,25 @@ func (s *merchantHandleGrpc) FindByTrashed(ctx context.Context, request *pb.Find
 		pageSize = 10
 	}
 
-	users, totalRecords, err := s.merchantService.FindByTrashed(search, page, pageSize)
-
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch trashed merchant: " + err.Message,
-		})
+	reqService := requests.FindAllMerchants{
+		Page:     page,
+		PageSize: pageSize,
+		Search:   search,
 	}
 
-	totalPages := int(math.Ceil(float64(totalRecords) / float64(pageSize)))
+	users, totalRecords, err := s.merchantService.FindByTrashed(&reqService)
+
+	if err != nil {
+		return nil, merchant_errors.ErrGrpcFailedFindTrashed
+	}
+
+	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
 
 	paginationMeta := &pb.PaginationMeta{
 		CurrentPage:  int32(page),
 		PageSize:     int32(pageSize),
 		TotalPages:   int32(totalPages),
-		TotalRecords: int32(0),
+		TotalRecords: int32(*totalRecords),
 	}
 
 	so := s.mapping.ToProtoResponsePaginationMerchantDeleteAt(paginationMeta, "success", "Successfully fetched trashed merchant", users)
@@ -167,18 +171,12 @@ func (s *merchantHandleGrpc) Create(ctx context.Context, request *pb.CreateMerch
 	}
 
 	if err := req.Validate(); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to create merchant: " + err.Error(),
-		})
+		return nil, merchant_errors.ErrGrpcValidateCreateMerchant
 	}
 
 	merchant, err := s.merchantService.Create(req)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to create merchant: ",
-		})
+		return nil, merchant_errors.ErrGrpcFailedCreateMerchant
 	}
 
 	so := s.mapping.ToProtoResponseMerchant("success", "Successfully created merchant", merchant)
@@ -186,15 +184,14 @@ func (s *merchantHandleGrpc) Create(ctx context.Context, request *pb.CreateMerch
 }
 
 func (s *merchantHandleGrpc) Update(ctx context.Context, request *pb.UpdateMerchantRequest) (*pb.ApiResponseMerchant, error) {
-	if request.GetMerchantId() == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid merchant id",
-		})
+	id := int(request.GetMerchantId())
+
+	if id == 0 {
+		return nil, merchant_errors.ErrGrpcMerchantInvalidId
 	}
 
 	req := &requests.UpdateMerchantRequest{
-		MerchantID:   int(request.GetMerchantId()),
+		MerchantID:   id,
 		UserID:       int(request.GetUserId()),
 		Name:         request.GetName(),
 		Description:  request.GetDescription(),
@@ -205,18 +202,12 @@ func (s *merchantHandleGrpc) Update(ctx context.Context, request *pb.UpdateMerch
 	}
 
 	if err := req.Validate(); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to update merchant: ",
-		})
+		return nil, merchant_errors.ErrGrpcValidateUpdateMerchant
 	}
 
 	merchant, err := s.merchantService.Update(req)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to update merchant: ",
-		})
+		return nil, merchant_errors.ErrGrpcFailedUpdateMerchant
 	}
 
 	so := s.mapping.ToProtoResponseMerchant("success", "Successfully updated merchant", merchant)
@@ -234,10 +225,7 @@ func (s *merchantHandleGrpc) Trashed(ctx context.Context, request *pb.FindByIdMe
 	merchant, err := s.merchantService.Trashed(int(request.GetId()))
 
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to trashed merchant: " + err.Message,
-		})
+		return nil, merchant_errors.ErrGrpcFailedTrashedMerchant
 	}
 
 	so := s.mapping.ToProtoResponseMerchantDeleteAt("success", "Successfully trashed merchant", merchant)
@@ -247,19 +235,13 @@ func (s *merchantHandleGrpc) Trashed(ctx context.Context, request *pb.FindByIdMe
 
 func (s *merchantHandleGrpc) Restore(ctx context.Context, request *pb.FindByIdMerchantRequest) (*pb.ApiResponseMerchantDeleteAt, error) {
 	if request.GetId() == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid merchant id",
-		})
+		return nil, merchant_errors.ErrGrpcMerchantInvalidId
 	}
 
 	merchant, err := s.merchantService.Restore(int(request.GetId()))
 
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to restore merchant: " + err.Message,
-		})
+		return nil, merchant_errors.ErrGrpcFailedRestoreMerchant
 	}
 
 	so := s.mapping.ToProtoResponseMerchantDeleteAt("success", "Successfully restored merchant", merchant)
@@ -269,19 +251,13 @@ func (s *merchantHandleGrpc) Restore(ctx context.Context, request *pb.FindByIdMe
 
 func (s *merchantHandleGrpc) DeletePermanent(ctx context.Context, request *pb.FindByIdMerchantRequest) (*pb.ApiResponseMerchantDelete, error) {
 	if request.GetId() == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid merchant id",
-		})
+		return nil, merchant_errors.ErrGrpcMerchantInvalidId
 	}
 
 	_, err := s.merchantService.DeletePermanent(int(request.GetId()))
 
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to delete merchant permanently: " + err.Message,
-		})
+		return nil, merchant_errors.ErrGrpcFailedDeletePermanent
 	}
 
 	so := s.mapping.ToProtoResponseMerchantDelete("success", "Successfully deleted merchant permanently")
@@ -293,10 +269,7 @@ func (s *merchantHandleGrpc) RestoreAll(ctx context.Context, _ *emptypb.Empty) (
 	_, err := s.merchantService.RestoreAll()
 
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to restore all merchant: ",
-		})
+		return nil, merchant_errors.ErrGrpcFailedRestoreAll
 	}
 
 	so := s.mapping.ToProtoResponseMerchantAll("success", "Successfully restore all merchant")
@@ -308,10 +281,7 @@ func (s *merchantHandleGrpc) DeleteAllPermanent(ctx context.Context, _ *emptypb.
 	_, err := s.merchantService.DeleteAllPermanent()
 
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", &pb.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to delete merchant permanent: ",
-		})
+		return nil, merchant_errors.ErrGrpcFailedDeleteAll
 	}
 
 	so := s.mapping.ToProtoResponseMerchantAll("success", "Successfully delete merchant permanen")

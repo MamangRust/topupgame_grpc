@@ -12,7 +12,19 @@ type ResponseApiMapper struct {
 	VoucherResponseMapper     VoucherResponseMapper
 }
 
-func NewResponseApiMapper() *ResponseApiMapper {
+type IResponseApiMapper interface {
+	GetAuthMapper() AuthResponseMapper
+	GetRoleMapper() RoleResponseMapper
+	GetUserMapper() UserResponseMapper
+	GetBankMapper() BankResponseMapper
+	GetCategoryMapper() CategoryResponseMapper
+	GetMerchantMapper() MerchantResponseMapper
+	GetNominalMapper() NominalResponseMapper
+	GetTransactionMapper() TransactionResponseMapper
+	GetVoucherMapper() VoucherResponseMapper
+}
+
+func NewResponseApiMapper() IResponseApiMapper {
 	return &ResponseApiMapper{
 		AuthResponseMapper:        NewAuthResponseMapper(),
 		UserResponseMapper:        NewUserResponseMapper(),
@@ -24,4 +36,40 @@ func NewResponseApiMapper() *ResponseApiMapper {
 		TransactionResponseMapper: NewTransactionResponseMapper(),
 		VoucherResponseMapper:     NewVoucherResponseMapper(),
 	}
+}
+
+func (r *ResponseApiMapper) GetAuthMapper() AuthResponseMapper {
+	return r.AuthResponseMapper
+}
+
+func (r *ResponseApiMapper) GetBankMapper() BankResponseMapper {
+	return r.BankResponseMapper
+}
+
+func (r *ResponseApiMapper) GetCategoryMapper() CategoryResponseMapper {
+	return r.CategoryResponseMapper
+}
+
+func (r *ResponseApiMapper) GetMerchantMapper() MerchantResponseMapper {
+	return r.MerchantResponseMapper
+}
+
+func (r *ResponseApiMapper) GetNominalMapper() NominalResponseMapper {
+	return r.NominalResponseMapper
+}
+
+func (r *ResponseApiMapper) GetRoleMapper() RoleResponseMapper {
+	return r.RoleResponseMapper
+}
+
+func (r *ResponseApiMapper) GetTransactionMapper() TransactionResponseMapper {
+	return r.TransactionResponseMapper
+}
+
+func (r *ResponseApiMapper) GetUserMapper() UserResponseMapper {
+	return r.UserResponseMapper
+}
+
+func (r *ResponseApiMapper) GetVoucherMapper() VoucherResponseMapper {
+	return r.VoucherResponseMapper
 }

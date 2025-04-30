@@ -1,0 +1,1168 @@
+{
+	"info": {
+		"_postman_id": "0e0749d9-6bdc-4e87-b3e1-93621327d0fb",
+		"name": "Bank",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12455638"
+	},
+	"item": [
+		{
+			"name": "Find ID",
+			"item": [
+				{
+					"name": "Monthly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/mybank/monthly-amount-success/123?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"mybank",
+								"monthly-amount-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/mybank/monthly-amount-success/123?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/mybank/yearly-amount-success/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"mybank",
+								"yearly-amount-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/mybank/yearly-amount-success/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/mybank/monthly-amount-failed/123?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"mybank",
+								"monthly-amount-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/mybank/monthly-amount-failed/123?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\"\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/mybank/yearly-amount-failed/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"mybank",
+								"yearly-amount-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/mybank/yearly-amount-failed/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/mybank/monthly-method-success/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"mybank",
+								"monthly-method-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/mybank/monthly-method-success/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\"\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/mybank/yearly-method-success/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"mybank",
+								"yearly-method-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/mybank/yearly-method-success/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/mybank/monthly-method-failed/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"mybank",
+								"monthly-method-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/mybank/monthly-method-failed/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/mybank/yearly-method-failed/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"mybank",
+								"yearly-method-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/mybank/yearly-method-failed/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Merchant",
+			"item": [
+				{
+					"name": "Monthly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/merchant/monthly-amount-success/456?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"merchant",
+								"monthly-amount-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/merchant/monthly-amount-success/456?year=2024&month=3\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/merchant/yearly-amount-success/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"merchant",
+								"yearly-amount-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/merchant/yearly-amount-success/456?year=2024\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/merchant/monthly-amount-failed/456?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"merchant",
+								"monthly-amount-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/merchant/monthly-amount-failed/456?year=2024&month=3\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/merchant/yearly-amount-failed/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"merchant",
+								"yearly-amount-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/merchant/yearly-amount-failed/456?year=2024\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/merchant/monthly-method-success/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"merchant",
+								"monthly-method-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/merchant/monthly-method-success/456?year=2024\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/merchant/yearly-method-success/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"merchant",
+								"yearly-method-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/merchant/yearly-method-success/456?year=2024\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/merchant/monthly-method-failed/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"merchant",
+								"monthly-method-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/merchant/monthly-method-failed/456?year=2024\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/bank/merchant/yearly-method-failed/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"bank",
+								"merchant",
+								"yearly-method-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/merchant/yearly-method-failed/456?year=2024\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Monthly Method Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/monthly-method-success?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"monthly-method-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/monthly-method-success?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Method Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/yearly-method-success?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"yearly-method-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/yearly-method-success?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Monthly Method Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/monthly-method-failed?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"monthly-method-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/monthly-method-failed?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Method Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/yearly-method-failed?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"yearly-method-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/yearly-method-failed?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "FindAll",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/bank \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Find Id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/bank/1 \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Find Active Bank",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/active",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"active"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/bank/active \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Find Trashed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/trashed",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"trashed"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/bank/trashed \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Monthly Amount Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/monthly-amount-success?year=2024&month=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"monthly-amount-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						},
+						{
+							"key": "month",
+							"value": "3"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/monthly-amount-success?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Create Bank",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\": \"Bank ABC\", \"code\": \"ABC123\", \"is_active\": true}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/bank/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"create"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:5000/api/bank/create \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"name\": \"Bank ABC\", \"code\": \"ABC123\", \"is_active\": true}'\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Monthly Amount Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/monthly-amount-failed?year=2024&month=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"monthly-amount-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						},
+						{
+							"key": "month",
+							"value": "3"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/monthly-amount-failed?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Amount Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/yearly-amount-failed?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"yearly-amount-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/yearly-amount-failed?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Trashed Bank",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/delete/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"delete",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X DELETE http://localhost:5000/api/bank/1 \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Restore Bank",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/restore/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"restore",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X PUT http://localhost:5000/api/bank/restore/1 \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Restore All",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/restore/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"restore",
+						"all"
+					]
+				},
+				"description": "Generated from cURL: curl -X PUT http://localhost:5000/api/bank/restore-all \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete All Permanent",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/permanent/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"permanent",
+						"all"
+					]
+				},
+				"description": "Generated from cURL: curl -X DELETE http://localhost:5000/api/bank/permanent-all \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Bank",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\": \"Bank ABC Updated\", \"code\": \"ABC123\", \"is_active\": false}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/bank/update/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"update",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:5000/api/bank/1 \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"name\": \"Bank ABC Updated\", \"code\": \"ABC123\", \"is_active\": false}'\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Amount Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/bank/yearly-amount-success?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"bank",
+						"yearly-amount-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/bank/yearly-amount-success?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\"\n"
+			},
+			"response": []
+		}
+	]
+}

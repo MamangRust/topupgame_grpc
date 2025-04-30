@@ -1,0 +1,1217 @@
+{
+	"info": {
+		"_postman_id": "f48f8ba4-6c4a-4353-93c0-745ebdf1a264",
+		"name": "Voucher",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12455638"
+	},
+	"item": [
+		{
+			"name": "Find Id",
+			"item": [
+				{
+					"name": "Monthly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/myvoucher/monthly-amount-success/123?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"myvoucher",
+								"monthly-amount-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/myvoucher/monthly-amount-success/123?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/myvoucher/yearly-amount-success/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"myvoucher",
+								"yearly-amount-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/myvoucher/yearly-amount-success/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/myvoucher/monthly-amount-failed/123?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"myvoucher",
+								"monthly-amount-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/myvoucher/monthly-amount-failed/123?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/myvoucher/yearly-amount-failed/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"myvoucher",
+								"yearly-amount-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/myvoucher/yearly-amount-failed/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/myvoucher/monthly-method-success/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"myvoucher",
+								"monthly-method-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/myvoucher/monthly-method-success/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/myvoucher/yearly-method-success/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"myvoucher",
+								"yearly-method-success",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/myvoucher/yearly-method-success/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/myvoucher/monthly-method-failed/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"myvoucher",
+								"monthly-method-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/myvoucher/monthly-method-failed/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/myvoucher/yearly-method-failed/123?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"myvoucher",
+								"yearly-method-failed",
+								"123"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/myvoucher/yearly-method-failed/123?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Merchant",
+			"item": [
+				{
+					"name": "Monthly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/merchant/monthly-amount-success/456?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"merchant",
+								"monthly-amount-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/merchant/monthly-amount-success/456?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/merchant/yearly-amount-success/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"merchant",
+								"yearly-amount-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/merchant/yearly-amount-success/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/merchant/monthly-amount-failed/456?year=2024&month=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"merchant",
+								"monthly-amount-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/merchant/monthly-amount-failed/456?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Amount Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/merchant/yearly-amount-failed/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"merchant",
+								"yearly-amount-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/merchant/yearly-amount-failed/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/merchant/monthly-method-success/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"merchant",
+								"monthly-method-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/merchant/monthly-method-success/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Success",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/merchant/yearly-method-success/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"merchant",
+								"yearly-method-success",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/merchant/yearly-method-success/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/merchant/monthly-method-failed/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"merchant",
+								"monthly-method-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/merchant/monthly-method-failed/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				},
+				{
+					"name": "Yearly Method Failed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{secret_key}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/voucher/merchant/yearly-method-failed/456?year=2024",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"voucher",
+								"merchant",
+								"yearly-method-failed",
+								"456"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/merchant/yearly-method-failed/456?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Monthly Amount Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/monthly-amount-failed?year=2024&month=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"monthly-amount-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						},
+						{
+							"key": "month",
+							"value": "3"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/monthly-amount-failed?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Amount Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/yearly-amount-failed?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"yearly-amount-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/yearly-amount-failed?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Monthly Amount Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/monthly-amount-success?year=2024&month=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"monthly-amount-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						},
+						{
+							"key": "month",
+							"value": "3"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/monthly-amount-success?year=2024&month=3\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Amount Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/yearly-amount-success?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"yearly-amount-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/yearly-amount-success?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Method Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/yearly-method-success?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"yearly-method-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/yearly-method-success?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Monthly Method Success",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/monthly-method-success?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"monthly-method-success"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/monthly-method-success?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Monthly Method Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/monthly-method-failed?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"monthly-method-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/monthly-method-failed?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Yearly Method Failed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/yearly-method-failed?year=2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"yearly-method-failed"
+					],
+					"query": [
+						{
+							"key": "year",
+							"value": "2024"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:5000/api/voucher/yearly-method-failed?year=2024\" \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Find All",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/voucher \\\n  -H \"Authorization: Bearer {{secret_key}}\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Find Id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/voucher/1 \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Find Active",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/active",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"active"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/voucher/active \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Find Trashed",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/trashed",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"trashed"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET http://localhost:5000/api/voucher/trashed \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Create Voucher",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "merchant_id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "category_id",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "Voucher Ramadan",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/path/to/image.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"create"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:5000/api/voucher/create \\\n  -H \"Authorization: Bearer {{secret_key}}\" \\\n  -F \"merchant_id=1\" \\\n  -F \"category_id=2\" \\\n  -F \"name=Voucher Ramadan\" \\\n  -F \"image=@/path/to/image.jpg\""
+			},
+			"response": []
+		},
+		{
+			"name": "Update Voucher",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "merchant_id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "category_id",
+							"value": "3",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "Voucher Lebaran Updated",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/path/to/new-image.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:5000/api/voucher/1 \\\n  -H \"Authorization: Bearer {{secret_key}}\" \\\n  -F \"merchant_id=1\" \\\n  -F \"category_id=3\" \\\n  -F \"name=Voucher Lebaran Updated\" \\\n  -F \"image=@/path/to/new-image.png\""
+			},
+			"response": []
+		},
+		{
+			"name": "Trashed",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X DELETE http://localhost:5000/api/voucher/1 \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Restore",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/restore/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"restore",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:5000/api/voucher/restore/1 \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete permanent",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/permanent/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"permanent",
+						"1"
+					]
+				},
+				"description": "Generated from cURL: curl -X DELETE http://localhost:5000/api/voucher/permanent/1 \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Restore All",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/restore/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"restore",
+						"all"
+					]
+				},
+				"description": "Generated from cURL: curl -X PUT http://localhost:5000/api/voucher/restore/all \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		},
+		{
+			"name": "Delte All Voucher",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{secret_key}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/voucher/permanent-all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"voucher",
+						"permanent-all"
+					]
+				},
+				"description": "Generated from cURL: curl -X DELETE http://localhost:5000/api/voucher/permanent-all \\\n  -H \"Authorization: Bearer {{secret_key}}\""
+			},
+			"response": []
+		}
+	]
+}

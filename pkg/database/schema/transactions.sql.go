@@ -8,12 +8,24 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createTransaction = `-- name: CreateTransaction :one
-INSERT INTO transactions (user_id, merchant_id, voucher_id, nominal_id, category_id, bank_id, payment_method, status)
+INSERT INTO
+    transactions (
+        user_id,
+        merchant_id,
+        voucher_id,
+        nominal_id,
+        bank_id,
+        payment_method,
+        status,
+        amount
+    )
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-  RETURNING transaction_id, user_id, merchant_id, voucher_id, nominal_id, category_id, bank_id, payment_method, status, created_at, updated_at, deleted_at
+RETURNING
+    transaction_id, user_id, merchant_id, voucher_id, nominal_id, bank_id, payment_method, amount, status, created_at, updated_at, deleted_at
 `
 
 type CreateTransactionParams struct {
@@ -21,10 +33,10 @@ type CreateTransactionParams struct {
 	MerchantID    sql.NullInt32  `json:"merchant_id"`
 	VoucherID     sql.NullInt32  `json:"voucher_id"`
 	NominalID     sql.NullInt32  `json:"nominal_id"`
-	CategoryID    sql.NullInt32  `json:"category_id"`
 	BankID        sql.NullInt32  `json:"bank_id"`
 	PaymentMethod string         `json:"payment_method"`
 	Status        sql.NullString `json:"status"`
+	Amount        int32          `json:"amount"`
 }
 
 // Create Transaction
@@ -34,10 +46,10 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 		arg.MerchantID,
 		arg.VoucherID,
 		arg.NominalID,
-		arg.CategoryID,
 		arg.BankID,
 		arg.PaymentMethod,
 		arg.Status,
+		arg.Amount,
 	)
 	var i Transaction
 	err := row.Scan(
@@ -46,9 +58,9 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 		&i.MerchantID,
 		&i.VoucherID,
 		&i.NominalID,
-		&i.CategoryID,
 		&i.BankID,
 		&i.PaymentMethod,
+		&i.Amount,
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -68,7 +80,10 @@ func (q *Queries) DeleteAllPermanentTransactions(ctx context.Context) error {
 }
 
 const deleteTransactionPermanently = `-- name: DeleteTransactionPermanently :exec
-DELETE FROM transactions WHERE transaction_id = $1 AND deleted_at IS NOT NULL
+DELETE FROM transactions
+WHERE
+    transaction_id = $1
+    AND deleted_at IS NOT NULL
 `
 
 // Delete Transaction Permanently
@@ -77,11 +92,906 @@ func (q *Queries) DeleteTransactionPermanently(ctx context.Context, transactionI
 	return err
 }
 
+const getMonthlyAmountTransactionFailed = `-- name: GetMonthlyAmountTransactionFailed :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'failed'
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at)
+    )
+SELECT
+    rm.year::text,
+    TO_CHAR(TO_DATE(rm.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_failed, 0) AS total_failed,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM report_months rm
+LEFT JOIN monthly_transactions mt ON
+    rm.year = mt.year AND
+    rm.month = mt.month
+ORDER BY 
+    rm.year DESC,
+    rm.month DESC
+`
+
+type GetMonthlyAmountTransactionFailedParams struct {
+	Column1 time.Time `json:"column_1"`
+	Column2 time.Time `json:"column_2"`
+	Column3 time.Time `json:"column_3"`
+	Column4 time.Time `json:"column_4"`
+}
+
+type GetMonthlyAmountTransactionFailedRow struct {
+	RmYear      string `json:"rm_year"`
+	Month       string `json:"month"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+// GetMonthlyAmountTransactionFailed: Retrieves monthly failed transaction metrics
+// Purpose: Generate monthly reports of failed transactions for analysis
+// Parameters:
+//
+//	$1: Start date of first comparison period (timestamp)
+//	$2: End date of first comparison period (timestamp)
+//	$3: Start date of second comparison period (timestamp)
+//	$4: End date of second comparison period (timestamp)
+//
+// Returns:
+//
+//	year: Year as text
+//	month: 3-letter month abbreviation (e.g. 'Jan')
+//	total_failed: Count of failed transactions
+//	total_amount: Sum of failed transaction amounts
+//
+// Business Logic:
+//   - Only includes failed (payment_status = 'failed') transactions
+//   - Excludes deleted transactions
+//   - Compares two customizable time periods
+//   - Includes gap-filling for months with no failed transactions
+//   - Returns 0 values for months with no failed transactions
+//   - Orders by most recent year/month first
+func (q *Queries) GetMonthlyAmountTransactionFailed(ctx context.Context, arg GetMonthlyAmountTransactionFailedParams) ([]*GetMonthlyAmountTransactionFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthlyAmountTransactionFailed,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthlyAmountTransactionFailedRow
+	for rows.Next() {
+		var i GetMonthlyAmountTransactionFailedRow
+		if err := rows.Scan(
+			&i.RmYear,
+			&i.Month,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthlyAmountTransactionFailedByMerchant = `-- name: GetMonthlyAmountTransactionFailedByMerchant :many
+WITH
+    month_series AS (
+        SELECT generate_series(
+            date_trunc('month', LEAST($1::timestamp, $3::timestamp)),
+            date_trunc('month', GREATEST($2::timestamp, $4::timestamp)),
+            INTERVAL '1 month'
+        ) AS month_start
+    ),
+    monthly_data AS (
+        SELECT
+            date_trunc('month', t.created_at) AS month_start,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'failed'
+            AND t.merchant_id = $5
+            AND t.created_at BETWEEN LEAST($1::timestamp, $3::timestamp) AND GREATEST($2::timestamp, $4::timestamp)
+        GROUP BY date_trunc('month', t.created_at)
+    )
+SELECT
+    EXTRACT(YEAR FROM m.month_start)::text AS year,
+    TO_CHAR(m.month_start, 'Mon') AS month,
+    COALESCE(md.total_failed, 0) AS total_failed,
+    COALESCE(md.total_amount, 0) AS total_amount
+FROM month_series m
+LEFT JOIN monthly_data md ON m.month_start = md.month_start
+ORDER BY m.month_start DESC
+`
+
+type GetMonthlyAmountTransactionFailedByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	Column2    time.Time     `json:"column_2"`
+	Column3    time.Time     `json:"column_3"`
+	Column4    time.Time     `json:"column_4"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthlyAmountTransactionFailedByMerchantRow struct {
+	Year        string `json:"year"`
+	Month       string `json:"month"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+// GetMonthlyAmountTransactionFailedByMerchant: Retrieves monthly failed transaction metrics
+// Purpose: Generate monthly reports of failed transactions for analysis by merchant_id
+// Parameters:
+//
+//	$1: Start date of first comparison period (timestamp)
+//	$2: End date of first comparison period (timestamp)
+//	$3: Start date of second comparison period (timestamp)
+//	$4: End date of second comparison period (timestamp)
+//	$5: Merchant ID
+//
+// Returns:
+//
+//	year: Year as text
+//	month: 3-letter month abbreviation (e.g. 'Jan')
+//	total_failed: Count of failed transactions
+//	total_amount: Sum of failed transaction amounts
+//
+// Business Logic:
+//   - Only includes failed (payment_status = 'failed') transactions
+//   - Excludes deleted transactions
+//   - Compares two customizable time periods
+//   - Includes gap-filling for months with no failed transactions
+//   - Returns 0 values for months with no failed transactions
+//   - Orders by most recent year/month first
+func (q *Queries) GetMonthlyAmountTransactionFailedByMerchant(ctx context.Context, arg GetMonthlyAmountTransactionFailedByMerchantParams) ([]*GetMonthlyAmountTransactionFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthlyAmountTransactionFailedByMerchant,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.MerchantID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthlyAmountTransactionFailedByMerchantRow
+	for rows.Next() {
+		var i GetMonthlyAmountTransactionFailedByMerchantRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.Month,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthlyAmountTransactionSuccess = `-- name: GetMonthlyAmountTransactionSuccess :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'success'
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at)
+    )
+SELECT
+    rm.year::text,
+    TO_CHAR(TO_DATE(rm.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_success, 0) AS total_success,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM report_months rm
+LEFT JOIN monthly_transactions mt ON
+    rm.year = mt.year AND
+    rm.month = mt.month
+ORDER BY 
+    rm.year DESC,
+    rm.month DESC
+`
+
+type GetMonthlyAmountTransactionSuccessParams struct {
+	Column1 time.Time `json:"column_1"`
+	Column2 time.Time `json:"column_2"`
+	Column3 time.Time `json:"column_3"`
+	Column4 time.Time `json:"column_4"`
+}
+
+type GetMonthlyAmountTransactionSuccessRow struct {
+	RmYear       string `json:"rm_year"`
+	Month        string `json:"month"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+// GetMonthlyAmountTransactionSuccess: Retrieves monthly success transaction metrics
+// Purpose: Generate monthly reports of successful transactions for analysis
+// Parameters:
+//
+//	$1: Start date of first comparison period (timestamp)
+//	$2: End date of first comparison period (timestamp)
+//	$3: Start date of second comparison period (timestamp)
+//	$4: End date of second comparison period (timestamp)
+//
+// Returns:
+//
+//	year: Year as text
+//	month: 3-letter month abbreviation (e.g. 'Jan')
+//	total_success: Count of successful transactions
+//	total_amount: Sum of successful transaction amounts
+//
+// Business Logic:
+//   - Only includes successful (payment_status = 'success') transactions
+//   - Excludes deleted transactions
+//   - Compares two customizable time periods
+//   - Includes gap-filling for months with no transactions
+//   - Returns 0 values for months with no successful transactions
+//   - Orders by most recent year/month first
+func (q *Queries) GetMonthlyAmountTransactionSuccess(ctx context.Context, arg GetMonthlyAmountTransactionSuccessParams) ([]*GetMonthlyAmountTransactionSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthlyAmountTransactionSuccess,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthlyAmountTransactionSuccessRow
+	for rows.Next() {
+		var i GetMonthlyAmountTransactionSuccessRow
+		if err := rows.Scan(
+			&i.RmYear,
+			&i.Month,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthlyAmountTransactionSuccessByMerchant = `-- name: GetMonthlyAmountTransactionSuccessByMerchant :many
+WITH
+    month_series AS (
+        SELECT generate_series(
+            date_trunc('month', LEAST($1::timestamp, $3::timestamp)),
+            date_trunc('month', GREATEST($2::timestamp, $4::timestamp)),
+            INTERVAL '1 month'
+        ) AS month_start
+    ),
+    monthly_data AS (
+        SELECT
+            date_trunc('month', t.created_at) AS month_start,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'success'
+            AND t.merchant_id = $5
+            AND t.created_at BETWEEN LEAST($1::timestamp, $3::timestamp) AND GREATEST($2::timestamp, $4::timestamp)
+        GROUP BY date_trunc('month', t.created_at)
+    )
+SELECT
+    EXTRACT(YEAR FROM m.month_start)::text AS year,
+    TO_CHAR(m.month_start, 'Mon') AS month,
+    COALESCE(md.total_success, 0) AS total_success,
+    COALESCE(md.total_amount, 0) AS total_amount
+FROM month_series m
+LEFT JOIN monthly_data md ON m.month_start = md.month_start
+ORDER BY m.month_start DESC
+`
+
+type GetMonthlyAmountTransactionSuccessByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	Column2    time.Time     `json:"column_2"`
+	Column3    time.Time     `json:"column_3"`
+	Column4    time.Time     `json:"column_4"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthlyAmountTransactionSuccessByMerchantRow struct {
+	Year         string `json:"year"`
+	Month        string `json:"month"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+// GetMonthlyAmountTransactionSuccessByMerchant: Retrieves monthly success transaction metrics by merchant_id
+// Purpose: Generate monthly reports of successful transactions for analysis
+// Parameters:
+//
+//	$1: Start date of first comparison period (timestamp)
+//	$2: End date of first comparison period (timestamp)
+//	$3: Start date of second comparison period (timestamp)
+//	$4: End date of second comparison period (timestamp)
+//	$5: Merchant ID
+//
+// Returns:
+//
+//	year: Year as text
+//	month: 3-letter month abbreviation (e.g. 'Jan')
+//	total_success: Count of successful transactions
+//	total_amount: Sum of successful transaction amounts
+//
+// Business Logic:
+//   - Only includes successful (payment_status = 'success') transactions
+//   - Excludes deleted transactions
+//   - Compares two customizable time periods
+//   - Includes gap-filling for months with no transactions
+//   - Returns 0 values for months with no successful transactions
+//   - Orders by most recent year/month first
+func (q *Queries) GetMonthlyAmountTransactionSuccessByMerchant(ctx context.Context, arg GetMonthlyAmountTransactionSuccessByMerchantParams) ([]*GetMonthlyAmountTransactionSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthlyAmountTransactionSuccessByMerchant,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.MerchantID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthlyAmountTransactionSuccessByMerchantRow
+	for rows.Next() {
+		var i GetMonthlyAmountTransactionSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.Month,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthlyTransactionMethodsFailed = `-- name: GetMonthlyTransactionMethodsFailed :many
+WITH
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    payment_methods AS (
+        SELECT DISTINCT
+            payment_method
+        FROM transactions
+        WHERE deleted_at IS NULL
+    ),
+    all_months AS (
+        SELECT generate_series(
+            (SELECT start_date FROM date_range),
+            (SELECT end_date FROM date_range),
+            interval '1 month'
+        )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            pm.payment_method
+        FROM all_months am
+        CROSS JOIN payment_methods pm
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'failed'
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            t.payment_method
+    )
+SELECT 
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_transactions mt ON 
+    ac.activity_month = mt.activity_month
+    AND ac.payment_method = mt.payment_method
+ORDER BY 
+    ac.activity_month, 
+    ac.payment_method
+`
+
+type GetMonthlyTransactionMethodsFailedRow struct {
+	Month             string  `json:"month"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+// GetMonthlyTransactionMethodsFailed: Analyzes failed payment method usage by month
+// Purpose: Track monthly trends in failed payment method attempts
+// Parameters:
+//
+//	$1: Reference date (timestamp) - determines the 12-month analysis period
+//
+// Returns:
+//
+//	month: 3-letter month abbreviation (e.g. 'Jan')
+//	payment_method: The payment method attempted
+//	total_transactions: Count of failed transactions
+//	total_amount: Total amount attempted (not successfully processed)
+//
+// Business Logic:
+//   - Analyzes a rolling 12-month period from reference date
+//   - Only includes failed (payment_status = 'failed') transactions
+//   - Excludes deleted transactions
+//   - Groups by month and payment method
+//   - Returns formatted month names for reporting
+//   - Orders chronologically by month then by payment method
+func (q *Queries) GetMonthlyTransactionMethodsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetMonthlyTransactionMethodsFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthlyTransactionMethodsFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthlyTransactionMethodsFailedRow
+	for rows.Next() {
+		var i GetMonthlyTransactionMethodsFailedRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthlyTransactionMethodsFailedByMerchant = `-- name: GetMonthlyTransactionMethodsFailedByMerchant :many
+WITH
+    date_range AS (
+        SELECT
+            date_trunc('month', $1::timestamp) AS start_date,
+            date_trunc('month', $1::timestamp) + INTERVAL '1 year' - INTERVAL '1 day' AS end_date
+    ),
+    month_series AS (
+        SELECT generate_series(
+            (SELECT start_date FROM date_range),
+            (SELECT end_date FROM date_range),
+            INTERVAL '1 month'
+        ) AS month_start
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS month_start,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            SUM(t.amount)::NUMERIC AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'failed'
+            AND t.merchant_id = $2
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) AND (SELECT end_date FROM date_range)
+        GROUP BY
+            month_start,
+            t.payment_method
+    ),
+    payment_methods AS (
+        SELECT DISTINCT payment_method
+        FROM transactions
+        WHERE deleted_at IS NULL
+    )
+SELECT
+    TO_CHAR(m.month_start, 'Mon') AS month,
+    pm.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_series m
+CROSS JOIN payment_methods pm
+LEFT JOIN monthly_transactions mt
+    ON m.month_start = mt.month_start
+    AND pm.payment_method = mt.payment_method
+ORDER BY m.month_start, pm.payment_method
+`
+
+type GetMonthlyTransactionMethodsFailedByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthlyTransactionMethodsFailedByMerchantRow struct {
+	Month             string  `json:"month"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+// Purpose: Analyze the monthly payment method usage for a specific merchant with a focus on failed transactions.
+// Parameters:
+//
+//	$1: Reference date (timestamp) - determines the 12-month analysis period.
+//	$2: Merchant ID - filters transactions for a specific merchant.
+//
+// Returns:
+//
+//	month: 3-letter month abbreviation (e.g. 'Jan').
+//	payment_method: The payment method used.
+//	total_transactions: Count of failed transactions.
+//	total_amount: Total amount attempted for this payment method (including failed transactions).
+//
+// Business Logic:
+//   - Analyzes a rolling 12-month period starting from the reference date ($1).
+//   - Only includes transactions with a payment status of 'failed' (payment_status = 'failed').
+//   - Excludes deleted transactions (where deleted_at IS NULL).
+//   - Groups the results by month and payment method.
+//   - For each month, reports the number of failed transactions and the total amount attempted.
+//   - Orders the result chronologically by month, followed by payment method.
+//   - Returns a report useful for tracking failed payment trends over the last 12 months.
+func (q *Queries) GetMonthlyTransactionMethodsFailedByMerchant(ctx context.Context, arg GetMonthlyTransactionMethodsFailedByMerchantParams) ([]*GetMonthlyTransactionMethodsFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthlyTransactionMethodsFailedByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthlyTransactionMethodsFailedByMerchantRow
+	for rows.Next() {
+		var i GetMonthlyTransactionMethodsFailedByMerchantRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthlyTransactionMethodsSuccess = `-- name: GetMonthlyTransactionMethodsSuccess :many
+WITH
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    payment_methods AS (
+        SELECT DISTINCT
+            payment_method
+        FROM transactions
+        WHERE deleted_at IS NULL
+    ),
+    all_months AS (
+        SELECT generate_series(
+            (SELECT start_date FROM date_range),
+            (SELECT end_date FROM date_range),
+            interval '1 month'
+        )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            pm.payment_method
+        FROM all_months am
+        CROSS JOIN payment_methods pm
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'success'
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            t.payment_method
+    )
+SELECT 
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_transactions mt ON 
+    ac.activity_month = mt.activity_month
+    AND ac.payment_method = mt.payment_method
+ORDER BY 
+    ac.activity_month, 
+    ac.payment_method
+`
+
+type GetMonthlyTransactionMethodsSuccessRow struct {
+	Month             string  `json:"month"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+// GetMonthlyTransactionMethodsSuccess: Analyzes successful payment method usage by month
+// Purpose: Track monthly trends in successful payment method preferences
+// Parameters:
+//
+//	$1: Reference date (timestamp) - determines the 12-month analysis period
+//
+// Returns:
+//
+//	month: 3-letter month abbreviation (e.g. 'Jan')
+//	payment_method: The payment method used
+//	total_transactions: Count of successful transactions
+//	total_amount: Total amount successfully processed by this method
+//
+// Business Logic:
+//   - Analyzes a rolling 12-month period from reference date
+//   - Only includes successful (payment_status = 'success') transactions
+//   - Excludes deleted transactions
+//   - Groups by month and payment method
+//   - Returns formatted month names for reporting
+//   - Orders chronologically by month then by payment method
+func (q *Queries) GetMonthlyTransactionMethodsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetMonthlyTransactionMethodsSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthlyTransactionMethodsSuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthlyTransactionMethodsSuccessRow
+	for rows.Next() {
+		var i GetMonthlyTransactionMethodsSuccessRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthlyTransactionMethodsSuccessByMerchant = `-- name: GetMonthlyTransactionMethodsSuccessByMerchant :many
+WITH
+    date_range AS (
+        SELECT
+            date_trunc('month', $1::timestamp) AS start_date,
+            date_trunc('month', $1::timestamp) + INTERVAL '1 year' - INTERVAL '1 day' AS end_date
+    ),
+    month_series AS (
+        SELECT generate_series(
+            (SELECT start_date FROM date_range),
+            (SELECT end_date FROM date_range),
+            INTERVAL '1 month'
+        ) AS month_start
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS month_start,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            SUM(t.amount)::NUMERIC AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'success'
+            AND t.merchant_id = $2
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) AND (SELECT end_date FROM date_range)
+        GROUP BY
+            month_start,
+            t.payment_method
+    ),
+    payment_methods AS (
+        SELECT DISTINCT payment_method
+        FROM transactions
+        WHERE deleted_at IS NULL
+    )
+SELECT
+    TO_CHAR(m.month_start, 'Mon') AS month,
+    pm.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_series m
+CROSS JOIN payment_methods pm
+LEFT JOIN monthly_transactions mt
+    ON m.month_start = mt.month_start
+    AND pm.payment_method = mt.payment_method
+ORDER BY m.month_start, pm.payment_method
+`
+
+type GetMonthlyTransactionMethodsSuccessByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthlyTransactionMethodsSuccessByMerchantRow struct {
+	Month             string  `json:"month"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+// Purpose: Analyze the monthly payment method usage for a specific merchant with a focus on successful transactions.
+// Parameters:
+//
+//	$1: Reference date (timestamp) - determines the 12-month analysis period.
+//	$2: Merchant ID - filters transactions for a specific merchant.
+//
+// Returns:
+//
+//	month: 3-letter month abbreviation (e.g. 'Jan').
+//	payment_method: The payment method used.
+//	total_transactions: Count of successful transactions.
+//	total_amount: Total amount processed by this payment method.
+//
+// Business Logic:
+//   - Analyzes a rolling 12-month period starting from the reference date ($1).
+//   - Only includes transactions with a payment status of 'success' (payment_status = 'success').
+//   - Excludes deleted transactions (where deleted_at IS NULL).
+//   - Groups the results by month and payment method.
+//   - For each month, reports the number of successful transactions and total amount processed.
+//   - Orders the result chronologically by month, followed by payment method.
+//   - Returns a report useful for tracking successful payment trends over the last 12 months.
+func (q *Queries) GetMonthlyTransactionMethodsSuccessByMerchant(ctx context.Context, arg GetMonthlyTransactionMethodsSuccessByMerchantParams) ([]*GetMonthlyTransactionMethodsSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthlyTransactionMethodsSuccessByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthlyTransactionMethodsSuccessByMerchantRow
+	for rows.Next() {
+		var i GetMonthlyTransactionMethodsSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTransactionByID = `-- name: GetTransactionByID :one
-SELECT transaction_id, user_id, merchant_id, voucher_id, nominal_id, category_id, bank_id, payment_method, status, created_at, updated_at, deleted_at
+SELECT transaction_id, user_id, merchant_id, voucher_id, nominal_id, bank_id, payment_method, amount, status, created_at, updated_at, deleted_at
 FROM transactions
-WHERE transaction_id = $1
-  AND deleted_at IS NULL
+WHERE
+    transaction_id = $1
+    AND deleted_at IS NULL
 `
 
 // Get Transaction by ID
@@ -94,9 +1004,9 @@ func (q *Queries) GetTransactionByID(ctx context.Context, transactionID int32) (
 		&i.MerchantID,
 		&i.VoucherID,
 		&i.NominalID,
-		&i.CategoryID,
 		&i.BankID,
 		&i.PaymentMethod,
+		&i.Amount,
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -105,15 +1015,122 @@ func (q *Queries) GetTransactionByID(ctx context.Context, transactionID int32) (
 	return &i, err
 }
 
-const getTransactions = `-- name: GetTransactions :many
-SELECT
-    transaction_id, user_id, merchant_id, voucher_id, nominal_id, category_id, bank_id, payment_method, status, created_at, updated_at, deleted_at,
-    COUNT(*) OVER() AS total_count
+const getTransactionByMerchant = `-- name: GetTransactionByMerchant :many
+SELECT transaction_id, user_id, merchant_id, voucher_id, nominal_id, bank_id, payment_method, amount, status, created_at, updated_at, deleted_at, COUNT(*) OVER () AS total_count
 FROM transactions
-WHERE deleted_at IS NULL
-AND ($1::TEXT IS NULL OR payment_method ILIKE '%' || $1 || '%')
+WHERE
+    deleted_at IS NULL
+    AND (
+        $1::TEXT IS NULL
+        OR payment_method ILIKE '%' || $1 || '%'
+        OR payment_status ILIKE '%' || $1 || '%'
+    )
+    AND (
+        $2::INT IS NULL
+        OR merchant_id = $2
+    )
 ORDER BY created_at DESC
-LIMIT $2 OFFSET $3
+LIMIT $3
+OFFSET
+    $4
+`
+
+type GetTransactionByMerchantParams struct {
+	Column1 string `json:"column_1"`
+	Column2 int32  `json:"column_2"`
+	Limit   int32  `json:"limit"`
+	Offset  int32  `json:"offset"`
+}
+
+type GetTransactionByMerchantRow struct {
+	TransactionID int32          `json:"transaction_id"`
+	UserID        int32          `json:"user_id"`
+	MerchantID    sql.NullInt32  `json:"merchant_id"`
+	VoucherID     sql.NullInt32  `json:"voucher_id"`
+	NominalID     sql.NullInt32  `json:"nominal_id"`
+	BankID        sql.NullInt32  `json:"bank_id"`
+	PaymentMethod string         `json:"payment_method"`
+	Amount        int32          `json:"amount"`
+	Status        sql.NullString `json:"status"`
+	CreatedAt     sql.NullTime   `json:"created_at"`
+	UpdatedAt     sql.NullTime   `json:"updated_at"`
+	DeletedAt     sql.NullTime   `json:"deleted_at"`
+	TotalCount    int64          `json:"total_count"`
+}
+
+// GetTransactionByMerchant: Retrieves merchant-specific transactions with pagination
+// Purpose: List transactions filtered by merchant ID
+// Parameters:
+//
+//	$1: search_term - Optional text to filter transactions
+//	$2: merchant_id - Optional merchant ID to filter by (NULL for all merchants)
+//	$3: limit - Pagination limit
+//	$4: offset - Pagination offset
+//
+// Returns:
+//
+//	Transaction records with total_count
+//
+// Business Logic:
+//   - Combines merchant filtering with search functionality
+//   - Maintains same sorting and pagination as other transaction queries
+//   - Useful for merchant-specific transaction reporting
+//   - NULL merchant_id parameter returns all merchants' transactions
+func (q *Queries) GetTransactionByMerchant(ctx context.Context, arg GetTransactionByMerchantParams) ([]*GetTransactionByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTransactionByMerchant,
+		arg.Column1,
+		arg.Column2,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetTransactionByMerchantRow
+	for rows.Next() {
+		var i GetTransactionByMerchantRow
+		if err := rows.Scan(
+			&i.TransactionID,
+			&i.UserID,
+			&i.MerchantID,
+			&i.VoucherID,
+			&i.NominalID,
+			&i.BankID,
+			&i.PaymentMethod,
+			&i.Amount,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.TotalCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTransactions = `-- name: GetTransactions :many
+SELECT transaction_id, user_id, merchant_id, voucher_id, nominal_id, bank_id, payment_method, amount, status, created_at, updated_at, deleted_at, COUNT(*) OVER () AS total_count
+FROM transactions
+WHERE
+    deleted_at IS NULL
+    AND (
+        $1::TEXT IS NULL
+        OR payment_method ILIKE '%' || $1 || '%'
+    )
+ORDER BY created_at DESC
+LIMIT $2
+OFFSET
+    $3
 `
 
 type GetTransactionsParams struct {
@@ -128,9 +1145,9 @@ type GetTransactionsRow struct {
 	MerchantID    sql.NullInt32  `json:"merchant_id"`
 	VoucherID     sql.NullInt32  `json:"voucher_id"`
 	NominalID     sql.NullInt32  `json:"nominal_id"`
-	CategoryID    sql.NullInt32  `json:"category_id"`
 	BankID        sql.NullInt32  `json:"bank_id"`
 	PaymentMethod string         `json:"payment_method"`
+	Amount        int32          `json:"amount"`
 	Status        sql.NullString `json:"status"`
 	CreatedAt     sql.NullTime   `json:"created_at"`
 	UpdatedAt     sql.NullTime   `json:"updated_at"`
@@ -154,9 +1171,9 @@ func (q *Queries) GetTransactions(ctx context.Context, arg GetTransactionsParams
 			&i.MerchantID,
 			&i.VoucherID,
 			&i.NominalID,
-			&i.CategoryID,
 			&i.BankID,
 			&i.PaymentMethod,
+			&i.Amount,
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -177,14 +1194,18 @@ func (q *Queries) GetTransactions(ctx context.Context, arg GetTransactionsParams
 }
 
 const getTransactionsActive = `-- name: GetTransactionsActive :many
-SELECT
-    transaction_id, user_id, merchant_id, voucher_id, nominal_id, category_id, bank_id, payment_method, status, created_at, updated_at, deleted_at,
-    COUNT(*) OVER() AS total_count
+SELECT transaction_id, user_id, merchant_id, voucher_id, nominal_id, bank_id, payment_method, amount, status, created_at, updated_at, deleted_at, COUNT(*) OVER () AS total_count
 FROM transactions
-WHERE deleted_at IS NULL
-AND ($1::TEXT IS NULL OR payment_method ILIKE '%' || $1 || '%')
+WHERE
+    deleted_at IS NULL
+    AND (
+        $1::TEXT IS NULL
+        OR payment_method ILIKE '%' || $1 || '%'
+    )
 ORDER BY created_at DESC
-LIMIT $2 OFFSET $3
+LIMIT $2
+OFFSET
+    $3
 `
 
 type GetTransactionsActiveParams struct {
@@ -199,9 +1220,9 @@ type GetTransactionsActiveRow struct {
 	MerchantID    sql.NullInt32  `json:"merchant_id"`
 	VoucherID     sql.NullInt32  `json:"voucher_id"`
 	NominalID     sql.NullInt32  `json:"nominal_id"`
-	CategoryID    sql.NullInt32  `json:"category_id"`
 	BankID        sql.NullInt32  `json:"bank_id"`
 	PaymentMethod string         `json:"payment_method"`
+	Amount        int32          `json:"amount"`
 	Status        sql.NullString `json:"status"`
 	CreatedAt     sql.NullTime   `json:"created_at"`
 	UpdatedAt     sql.NullTime   `json:"updated_at"`
@@ -225,9 +1246,9 @@ func (q *Queries) GetTransactionsActive(ctx context.Context, arg GetTransactions
 			&i.MerchantID,
 			&i.VoucherID,
 			&i.NominalID,
-			&i.CategoryID,
 			&i.BankID,
 			&i.PaymentMethod,
+			&i.Amount,
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -248,14 +1269,18 @@ func (q *Queries) GetTransactionsActive(ctx context.Context, arg GetTransactions
 }
 
 const getTransactionsTrashed = `-- name: GetTransactionsTrashed :many
-SELECT
-    transaction_id, user_id, merchant_id, voucher_id, nominal_id, category_id, bank_id, payment_method, status, created_at, updated_at, deleted_at,
-    COUNT(*) OVER() AS total_count
+SELECT transaction_id, user_id, merchant_id, voucher_id, nominal_id, bank_id, payment_method, amount, status, created_at, updated_at, deleted_at, COUNT(*) OVER () AS total_count
 FROM transactions
-WHERE deleted_at IS NOT NULL
-AND ($1::TEXT IS NULL OR payment_method ILIKE '%' || $1 || '%')
+WHERE
+    deleted_at IS NOT NULL
+    AND (
+        $1::TEXT IS NULL
+        OR payment_method ILIKE '%' || $1 || '%'
+    )
 ORDER BY created_at DESC
-LIMIT $2 OFFSET $3
+LIMIT $2
+OFFSET
+    $3
 `
 
 type GetTransactionsTrashedParams struct {
@@ -270,9 +1295,9 @@ type GetTransactionsTrashedRow struct {
 	MerchantID    sql.NullInt32  `json:"merchant_id"`
 	VoucherID     sql.NullInt32  `json:"voucher_id"`
 	NominalID     sql.NullInt32  `json:"nominal_id"`
-	CategoryID    sql.NullInt32  `json:"category_id"`
 	BankID        sql.NullInt32  `json:"bank_id"`
 	PaymentMethod string         `json:"payment_method"`
+	Amount        int32          `json:"amount"`
 	Status        sql.NullString `json:"status"`
 	CreatedAt     sql.NullTime   `json:"created_at"`
 	UpdatedAt     sql.NullTime   `json:"updated_at"`
@@ -296,9 +1321,9 @@ func (q *Queries) GetTransactionsTrashed(ctx context.Context, arg GetTransaction
 			&i.MerchantID,
 			&i.VoucherID,
 			&i.NominalID,
-			&i.CategoryID,
 			&i.BankID,
 			&i.PaymentMethod,
+			&i.Amount,
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -318,10 +1343,766 @@ func (q *Queries) GetTransactionsTrashed(ctx context.Context, arg GetTransaction
 	return items, nil
 }
 
+const getYearlyAmountTransactionFailed = `-- name: GetYearlyAmountTransactionFailed :many
+WITH
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'failed'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at)
+    )
+SELECT
+    ry.year::text,
+    COALESCE(yt.total_failed, 0) AS total_failed,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM report_years ry
+LEFT JOIN yearly_transactions yt ON
+    ry.year = yt.year
+ORDER BY 
+    ry.year DESC
+`
+
+type GetYearlyAmountTransactionFailedRow struct {
+	RyYear      string `json:"ry_year"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+// GetYearlyAmountTransactionFailed: Retrieves yearly failed transaction metrics
+// Purpose: Generate annual reports of failed transactions
+// Parameters:
+//
+//	$1: Reference year for comparison (current year as integer)
+//
+// Returns:
+//
+//	year: Year as text
+//	total_failed: Count of failed transactions
+//	total_amount: Sum of failed transaction amounts
+//
+// Business Logic:
+//   - Compares current year with previous year automatically
+//   - Only includes failed (payment_status = 'failed') transactions
+//   - Excludes deleted transactions
+//   - Includes gap-filling for years with no transactions
+//   - Returns 0 values for years with no failed transactions
+//   - Orders by most recent year first
+func (q *Queries) GetYearlyAmountTransactionFailed(ctx context.Context, dollar_1 int32) ([]*GetYearlyAmountTransactionFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearlyAmountTransactionFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearlyAmountTransactionFailedRow
+	for rows.Next() {
+		var i GetYearlyAmountTransactionFailedRow
+		if err := rows.Scan(&i.RyYear, &i.TotalFailed, &i.TotalAmount); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearlyAmountTransactionFailedByMerchant = `-- name: GetYearlyAmountTransactionFailedByMerchant :many
+WITH
+    year_series AS (
+        SELECT unnest(ARRAY[
+            $1::integer,
+            $1::integer - 1
+        ]) AS year
+    ),
+    yearly_data AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'failed'
+            AND t.merchant_id = $2
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1, $1 - 1)
+        GROUP BY EXTRACT(YEAR FROM t.created_at)
+    )
+SELECT
+    ys.year::text,
+    COALESCE(yd.total_failed, 0) AS total_failed,
+    COALESCE(yd.total_amount, 0) AS total_amount
+FROM year_series ys
+LEFT JOIN yearly_data yd ON ys.year = yd.year
+ORDER BY ys.year DESC
+`
+
+type GetYearlyAmountTransactionFailedByMerchantParams struct {
+	Column1    int32         `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearlyAmountTransactionFailedByMerchantRow struct {
+	YsYear      string `json:"ys_year"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+// GetYearlyAmountTransactionFailedByMerchant: Retrieves yearly failed transaction metrics
+// Purpose: Generate annual reports of failed transactions by merchant_id
+// Parameters:
+//
+//	$1: Reference year for comparison (current year as integer)
+//	$2: Merchant ID
+//
+// Returns:
+//
+//	year: Year as text
+//	total_failed: Count of failed transactions
+//	total_amount: Sum of failed transaction amounts
+//
+// Business Logic:
+//   - Compares current year with previous year automatically
+//   - Only includes failed (payment_status = 'failed') transactions
+//   - Excludes deleted transactions
+//   - Includes gap-filling for years with no transactions
+//   - Returns 0 values for years with no failed transactions
+//   - Orders by most recent year first
+func (q *Queries) GetYearlyAmountTransactionFailedByMerchant(ctx context.Context, arg GetYearlyAmountTransactionFailedByMerchantParams) ([]*GetYearlyAmountTransactionFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearlyAmountTransactionFailedByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearlyAmountTransactionFailedByMerchantRow
+	for rows.Next() {
+		var i GetYearlyAmountTransactionFailedByMerchantRow
+		if err := rows.Scan(&i.YsYear, &i.TotalFailed, &i.TotalAmount); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearlyAmountTransactionSuccess = `-- name: GetYearlyAmountTransactionSuccess :many
+WITH
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at)
+    )
+SELECT
+    ry.year::text,
+    COALESCE(yt.total_success, 0) AS total_success,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM report_years ry
+LEFT JOIN yearly_transactions yt ON
+    ry.year = yt.year
+ORDER BY 
+    ry.year DESC
+`
+
+type GetYearlyAmountTransactionSuccessRow struct {
+	RyYear       string `json:"ry_year"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+// GetYearlyAmountTransactionSuccess: Retrieves yearly success transaction metrics
+// Purpose: Generate annual reports of successful transactions
+// Parameters:
+//
+//	$1: Reference year for comparison (current year as integer)
+//
+// Returns:
+//
+//	year: Year as text
+//	total_success: Count of successful transactions
+//	total_amount: Sum of successful transaction amounts
+//
+// Business Logic:
+//   - Compares current year with previous year automatically
+//   - Only includes successful (payment_status = 'success') transactions
+//   - Excludes deleted transactions
+//   - Includes gap-filling for years with no transactions
+//   - Returns 0 values for years with no successful transactions
+//   - Orders by most recent year first
+func (q *Queries) GetYearlyAmountTransactionSuccess(ctx context.Context, dollar_1 int32) ([]*GetYearlyAmountTransactionSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearlyAmountTransactionSuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearlyAmountTransactionSuccessRow
+	for rows.Next() {
+		var i GetYearlyAmountTransactionSuccessRow
+		if err := rows.Scan(&i.RyYear, &i.TotalSuccess, &i.TotalAmount); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearlyAmountTransactionSuccessByMerchant = `-- name: GetYearlyAmountTransactionSuccessByMerchant :many
+WITH
+    year_series AS (
+        SELECT unnest(ARRAY[
+            $1::integer,
+            $1::integer - 1
+        ]) AS year
+    ),
+    yearly_data AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'success'
+            AND t.merchant_id = $2
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1, $1 - 1)
+        GROUP BY EXTRACT(YEAR FROM t.created_at)
+    )
+SELECT
+    ys.year::text,
+    COALESCE(yd.total_success, 0) AS total_success,
+    COALESCE(yd.total_amount, 0) AS total_amount
+FROM year_series ys
+LEFT JOIN yearly_data yd ON ys.year = yd.year
+ORDER BY ys.year DESC
+`
+
+type GetYearlyAmountTransactionSuccessByMerchantParams struct {
+	Column1    int32         `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearlyAmountTransactionSuccessByMerchantRow struct {
+	YsYear       string `json:"ys_year"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+// GetYearlyAmountTransactionSuccessByMerchant: Retrieves yearly success transaction metrics
+// Purpose: Generate annual reports of successful transactions by merchant_id
+// Parameters:
+//
+//	$1: Reference year for comparison (current year as integer)
+//	$2: Merchant ID
+//
+// Returns:
+//
+//	year: Year as text
+//	total_success: Count of successful transactions
+//	total_amount: Sum of successful transaction amounts
+//
+// Business Logic:
+//   - Compares current year with previous year automatically
+//   - Only includes successful (payment_status = 'success') transactions
+//   - Excludes deleted transactions
+//   - Includes gap-filling for years with no transactions
+//   - Returns 0 values for years with no successful transactions
+//   - Orders by most recent year first
+func (q *Queries) GetYearlyAmountTransactionSuccessByMerchant(ctx context.Context, arg GetYearlyAmountTransactionSuccessByMerchantParams) ([]*GetYearlyAmountTransactionSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearlyAmountTransactionSuccessByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearlyAmountTransactionSuccessByMerchantRow
+	for rows.Next() {
+		var i GetYearlyAmountTransactionSuccessByMerchantRow
+		if err := rows.Scan(&i.YsYear, &i.TotalSuccess, &i.TotalAmount); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearlyTransactionMethodsFailed = `-- name: GetYearlyTransactionMethodsFailed :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    payment_methods AS (
+        SELECT DISTINCT
+            payment_method
+        FROM transactions
+        WHERE deleted_at IS NULL
+    ),
+    all_years AS (
+        SELECT generate_series(
+            (SELECT start_year FROM year_range),
+            (SELECT end_year FROM year_range)
+        )::int AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year::text AS year,  
+            pm.payment_method
+        FROM all_years ay
+        CROSS JOIN payment_methods pm
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'failed'
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN (SELECT start_year FROM year_range) AND (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            t.payment_method
+    )
+SELECT 
+    ac.year, 
+    ac.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_transactions yt ON 
+    ac.year = yt.year
+    AND ac.payment_method = yt.payment_method
+ORDER BY 
+    ac.year,  
+    ac.payment_method
+`
+
+type GetYearlyTransactionMethodsFailedRow struct {
+	Year              string  `json:"year"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+// GetYearlyTransactionMethodsFailed: Analyzes failed payment method usage by year
+// Purpose: Track annual trends in failed payment method attempts
+// Parameters:
+//
+//	$1: Reference date (timestamp) - determines the 5-year analysis window
+//
+// Returns:
+//
+//	year: 4-digit year as text
+//	payment_method: The payment method attempted
+//	total_transactions: Count of failed transactions
+//	total_amount: Total amount attempted (not successfully processed)
+//
+// Business Logic:
+//   - Covers current year plus previous 4 years (5-year total window)
+//   - Only includes failed (payment_status = 'failed') transactions
+//   - Excludes deleted transactions
+//   - Groups by year and payment method
+//   - Orders chronologically by year then by payment method
+//   - Useful for identifying long-term failed payment trends
+func (q *Queries) GetYearlyTransactionMethodsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetYearlyTransactionMethodsFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearlyTransactionMethodsFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearlyTransactionMethodsFailedRow
+	for rows.Next() {
+		var i GetYearlyTransactionMethodsFailedRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearlyTransactionMethodsFailedByMerchant = `-- name: GetYearlyTransactionMethodsFailedByMerchant :many
+WITH
+    year_series AS (
+        SELECT generate_series(
+            EXTRACT(YEAR FROM $1::timestamp)::integer - 4,
+            EXTRACT(YEAR FROM $1::timestamp)::integer,
+            1
+        ) AS year
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            SUM(t.amount)::NUMERIC AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'failed'
+            AND t.merchant_id = $2
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN (EXTRACT(YEAR FROM $1::timestamp) - 4) AND EXTRACT(YEAR FROM $1::timestamp)
+        GROUP BY
+            year,
+            t.payment_method
+    ),
+    payment_methods AS (
+        SELECT DISTINCT payment_method
+        FROM transactions
+        WHERE deleted_at IS NULL
+    )
+SELECT
+    ys.year::text AS year,
+    pm.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_series ys
+CROSS JOIN payment_methods pm
+LEFT JOIN yearly_transactions yt
+    ON ys.year = yt.year
+    AND pm.payment_method = yt.payment_method
+ORDER BY ys.year, pm.payment_method
+`
+
+type GetYearlyTransactionMethodsFailedByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearlyTransactionMethodsFailedByMerchantRow struct {
+	Year              string  `json:"year"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+// Purpose: Analyze the yearly payment method usage for a specific merchant with a focus on failed transactions.
+// Parameters:
+//
+//	$1: Reference date (timestamp) - determines the 5-year analysis window.
+//	$2: Merchant ID - filters transactions for a specific merchant.
+//
+// Returns:
+//
+//	year: 4-digit year as text (e.g., '2023').
+//	payment_method: The payment method used.
+//	total_transactions: Count of failed transactions.
+//	total_amount: Total amount attempted for this payment method (including failed transactions).
+//
+// Business Logic:
+//   - Analyzes a 5-year period, covering the current year and the previous 4 years.
+//   - Only includes transactions with a payment status of 'failed' (payment_status = 'failed').
+//   - Excludes deleted transactions (where deleted_at IS NULL).
+//   - Groups the results by year and payment method.
+//   - For each year, reports the number of failed transactions and the total amount attempted.
+//   - Orders the result chronologically by year, followed by payment method.
+//   - Useful for identifying long-term failed payment trends for the merchant.
+func (q *Queries) GetYearlyTransactionMethodsFailedByMerchant(ctx context.Context, arg GetYearlyTransactionMethodsFailedByMerchantParams) ([]*GetYearlyTransactionMethodsFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearlyTransactionMethodsFailedByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearlyTransactionMethodsFailedByMerchantRow
+	for rows.Next() {
+		var i GetYearlyTransactionMethodsFailedByMerchantRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearlyTransactionMethodsSuccess = `-- name: GetYearlyTransactionMethodsSuccess :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    payment_methods AS (
+        SELECT DISTINCT
+            payment_method
+        FROM transactions
+        WHERE deleted_at IS NULL
+    ),
+    all_years AS (
+        SELECT generate_series(
+            (SELECT start_year FROM year_range),
+            (SELECT end_year FROM year_range)
+        )::int AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year::text AS year,  
+            pm.payment_method
+        FROM all_years ay
+        CROSS JOIN payment_methods pm
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN (SELECT start_year FROM year_range) AND (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            t.payment_method
+    )
+SELECT 
+    ac.year,  
+    ac.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_transactions yt ON 
+    ac.year = yt.year
+    AND ac.payment_method = yt.payment_method
+ORDER BY 
+    ac.year,
+    ac.payment_method
+`
+
+type GetYearlyTransactionMethodsSuccessRow struct {
+	Year              string  `json:"year"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+// GetYearlyTransactionMethodsSuccess: Analyzes successful payment method usage by year
+// Purpose: Track annual trends in successful payment method preferences
+// Parameters:
+//
+//	$1: Reference date (timestamp) - determines the 5-year analysis window
+//
+// Returns:
+//
+//	year: 4-digit year as text
+//	payment_method: The payment method used
+//	total_transactions: Count of successful transactions
+//	total_amount: Total amount successfully processed by this method
+//
+// Business Logic:
+//   - Covers current year plus previous 4 years (5-year total window)
+//   - Only includes successful (payment_status = 'success') transactions
+//   - Excludes deleted transactions
+//   - Groups by year and payment method
+//   - Orders chronologically by year then by payment method
+//   - Useful for identifying long-term successful payment trends
+func (q *Queries) GetYearlyTransactionMethodsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetYearlyTransactionMethodsSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearlyTransactionMethodsSuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearlyTransactionMethodsSuccessRow
+	for rows.Next() {
+		var i GetYearlyTransactionMethodsSuccessRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearlyTransactionMethodsSuccessByMerchant = `-- name: GetYearlyTransactionMethodsSuccessByMerchant :many
+WITH
+    year_series AS (
+        SELECT generate_series(
+            EXTRACT(YEAR FROM $1::timestamp)::integer - 4,
+            EXTRACT(YEAR FROM $1::timestamp)::integer,
+            1
+        ) AS year
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            SUM(t.amount)::NUMERIC AS total_amount
+        FROM transactions t
+        WHERE
+            t.deleted_at IS NULL
+            AND t.payment_status = 'success'
+            AND t.merchant_id = $2
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN (EXTRACT(YEAR FROM $1::timestamp) - 4) AND EXTRACT(YEAR FROM $1::timestamp)
+        GROUP BY
+            year,
+            t.payment_method
+    ),
+    payment_methods AS (
+        SELECT DISTINCT payment_method
+        FROM transactions
+        WHERE deleted_at IS NULL
+    )
+SELECT
+    ys.year::text AS year,
+    pm.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_series ys
+CROSS JOIN payment_methods pm
+LEFT JOIN yearly_transactions yt
+    ON ys.year = yt.year
+    AND pm.payment_method = yt.payment_method
+ORDER BY ys.year, pm.payment_method
+`
+
+type GetYearlyTransactionMethodsSuccessByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearlyTransactionMethodsSuccessByMerchantRow struct {
+	Year              string  `json:"year"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+// Purpose: Analyze the yearly payment method usage for a specific merchant with a focus on successful transactions.
+// Parameters:
+//
+//	$1: Reference date (timestamp) - determines the 5-year analysis window.
+//	$2: Merchant ID - filters transactions for a specific merchant.
+//
+// Returns:
+//
+//	year: 4-digit year as text (e.g., '2023').
+//	payment_method: The payment method used.
+//	total_transactions: Count of successful transactions.
+//	total_amount: Total amount processed by this payment method.
+//
+// Business Logic:
+//   - Analyzes a 5-year period, covering the current year and the previous 4 years.
+//   - Only includes transactions with a payment status of 'success' (payment_status = 'success').
+//   - Excludes deleted transactions (where deleted_at IS NULL).
+//   - Groups the results by year and payment method.
+//   - For each year, reports the number of successful transactions and total amount processed.
+//   - Orders the result chronologically by year, followed by payment method.
+//   - Useful for identifying long-term successful payment trends for the merchant.
+func (q *Queries) GetYearlyTransactionMethodsSuccessByMerchant(ctx context.Context, arg GetYearlyTransactionMethodsSuccessByMerchantParams) ([]*GetYearlyTransactionMethodsSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearlyTransactionMethodsSuccessByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearlyTransactionMethodsSuccessByMerchantRow
+	for rows.Next() {
+		var i GetYearlyTransactionMethodsSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const restoreAllTransactions = `-- name: RestoreAllTransactions :exec
 UPDATE transactions
-SET deleted_at = NULL
-WHERE deleted_at IS NOT NULL
+SET
+    deleted_at = NULL
+WHERE
+    deleted_at IS NOT NULL
 `
 
 // Restore All Trashed Transactions
@@ -332,10 +2113,13 @@ func (q *Queries) RestoreAllTransactions(ctx context.Context) error {
 
 const restoreTransaction = `-- name: RestoreTransaction :one
 UPDATE transactions
-SET deleted_at = NULL
-WHERE transaction_id = $1
-  AND deleted_at IS NOT NULL
-  RETURNING transaction_id, user_id, merchant_id, voucher_id, nominal_id, category_id, bank_id, payment_method, status, created_at, updated_at, deleted_at
+SET
+    deleted_at = NULL
+WHERE
+    transaction_id = $1
+    AND deleted_at IS NOT NULL
+RETURNING
+    transaction_id, user_id, merchant_id, voucher_id, nominal_id, bank_id, payment_method, amount, status, created_at, updated_at, deleted_at
 `
 
 // Restore Trashed Transaction
@@ -348,9 +2132,9 @@ func (q *Queries) RestoreTransaction(ctx context.Context, transactionID int32) (
 		&i.MerchantID,
 		&i.VoucherID,
 		&i.NominalID,
-		&i.CategoryID,
 		&i.BankID,
 		&i.PaymentMethod,
+		&i.Amount,
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -361,10 +2145,13 @@ func (q *Queries) RestoreTransaction(ctx context.Context, transactionID int32) (
 
 const trashTransaction = `-- name: TrashTransaction :one
 UPDATE transactions
-SET deleted_at = CURRENT_TIMESTAMP
-WHERE transaction_id = $1
-  AND deleted_at IS NULL
-  RETURNING transaction_id, user_id, merchant_id, voucher_id, nominal_id, category_id, bank_id, payment_method, status, created_at, updated_at, deleted_at
+SET
+    deleted_at = CURRENT_TIMESTAMP
+WHERE
+    transaction_id = $1
+    AND deleted_at IS NULL
+RETURNING
+    transaction_id, user_id, merchant_id, voucher_id, nominal_id, bank_id, payment_method, amount, status, created_at, updated_at, deleted_at
 `
 
 // Trash Transaction (Soft Delete)
@@ -377,9 +2164,9 @@ func (q *Queries) TrashTransaction(ctx context.Context, transactionID int32) (*T
 		&i.MerchantID,
 		&i.VoucherID,
 		&i.NominalID,
-		&i.CategoryID,
 		&i.BankID,
 		&i.PaymentMethod,
+		&i.Amount,
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -390,18 +2177,21 @@ func (q *Queries) TrashTransaction(ctx context.Context, transactionID int32) (*T
 
 const updateTransaction = `-- name: UpdateTransaction :one
 UPDATE transactions
-SET user_id = $2,
+SET
+    user_id = $2,
     merchant_id = $3,
     voucher_id = $4,
     nominal_id = $5,
-    category_id = $6,
-    bank_id = $7,
-    payment_method = $8,
-    status = $9,
+    bank_id = $6,
+    payment_method = $7,
+    status = $8,
+    amount = $9,
     updated_at = CURRENT_TIMESTAMP
-WHERE transaction_id = $1
-  AND deleted_at IS NULL
-  RETURNING transaction_id, user_id, merchant_id, voucher_id, nominal_id, category_id, bank_id, payment_method, status, created_at, updated_at, deleted_at
+WHERE
+    transaction_id = $1
+    AND deleted_at IS NULL
+RETURNING
+    transaction_id, user_id, merchant_id, voucher_id, nominal_id, bank_id, payment_method, amount, status, created_at, updated_at, deleted_at
 `
 
 type UpdateTransactionParams struct {
@@ -410,10 +2200,10 @@ type UpdateTransactionParams struct {
 	MerchantID    sql.NullInt32  `json:"merchant_id"`
 	VoucherID     sql.NullInt32  `json:"voucher_id"`
 	NominalID     sql.NullInt32  `json:"nominal_id"`
-	CategoryID    sql.NullInt32  `json:"category_id"`
 	BankID        sql.NullInt32  `json:"bank_id"`
 	PaymentMethod string         `json:"payment_method"`
 	Status        sql.NullString `json:"status"`
+	Amount        int32          `json:"amount"`
 }
 
 // Update Transaction
@@ -424,10 +2214,10 @@ func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionPa
 		arg.MerchantID,
 		arg.VoucherID,
 		arg.NominalID,
-		arg.CategoryID,
 		arg.BankID,
 		arg.PaymentMethod,
 		arg.Status,
+		arg.Amount,
 	)
 	var i Transaction
 	err := row.Scan(
@@ -436,9 +2226,9 @@ func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionPa
 		&i.MerchantID,
 		&i.VoucherID,
 		&i.NominalID,
-		&i.CategoryID,
 		&i.BankID,
 		&i.PaymentMethod,
+		&i.Amount,
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -449,11 +2239,12 @@ func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionPa
 
 const updateTransactionStatus = `-- name: UpdateTransactionStatus :exec
 UPDATE transactions
-SET 
+SET
     status = $2,
     updated_at = CURRENT_TIMESTAMP
-WHERE transaction_id = $1
-  AND deleted_at IS NULL
+WHERE
+    transaction_id = $1
+    AND deleted_at IS NULL
 `
 
 type UpdateTransactionStatusParams struct {

@@ -39,6 +39,12 @@ type BankResponseMapper interface {
 	ToApiResponsesBank(pbResponse *pb.ApiResponsesBank) *response.ApiResponsesBank
 	ToApiResponsePaginationBank(pbResponse *pb.ApiResponsePaginationBank) *response.ApiResponsePaginationBank
 	ToApiResponsePaginationBankDeleteAt(pbResponse *pb.ApiResponsePaginationBankDeleteAt) *response.ApiResponsePaginationBankDeleteAt
+	ToApiResponsesMonthAmountSuccess(pbResponse *pb.ApiResponseBankMonthAmountSuccess) *response.ApiResponseBankMonthAmountSuccess
+	ToApiResponseYearAmountSuccess(pbResponse *pb.ApiResponseBankYearAmountSuccess) *response.ApiResponseBankYearAmountSuccess
+	ToApiResponsesMonthAmountFailed(pbResponse *pb.ApiResponseBankMonthAmountFailed) *response.ApiResponseBankMonthAmountFailed
+	ToApiResponseYearAmountFailed(pbResponse *pb.ApiResponseBankYearAmountFailed) *response.ApiResponseBankYearAmountFailed
+	ToApiResponsesMonthMethod(pbResponse *pb.ApiResponseBankMonthMethod) *response.ApiResponseBankMonthMethod
+	ToApiResponseYearMethod(pbResponse *pb.ApiResponseBankYearMethod) *response.ApiResponseBankYearMethod
 }
 
 type CategoryResponseMapper interface {
@@ -49,6 +55,14 @@ type CategoryResponseMapper interface {
 	ToApiResponsesCategory(pbResponse *pb.ApiResponsesCategory) *response.ApiResponsesCategory
 	ToApiResponsePaginationCategory(pbResponse *pb.ApiResponsePaginationCategory) *response.ApiResponsePaginationCategory
 	ToApiResponsePaginationCategoryDeleteAt(pbResponse *pb.ApiResponsePaginationCategoryDeleteAt) *response.ApiResponsePaginationCategoryDeleteAt
+
+	ToApiResponsesMonthAmountSuccess(pbResponse *pb.ApiResponseCategoryMonthAmountSuccess) *response.ApiResponseCategoryMonthAmountSuccess
+	ToApiResponseYearAmountSuccess(pbResponse *pb.ApiResponseCategoryYearAmountSuccess) *response.ApiResponseCategoryYearAmountSuccess
+	ToApiResponsesMonthAmountFailed(pbResponse *pb.ApiResponseCategoryMonthAmountFailed) *response.ApiResponseCategoryMonthAmountFailed
+	ToApiResponseYearAmountFailed(pbResponse *pb.ApiResponseCategoryYearAmountFailed) *response.ApiResponseCategoryYearAmountFailed
+
+	ToApiResponsesMonthMethod(pbResponse *pb.ApiResponseCategoryMonthMethod) *response.ApiResponseCategoryMonthMethod
+	ToApiResponseYearMethod(pbResponse *pb.ApiResponseCategoryYearMethod) *response.ApiResponseCategoryYearMethod
 }
 
 type MerchantResponseMapper interface {
@@ -69,6 +83,13 @@ type NominalResponseMapper interface {
 	ToApiResponsesNominal(pbResponse *pb.ApiResponsesNominal) *response.ApiResponsesNominal
 	ToApiResponsePaginationNominal(pbResponse *pb.ApiResponsePaginationNominal) *response.ApiResponsePaginationNominal
 	ToApiResponsePaginationNominalDeleteAt(pbResponse *pb.ApiResponsePaginationNominalDeleteAt) *response.ApiResponsePaginationNominalDeleteAt
+
+	ToApiResponsesMonthAmountSuccess(pbResponse *pb.ApiResponseNominalMonthAmountSuccess) *response.ApiResponseNominalMonthAmountSuccess
+	ToApiResponseYearAmountSuccess(pbResponse *pb.ApiResponseNominalYearAmountSuccess) *response.ApiResponseNominalYearAmountSuccess
+	ToApiResponsesMonthAmountFailed(pbResponse *pb.ApiResponseNominalMonthAmountFailed) *response.ApiResponseNominalMonthAmountFailed
+	ToApiResponseYearAmountFailed(pbResponse *pb.ApiResponseNominalYearAmountFailed) *response.ApiResponseNominalYearAmountFailed
+	ToApiResponsesMonthMethod(pbResponse *pb.ApiResponseNominalMonthMethod) *response.ApiResponseNominalMonthMethod
+	ToApiResponseYearMethod(pbResponse *pb.ApiResponseNominalYearMethod) *response.ApiResponseNominalYearMethod
 }
 
 type TransactionResponseMapper interface {
@@ -79,6 +100,14 @@ type TransactionResponseMapper interface {
 	ToApiResponsesTransaction(pbResponse *pb.ApiResponsesTransaction) *response.ApiResponsesTransaction
 	ToApiResponsePaginationTransaction(pbResponse *pb.ApiResponsePaginationTransaction) *response.ApiResponsePaginationTransaction
 	ToApiResponsePaginationTransactionDeleteAt(pbResponse *pb.ApiResponsePaginationTransactionDeleteAt) *response.ApiResponsePaginationTransactionDeleteAt
+
+	ToApiResponsesMonthAmountSuccess(pbResponse *pb.ApiResponseTransactionMonthAmountSuccess) *response.ApiResponsesTransactionMonthSuccess
+	ToApiResponseYearAmountSuccess(pbResponse *pb.ApiResponseTransactionYearAmountSuccess) *response.ApiResponsesTransactionYearSuccess
+	ToApiResponsesMonthAmountFailed(pbResponse *pb.ApiResponseTransactionMonthAmountFailed) *response.ApiResponsesTransactionMonthFailed
+	ToApiResponseYearAmountFailed(pbResponse *pb.ApiResponseTransactionYearAmountFailed) *response.ApiResponsesTransactionYearFailed
+
+	ToApiResponsesMonthMethod(pbResponse *pb.ApiResponseTransactionMonthMethod) *response.ApiResponsesTransactionMonthMethod
+	ToApiResponseYearMethod(pbResponse *pb.ApiResponseTransactionYearMethod) *response.ApiResponsesTransactionYearMethod
 }
 
 type VoucherResponseMapper interface {
@@ -89,4 +118,11 @@ type VoucherResponseMapper interface {
 	ToApiResponsesVoucher(pbResponse *pb.ApiResponsesVoucher) *response.ApiResponsesVoucher
 	ToApiResponsePaginationVoucher(pbResponse *pb.ApiResponsePaginationVoucher) *response.ApiResponsePaginationVoucher
 	ToApiResponsePaginationVoucherDeleteAt(pbResponse *pb.ApiResponsePaginationVoucherDeleteAt) *response.ApiResponsePaginationVoucherDeleteAt
+
+	ToApiResponsesMonthAmountSuccess(pbResponse *pb.ApiResponseVoucherMonthAmountSuccess) *response.ApiResponsesVoucherMonthSuccess
+	ToApiResponseYearAmountSuccess(pbResponse *pb.ApiResponseVoucherYearAmountSuccess) *response.ApiResponsesVoucherYearSuccess
+	ToApiResponsesMonthAmountFailed(pbResponse *pb.ApiResponseVoucherMonthAmountFailed) *response.ApiResponsesVoucherMonthFailed
+	ToApiResponseYearAmountFailed(pbResponse *pb.ApiResponseVoucherYearAmountFailed) *response.ApiResponsesVoucherYearFailed
+	ToApiResponsesMonthMethod(pbResponse *pb.ApiResponseVoucherMonthMethod) *response.ApiResponsesVoucherMonthMethod
+	ToApiResponseYearMethod(pbResponse *pb.ApiResponseVoucherYearMethod) *response.ApiResponsesVoucherYearMethod
 }

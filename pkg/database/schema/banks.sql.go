@@ -8,12 +8,11 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createBank = `-- name: CreateBank :one
-INSERT INTO banks (name)
-VALUES ($1)
-  RETURNING bank_id, name, created_at, updated_at, deleted_at
+INSERT INTO banks (name) VALUES ($1) RETURNING bank_id, name, created_at, updated_at, deleted_at
 `
 
 // Create Bank
@@ -51,10 +50,16 @@ func (q *Queries) DeleteBankPermanently(ctx context.Context, bankID int32) error
 }
 
 const getBankByID = `-- name: GetBankByID :one
-SELECT bank_id, name, created_at, updated_at, deleted_at
+SELECT
+    bank_id,
+    name,
+    created_at,
+    updated_at,
+    deleted_at
 FROM banks
-WHERE bank_id = $1
-  AND deleted_at IS NULL
+WHERE
+    bank_id = $1
+    AND deleted_at IS NULL
 `
 
 // Get Bank by ID
@@ -72,14 +77,18 @@ func (q *Queries) GetBankByID(ctx context.Context, bankID int32) (*Bank, error) 
 }
 
 const getBanks = `-- name: GetBanks :many
-SELECT
-    bank_id, name, created_at, updated_at, deleted_at,
-    COUNT(*) OVER() AS total_count
+SELECT bank_id, name, created_at, updated_at, deleted_at, COUNT(*) OVER () AS total_count
 FROM banks
-WHERE deleted_at IS NULL
-AND ($1::TEXT IS NULL OR name ILIKE '%' || $1 || '%')
+WHERE
+    deleted_at IS NULL
+    AND (
+        $1::TEXT IS NULL
+        OR name ILIKE '%' || $1 || '%'
+    )
 ORDER BY created_at DESC
-LIMIT $2 OFFSET $3
+LIMIT $2
+OFFSET
+    $3
 `
 
 type GetBanksParams struct {
@@ -129,14 +138,18 @@ func (q *Queries) GetBanks(ctx context.Context, arg GetBanksParams) ([]*GetBanks
 }
 
 const getBanksActive = `-- name: GetBanksActive :many
-SELECT
-    bank_id, name, created_at, updated_at, deleted_at,
-    COUNT(*) OVER() AS total_count
+SELECT bank_id, name, created_at, updated_at, deleted_at, COUNT(*) OVER () AS total_count
 FROM banks
-WHERE deleted_at IS NULL
-AND ($1::TEXT IS NULL OR name ILIKE '%' || $1 || '%')
+WHERE
+    deleted_at IS NULL
+    AND (
+        $1::TEXT IS NULL
+        OR name ILIKE '%' || $1 || '%'
+    )
 ORDER BY created_at DESC
-LIMIT $2 OFFSET $3
+LIMIT $2
+OFFSET
+    $3
 `
 
 type GetBanksActiveParams struct {
@@ -186,14 +199,18 @@ func (q *Queries) GetBanksActive(ctx context.Context, arg GetBanksActiveParams) 
 }
 
 const getBanksTrashed = `-- name: GetBanksTrashed :many
-SELECT
-    bank_id, name, created_at, updated_at, deleted_at,
-    COUNT(*) OVER() AS total_count
+SELECT bank_id, name, created_at, updated_at, deleted_at, COUNT(*) OVER () AS total_count
 FROM banks
-WHERE deleted_at IS NOT NULL
-AND ($1::TEXT IS NULL OR name ILIKE '%' || $1 || '%')
+WHERE
+    deleted_at IS NOT NULL
+    AND (
+        $1::TEXT IS NULL
+        OR name ILIKE '%' || $1 || '%'
+    )
 ORDER BY created_at DESC
-LIMIT $2 OFFSET $3
+LIMIT $2
+OFFSET
+    $3
 `
 
 type GetBanksTrashedParams struct {
@@ -242,10 +259,2925 @@ func (q *Queries) GetBanksTrashed(ctx context.Context, arg GetBanksTrashedParams
 	return items, nil
 }
 
+const getMonthAmountBankFailed = `-- name: GetMonthAmountBankFailed :many
+WITH 
+    date_ranges AS (
+        SELECT 
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    active_banks AS (
+        SELECT bank_id, name AS bank_name
+        FROM banks
+        WHERE deleted_at IS NULL
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_bank_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            ab.bank_id,
+            ab.bank_name
+        FROM report_months rm
+        CROSS JOIN active_banks ab
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            b.bank_id,
+            b.name AS bank_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN banks b ON t.bank_id = b.bank_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            b.bank_id,
+            b.name
+    )
+SELECT
+    mbc.bank_id,
+    mbc.bank_name,
+    mbc.year::text,
+    TO_CHAR(TO_DATE(mbc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_failed, 0) AS total_failed,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_bank_combos mbc
+LEFT JOIN monthly_transactions mt ON
+    mbc.year = mt.year AND
+    mbc.month = mt.month AND
+    mbc.bank_id = mt.bank_id
+ORDER BY 
+    mbc.bank_name ASC,
+    mbc.year DESC,
+    mbc.month DESC
+`
+
+type GetMonthAmountBankFailedParams struct {
+	Column1 time.Time `json:"column_1"`
+	Column2 time.Time `json:"column_2"`
+	Column3 time.Time `json:"column_3"`
+	Column4 time.Time `json:"column_4"`
+}
+
+type GetMonthAmountBankFailedRow struct {
+	BankID      int32  `json:"bank_id"`
+	BankName    string `json:"bank_name"`
+	MbcYear     string `json:"mbc_year"`
+	Month       string `json:"month"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountBankFailed(ctx context.Context, arg GetMonthAmountBankFailedParams) ([]*GetMonthAmountBankFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountBankFailed,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountBankFailedRow
+	for rows.Next() {
+		var i GetMonthAmountBankFailedRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.MbcYear,
+			&i.Month,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountBankFailedById = `-- name: GetMonthAmountBankFailedById :many
+WITH
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    target_bank AS (
+        SELECT b.bank_id, b.name AS bank_name
+        FROM banks b
+        WHERE
+            b.bank_id = $5
+            AND b.deleted_at IS NULL
+    ),
+    all_months AS (
+        SELECT
+            EXTRACT(YEAR FROM dr.range1_start)::integer AS year,
+            EXTRACT(MONTH FROM dr.range1_start)::integer AS month
+        FROM date_ranges dr
+        UNION
+        SELECT
+            EXTRACT(YEAR FROM dr.range2_start)::integer AS year,
+            EXTRACT(MONTH FROM dr.range2_start)::integer AS month
+        FROM date_ranges dr
+    ),
+    month_bank_combos AS (
+        SELECT
+            am.year,
+            am.month,
+            tb.bank_id,
+            tb.bank_name
+        FROM all_months am
+        CROSS JOIN target_bank tb
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            t.bank_id,
+            b.name AS bank_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN banks b ON t.bank_id = b.bank_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end)
+            OR (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.bank_id = $5
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            t.bank_id,
+            b.name
+    )
+SELECT
+    mbc.bank_id,
+    mbc.bank_name,
+    mbc.year::text AS year,
+    TO_CHAR(TO_DATE(mbc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_failed, 0) AS total_failed,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM
+    month_bank_combos mbc
+LEFT JOIN
+    monthly_transactions mt
+    ON mbc.year = mt.year
+    AND mbc.month = mt.month
+    AND mbc.bank_id = mt.bank_id
+ORDER BY
+    mbc.year DESC,
+    mbc.month DESC
+`
+
+type GetMonthAmountBankFailedByIdParams struct {
+	Column1 time.Time `json:"column_1"`
+	Column2 time.Time `json:"column_2"`
+	Column3 time.Time `json:"column_3"`
+	Column4 time.Time `json:"column_4"`
+	BankID  int32     `json:"bank_id"`
+}
+
+type GetMonthAmountBankFailedByIdRow struct {
+	BankID      int32  `json:"bank_id"`
+	BankName    string `json:"bank_name"`
+	Year        string `json:"year"`
+	Month       string `json:"month"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountBankFailedById(ctx context.Context, arg GetMonthAmountBankFailedByIdParams) ([]*GetMonthAmountBankFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountBankFailedById,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.BankID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountBankFailedByIdRow
+	for rows.Next() {
+		var i GetMonthAmountBankFailedByIdRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.Year,
+			&i.Month,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountBankFailedByMerchant = `-- name: GetMonthAmountBankFailedByMerchant :many
+WITH
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS start1,
+            $2::timestamp AS end1,
+            $3::timestamp AS start2,
+            $4::timestamp AS end2
+    ),
+    all_banks AS (
+        SELECT b.bank_id, b.name AS bank_name
+        FROM banks b
+        WHERE
+            b.deleted_at IS NULL
+    ),
+    all_months AS (
+        SELECT EXTRACT(
+                YEAR
+                FROM start1
+            )::integer AS year, EXTRACT(
+                MONTH
+                FROM start1
+            )::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT EXTRACT(
+                YEAR
+                FROM start2
+            )::integer AS year, EXTRACT(
+                MONTH
+                FROM start2
+            )::integer AS month
+        FROM date_ranges
+    ),
+    bank_month_combos AS (
+        SELECT ab.bank_id, ab.bank_name, am.year, am.month
+        FROM all_banks ab
+            CROSS JOIN all_months am
+    ),
+    actual_data AS (
+        SELECT
+            b.bank_id,
+            b.name AS bank_name,
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )::integer AS year,
+            EXTRACT(
+                MONTH
+                FROM t.created_at
+            )::integer AS month,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM
+            transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+            JOIN date_ranges dr ON (
+                (
+                    t.created_at BETWEEN dr.start1 AND dr.end1
+                )
+                OR (
+                    t.created_at BETWEEN dr.start2 AND dr.end2
+                )
+            )
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.merchant_id = $5
+        GROUP BY
+            b.bank_id,
+            b.name,
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            ),
+            EXTRACT(
+                MONTH
+                FROM t.created_at
+            )
+    )
+SELECT
+    bmc.bank_id,
+    bmc.bank_name,
+    bmc.year::text,
+    TO_CHAR(
+        TO_DATE(bmc.month::text, 'MM'),
+        'Mon'
+    ) AS month,
+    COALESCE(ad.total_failed, 0) AS total_failed,
+    COALESCE(ad.total_amount, 0) AS total_amount
+FROM
+    bank_month_combos bmc
+    LEFT JOIN actual_data ad ON bmc.bank_id = ad.bank_id
+    AND bmc.year = ad.year
+    AND bmc.month = ad.month
+ORDER BY bmc.year DESC, bmc.month DESC
+`
+
+type GetMonthAmountBankFailedByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	Column2    time.Time     `json:"column_2"`
+	Column3    time.Time     `json:"column_3"`
+	Column4    time.Time     `json:"column_4"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthAmountBankFailedByMerchantRow struct {
+	BankID      int32  `json:"bank_id"`
+	BankName    string `json:"bank_name"`
+	BmcYear     string `json:"bmc_year"`
+	Month       string `json:"month"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountBankFailedByMerchant(ctx context.Context, arg GetMonthAmountBankFailedByMerchantParams) ([]*GetMonthAmountBankFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountBankFailedByMerchant,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.MerchantID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountBankFailedByMerchantRow
+	for rows.Next() {
+		var i GetMonthAmountBankFailedByMerchantRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.BmcYear,
+			&i.Month,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountBankSuccess = `-- name: GetMonthAmountBankSuccess :many
+WITH 
+    date_ranges AS (
+        SELECT 
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    active_banks AS (
+        SELECT bank_id, name AS bank_name
+        FROM banks
+        WHERE deleted_at IS NULL
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_bank_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            ab.bank_id,
+            ab.bank_name
+        FROM report_months rm
+        CROSS JOIN active_banks ab
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            b.bank_id,
+            b.name AS bank_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN banks b ON t.bank_id = b.bank_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            b.bank_id,
+            b.name
+    )
+SELECT
+    mbc.bank_id,
+    mbc.bank_name,
+    mbc.year::text,
+    TO_CHAR(TO_DATE(mbc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_success, 0) AS total_success,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_bank_combos mbc
+LEFT JOIN monthly_transactions mt ON
+    mbc.year = mt.year AND
+    mbc.month = mt.month AND
+    mbc.bank_id = mt.bank_id
+ORDER BY 
+    mbc.bank_name ASC,
+    mbc.year DESC,
+    mbc.month DESC
+`
+
+type GetMonthAmountBankSuccessParams struct {
+	Column1 time.Time `json:"column_1"`
+	Column2 time.Time `json:"column_2"`
+	Column3 time.Time `json:"column_3"`
+	Column4 time.Time `json:"column_4"`
+}
+
+type GetMonthAmountBankSuccessRow struct {
+	BankID       int32  `json:"bank_id"`
+	BankName     string `json:"bank_name"`
+	MbcYear      string `json:"mbc_year"`
+	Month        string `json:"month"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountBankSuccess(ctx context.Context, arg GetMonthAmountBankSuccessParams) ([]*GetMonthAmountBankSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountBankSuccess,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountBankSuccessRow
+	for rows.Next() {
+		var i GetMonthAmountBankSuccessRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.MbcYear,
+			&i.Month,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountBankSuccessById = `-- name: GetMonthAmountBankSuccessById :many
+WITH
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    target_bank AS (
+        SELECT b.bank_id, b.name AS bank_name
+        FROM banks b
+        WHERE
+            b.bank_id = $5
+            AND b.deleted_at IS NULL
+    ),
+    all_months AS (
+        SELECT
+            EXTRACT(YEAR FROM dr.range1_start)::integer AS year,
+            EXTRACT(MONTH FROM dr.range1_start)::integer AS month
+        FROM date_ranges dr
+        UNION
+        SELECT
+            EXTRACT(YEAR FROM dr.range2_start)::integer AS year,
+            EXTRACT(MONTH FROM dr.range2_start)::integer AS month
+        FROM date_ranges dr
+    ),
+    month_bank_combos AS (
+        SELECT
+            am.year,
+            am.month,
+            tb.bank_id,
+            tb.bank_name
+        FROM all_months am
+        CROSS JOIN target_bank tb
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            t.bank_id,
+            b.name AS bank_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN banks b ON t.bank_id = b.bank_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end)
+            OR (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.bank_id = $5
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            t.bank_id,
+            b.name
+    )
+SELECT
+    mbc.bank_id,
+    mbc.bank_name,
+    mbc.year::text AS year,
+    TO_CHAR(TO_DATE(mbc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_success, 0) AS total_success,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM
+    month_bank_combos mbc
+LEFT JOIN
+    monthly_transactions mt
+    ON mbc.year = mt.year
+    AND mbc.month = mt.month
+    AND mbc.bank_id = mt.bank_id
+ORDER BY
+    mbc.year DESC,
+    mbc.month DESC
+`
+
+type GetMonthAmountBankSuccessByIdParams struct {
+	Column1 time.Time `json:"column_1"`
+	Column2 time.Time `json:"column_2"`
+	Column3 time.Time `json:"column_3"`
+	Column4 time.Time `json:"column_4"`
+	BankID  int32     `json:"bank_id"`
+}
+
+type GetMonthAmountBankSuccessByIdRow struct {
+	BankID       int32  `json:"bank_id"`
+	BankName     string `json:"bank_name"`
+	Year         string `json:"year"`
+	Month        string `json:"month"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountBankSuccessById(ctx context.Context, arg GetMonthAmountBankSuccessByIdParams) ([]*GetMonthAmountBankSuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountBankSuccessById,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.BankID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountBankSuccessByIdRow
+	for rows.Next() {
+		var i GetMonthAmountBankSuccessByIdRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.Year,
+			&i.Month,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountBankSuccessByMerchant = `-- name: GetMonthAmountBankSuccessByMerchant :many
+WITH
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS start1,
+            $2::timestamp AS end1,
+            $3::timestamp AS start2,
+            $4::timestamp AS end2
+    ),
+    all_banks AS (
+        SELECT b.bank_id, b.name AS bank_name
+        FROM banks b
+        WHERE
+            b.deleted_at IS NULL
+    ),
+    all_months AS (
+        SELECT EXTRACT(
+                YEAR
+                FROM start1
+            )::integer AS year, EXTRACT(
+                MONTH
+                FROM start1
+            )::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT EXTRACT(
+                YEAR
+                FROM start2
+            )::integer AS year, EXTRACT(
+                MONTH
+                FROM start2
+            )::integer AS month
+        FROM date_ranges
+    ),
+    bank_month_combos AS (
+        SELECT ab.bank_id, ab.bank_name, am.year, am.month
+        FROM all_banks ab
+            CROSS JOIN all_months am
+    ),
+    actual_data AS (
+        SELECT
+            b.bank_id,
+            b.name AS bank_name,
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )::integer AS year,
+            EXTRACT(
+                MONTH
+                FROM t.created_at
+            )::integer AS month,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM
+            transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+            JOIN date_ranges dr ON (
+                (
+                    t.created_at BETWEEN dr.start1 AND dr.end1
+                )
+                OR (
+                    t.created_at BETWEEN dr.start2 AND dr.end2
+                )
+            )
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.merchant_id = $5
+        GROUP BY
+            b.bank_id,
+            b.name,
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            ),
+            EXTRACT(
+                MONTH
+                FROM t.created_at
+            )
+    )
+SELECT
+    bmc.bank_id,
+    bmc.bank_name,
+    bmc.year::text,
+    TO_CHAR(
+        TO_DATE(bmc.month::text, 'MM'),
+        'Mon'
+    ) AS month,
+    COALESCE(ad.total_success, 0) AS total_success,
+    COALESCE(ad.total_amount, 0) AS total_amount
+FROM
+    bank_month_combos bmc
+    LEFT JOIN actual_data ad ON bmc.bank_id = ad.bank_id
+    AND bmc.year = ad.year
+    AND bmc.month = ad.month
+ORDER BY bmc.year DESC, bmc.month DESC
+`
+
+type GetMonthAmountBankSuccessByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	Column2    time.Time     `json:"column_2"`
+	Column3    time.Time     `json:"column_3"`
+	Column4    time.Time     `json:"column_4"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthAmountBankSuccessByMerchantRow struct {
+	BankID       int32  `json:"bank_id"`
+	BankName     string `json:"bank_name"`
+	BmcYear      string `json:"bmc_year"`
+	Month        string `json:"month"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountBankSuccessByMerchant(ctx context.Context, arg GetMonthAmountBankSuccessByMerchantParams) ([]*GetMonthAmountBankSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountBankSuccessByMerchant,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.MerchantID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountBankSuccessByMerchantRow
+	for rows.Next() {
+		var i GetMonthAmountBankSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.BmcYear,
+			&i.Month,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthBankMethodsFailed = `-- name: GetMonthBankMethodsFailed :many
+WITH
+    date_range AS (
+        SELECT date_trunc('month', $1::timestamp) AS start_date, date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    active_bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+    ),
+    all_months AS (
+        SELECT generate_series(
+                (
+                    SELECT start_date
+                    FROM date_range
+                ), (
+                    SELECT end_date
+                    FROM date_range
+                ), interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT am.activity_month, abm.bank_id, abm.bank_name, abm.payment_method
+        FROM
+            all_months am
+            CROSS JOIN active_bank_methods abm
+    ),
+    monthly_stats AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(*) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.created_at BETWEEN (
+                SELECT start_date
+                FROM date_range
+            ) AND (
+                SELECT end_date
+                FROM date_range
+            )
+        GROUP BY
+            date_trunc('month', t.created_at),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(ms.total_transactions, 0) AS total_transactions,
+    COALESCE(ms.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN monthly_stats ms ON ac.activity_month = ms.activity_month
+    AND ac.bank_id = ms.bank_id
+    AND ac.payment_method = ms.payment_method
+ORDER BY ac.activity_month, ac.bank_name, ac.payment_method
+`
+
+type GetMonthBankMethodsFailedRow struct {
+	Month             string  `json:"month"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthBankMethodsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetMonthBankMethodsFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthBankMethodsFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthBankMethodsFailedRow
+	for rows.Next() {
+		var i GetMonthBankMethodsFailedRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthBankMethodsFailedById = `-- name: GetMonthBankMethodsFailedById :many
+WITH
+    date_range AS (
+        SELECT date_trunc('month', $1::timestamp) AS start_date, date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND b.bank_id = $2
+    ),
+    all_months AS (
+        SELECT generate_series(
+                (
+                    SELECT start_date
+                    FROM date_range
+                ), (
+                    SELECT end_date
+                    FROM date_range
+                ), interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT am.activity_month, bm.bank_id, bm.bank_name, bm.payment_method
+        FROM all_months am
+            CROSS JOIN bank_methods bm
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND b.bank_id = $2
+            AND t.created_at BETWEEN (
+                SELECT start_date
+                FROM date_range
+            ) AND (
+                SELECT end_date
+                FROM date_range
+            )
+        GROUP BY
+            date_trunc('month', t.created_at),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN monthly_transactions mt ON ac.activity_month = mt.activity_month
+    AND ac.bank_id = mt.bank_id
+    AND ac.payment_method = mt.payment_method
+ORDER BY ac.activity_month, ac.payment_method
+`
+
+type GetMonthBankMethodsFailedByIdParams struct {
+	Column1 time.Time `json:"column_1"`
+	BankID  int32     `json:"bank_id"`
+}
+
+type GetMonthBankMethodsFailedByIdRow struct {
+	Month             string  `json:"month"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthBankMethodsFailedById(ctx context.Context, arg GetMonthBankMethodsFailedByIdParams) ([]*GetMonthBankMethodsFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthBankMethodsFailedById, arg.Column1, arg.BankID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthBankMethodsFailedByIdRow
+	for rows.Next() {
+		var i GetMonthBankMethodsFailedByIdRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthBankMethodsFailedByMerchant = `-- name: GetMonthBankMethodsFailedByMerchant :many
+WITH
+    date_range AS (
+        SELECT date_trunc('month', $1::timestamp) AS start_date, date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.merchant_id = $2
+    ),
+    all_months AS (
+        SELECT generate_series(
+                (
+                    SELECT start_date
+                    FROM date_range
+                ), (
+                    SELECT end_date
+                    FROM date_range
+                ), interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT am.activity_month, bm.bank_id, bm.bank_name, bm.payment_method
+        FROM all_months am
+            CROSS JOIN bank_methods bm
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.merchant_id = $2
+            AND t.created_at BETWEEN (
+                SELECT start_date
+                FROM date_range
+            ) AND (
+                SELECT end_date
+                FROM date_range
+            )
+        GROUP BY
+            date_trunc('month', t.created_at),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN monthly_transactions mt ON ac.activity_month = mt.activity_month
+    AND ac.bank_id = mt.bank_id
+    AND ac.payment_method = mt.payment_method
+ORDER BY ac.activity_month, ac.bank_name, ac.payment_method
+`
+
+type GetMonthBankMethodsFailedByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthBankMethodsFailedByMerchantRow struct {
+	Month             string  `json:"month"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthBankMethodsFailedByMerchant(ctx context.Context, arg GetMonthBankMethodsFailedByMerchantParams) ([]*GetMonthBankMethodsFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthBankMethodsFailedByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthBankMethodsFailedByMerchantRow
+	for rows.Next() {
+		var i GetMonthBankMethodsFailedByMerchantRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthBankMethodsSuccess = `-- name: GetMonthBankMethodsSuccess :many
+WITH
+    date_range AS (
+        SELECT date_trunc('month', $1::timestamp) AS start_date, date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    active_bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+    ),
+    all_months AS (
+        SELECT generate_series(
+                (
+                    SELECT start_date
+                    FROM date_range
+                ), (
+                    SELECT end_date
+                    FROM date_range
+                ), interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT am.activity_month, abm.bank_id, abm.bank_name, abm.payment_method
+        FROM
+            all_months am
+            CROSS JOIN active_bank_methods abm
+    ),
+    monthly_stats AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(*) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.created_at BETWEEN (
+                SELECT start_date
+                FROM date_range
+            ) AND (
+                SELECT end_date
+                FROM date_range
+            )
+        GROUP BY
+            date_trunc('month', t.created_at),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(ms.total_transactions, 0) AS total_transactions,
+    COALESCE(ms.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN monthly_stats ms ON ac.activity_month = ms.activity_month
+    AND ac.bank_id = ms.bank_id
+    AND ac.payment_method = ms.payment_method
+ORDER BY ac.activity_month, ac.bank_name, ac.payment_method
+`
+
+type GetMonthBankMethodsSuccessRow struct {
+	Month             string  `json:"month"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthBankMethodsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetMonthBankMethodsSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthBankMethodsSuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthBankMethodsSuccessRow
+	for rows.Next() {
+		var i GetMonthBankMethodsSuccessRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthBankMethodsSuccessById = `-- name: GetMonthBankMethodsSuccessById :many
+WITH
+    date_range AS (
+        SELECT date_trunc('month', $1::timestamp) AS start_date, date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND b.bank_id = $2
+    ),
+    all_months AS (
+        SELECT generate_series(
+                (
+                    SELECT start_date
+                    FROM date_range
+                ), (
+                    SELECT end_date
+                    FROM date_range
+                ), interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT am.activity_month, bm.bank_id, bm.bank_name, bm.payment_method
+        FROM all_months am
+            CROSS JOIN bank_methods bm
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+            AND b.bank_id = $2
+            AND t.created_at BETWEEN (
+                SELECT start_date
+                FROM date_range
+            ) AND (
+                SELECT end_date
+                FROM date_range
+            )
+        GROUP BY
+            date_trunc('month', t.created_at),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN monthly_transactions mt ON ac.activity_month = mt.activity_month
+    AND ac.bank_id = mt.bank_id
+    AND ac.payment_method = mt.payment_method
+ORDER BY ac.activity_month, ac.payment_method
+`
+
+type GetMonthBankMethodsSuccessByIdParams struct {
+	Column1 time.Time `json:"column_1"`
+	BankID  int32     `json:"bank_id"`
+}
+
+type GetMonthBankMethodsSuccessByIdRow struct {
+	Month             string  `json:"month"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthBankMethodsSuccessById(ctx context.Context, arg GetMonthBankMethodsSuccessByIdParams) ([]*GetMonthBankMethodsSuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthBankMethodsSuccessById, arg.Column1, arg.BankID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthBankMethodsSuccessByIdRow
+	for rows.Next() {
+		var i GetMonthBankMethodsSuccessByIdRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthBankMethodsSuccessByMerchant = `-- name: GetMonthBankMethodsSuccessByMerchant :many
+WITH
+    date_range AS (
+        SELECT date_trunc('month', $1::timestamp) AS start_date, date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.merchant_id = $2
+    ),
+    all_months AS (
+        SELECT generate_series(
+                (
+                    SELECT start_date
+                    FROM date_range
+                ), (
+                    SELECT end_date
+                    FROM date_range
+                ), interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT am.activity_month, bm.bank_id, bm.bank_name, bm.payment_method
+        FROM all_months am
+            CROSS JOIN bank_methods bm
+    ),
+    monthly_transactions AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.merchant_id = $2
+            AND t.created_at BETWEEN (
+                SELECT start_date
+                FROM date_range
+            ) AND (
+                SELECT end_date
+                FROM date_range
+            )
+        GROUP BY
+            date_trunc('month', t.created_at),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(mt.total_transactions, 0) AS total_transactions,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN monthly_transactions mt ON ac.activity_month = mt.activity_month
+    AND ac.bank_id = mt.bank_id
+    AND ac.payment_method = mt.payment_method
+ORDER BY ac.activity_month, ac.bank_name, ac.payment_method
+`
+
+type GetMonthBankMethodsSuccessByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthBankMethodsSuccessByMerchantRow struct {
+	Month             string  `json:"month"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthBankMethodsSuccessByMerchant(ctx context.Context, arg GetMonthBankMethodsSuccessByMerchantParams) ([]*GetMonthBankMethodsSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthBankMethodsSuccessByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthBankMethodsSuccessByMerchantRow
+	for rows.Next() {
+		var i GetMonthBankMethodsSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountBankFailed = `-- name: GetYearAmountBankFailed :many
+WITH
+    active_banks AS (
+        SELECT bank_id, name AS bank_name
+        FROM banks
+        WHERE deleted_at IS NULL
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_bank_combos AS (
+        SELECT
+            ry.year,
+            ab.bank_id,
+            ab.bank_name
+        FROM report_years ry
+        CROSS JOIN active_banks ab
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            b.bank_id,
+            b.name AS bank_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            b.bank_id,
+            b.name
+    )
+SELECT
+    ybc.bank_id,
+    ybc.bank_name,
+    ybc.year::text,
+    COALESCE(yt.total_failed, 0) AS total_failed,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_bank_combos ybc
+LEFT JOIN yearly_transactions yt ON
+    ybc.year = yt.year AND
+    ybc.bank_id = yt.bank_id
+ORDER BY 
+    ybc.bank_name ASC,
+    ybc.year DESC
+`
+
+type GetYearAmountBankFailedRow struct {
+	BankID      int32  `json:"bank_id"`
+	BankName    string `json:"bank_name"`
+	YbcYear     string `json:"ybc_year"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountBankFailed(ctx context.Context, dollar_1 int32) ([]*GetYearAmountBankFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountBankFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountBankFailedRow
+	for rows.Next() {
+		var i GetYearAmountBankFailedRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.YbcYear,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountBankFailedById = `-- name: GetYearAmountBankFailedById :many
+WITH
+    target_bank AS (
+        SELECT b.bank_id, b.name AS bank_name
+        FROM banks b
+        WHERE
+            b.bank_id = $2
+            AND b.deleted_at IS NULL
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT ($1::integer - 1) AS year
+    ),
+    year_bank_combos AS (
+        SELECT
+            ry.year,
+            tb.bank_id,
+            tb.bank_name
+        FROM report_years ry
+        CROSS JOIN target_bank tb
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            t.bank_id,
+            b.name AS bank_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.bank_id = $2
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, ($1::integer - 1))
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            t.bank_id,
+            b.name
+    )
+SELECT
+    ybc.bank_id,
+    ybc.bank_name,
+    ybc.year::text AS year,
+    COALESCE(yt.total_failed, 0) AS total_failed,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM
+    year_bank_combos ybc
+LEFT JOIN
+    yearly_transactions yt
+    ON ybc.year = yt.year
+    AND ybc.bank_id = yt.bank_id
+ORDER BY
+    ybc.year DESC
+`
+
+type GetYearAmountBankFailedByIdParams struct {
+	Column1 int32 `json:"column_1"`
+	BankID  int32 `json:"bank_id"`
+}
+
+type GetYearAmountBankFailedByIdRow struct {
+	BankID      int32  `json:"bank_id"`
+	BankName    string `json:"bank_name"`
+	Year        string `json:"year"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountBankFailedById(ctx context.Context, arg GetYearAmountBankFailedByIdParams) ([]*GetYearAmountBankFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountBankFailedById, arg.Column1, arg.BankID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountBankFailedByIdRow
+	for rows.Next() {
+		var i GetYearAmountBankFailedByIdRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.Year,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountBankFailedByMerchant = `-- name: GetYearAmountBankFailedByMerchant :many
+WITH
+    all_banks AS (
+        SELECT b.bank_id, b.name AS bank_name
+        FROM banks b
+        WHERE
+            b.deleted_at IS NULL
+    ),
+    all_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    bank_year_combos AS (
+        SELECT ab.bank_id, ab.bank_name, ay.year
+        FROM all_banks ab
+            CROSS JOIN all_years ay
+    ),
+    actual_data AS (
+        SELECT
+            b.bank_id,
+            b.name AS bank_name,
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )::integer AS year,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.merchant_id = $2
+            AND EXTRACT(
+                YEAR
+                FROM t.created_at
+            ) IN ($1::integer, $1::integer - 1)
+        GROUP BY
+            b.bank_id,
+            b.name,
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )
+    )
+SELECT
+    byc.bank_id,
+    byc.bank_name,
+    byc.year::text,
+    COALESCE(ad.total_failed, 0) AS total_failed,
+    COALESCE(ad.total_amount, 0) AS total_amount
+FROM
+    bank_year_combos byc
+    LEFT JOIN actual_data ad ON byc.bank_id = ad.bank_id
+    AND byc.year = ad.year
+ORDER BY byc.year DESC
+`
+
+type GetYearAmountBankFailedByMerchantParams struct {
+	Column1    int32         `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearAmountBankFailedByMerchantRow struct {
+	BankID      int32  `json:"bank_id"`
+	BankName    string `json:"bank_name"`
+	BycYear     string `json:"byc_year"`
+	TotalFailed int64  `json:"total_failed"`
+	TotalAmount int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountBankFailedByMerchant(ctx context.Context, arg GetYearAmountBankFailedByMerchantParams) ([]*GetYearAmountBankFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountBankFailedByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountBankFailedByMerchantRow
+	for rows.Next() {
+		var i GetYearAmountBankFailedByMerchantRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.BycYear,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountBankSuccess = `-- name: GetYearAmountBankSuccess :many
+WITH
+    active_banks AS (
+        SELECT bank_id, name AS bank_name
+        FROM banks
+        WHERE deleted_at IS NULL
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_bank_combos AS (
+        SELECT
+            ry.year,
+            ab.bank_id,
+            ab.bank_name
+        FROM report_years ry
+        CROSS JOIN active_banks ab
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            b.bank_id,
+            b.name AS bank_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            b.bank_id,
+            b.name
+    )
+SELECT
+    ybc.bank_id,
+    ybc.bank_name,
+    ybc.year::text,
+    COALESCE(yt.total_success, 0) AS total_success,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_bank_combos ybc
+LEFT JOIN yearly_transactions yt ON
+    ybc.year = yt.year AND
+    ybc.bank_id = yt.bank_id
+ORDER BY 
+    ybc.bank_name ASC,
+    ybc.year DESC
+`
+
+type GetYearAmountBankSuccessRow struct {
+	BankID       int32  `json:"bank_id"`
+	BankName     string `json:"bank_name"`
+	YbcYear      string `json:"ybc_year"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountBankSuccess(ctx context.Context, dollar_1 int32) ([]*GetYearAmountBankSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountBankSuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountBankSuccessRow
+	for rows.Next() {
+		var i GetYearAmountBankSuccessRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.YbcYear,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountBankSuccessById = `-- name: GetYearAmountBankSuccessById :many
+WITH
+    target_bank AS (
+        SELECT b.bank_id, b.name AS bank_name
+        FROM banks b
+        WHERE
+            b.bank_id = $2
+            AND b.deleted_at IS NULL
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT ($1::integer - 1) AS year
+    ),
+    year_bank_combos AS (
+        SELECT
+            ry.year,
+            tb.bank_id,
+            tb.bank_name
+        FROM report_years ry
+        CROSS JOIN target_bank tb
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            t.bank_id,
+            b.name AS bank_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.bank_id = $2
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, ($1::integer - 1))
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            t.bank_id,
+            b.name
+    )
+SELECT
+    ybc.bank_id,
+    ybc.bank_name,
+    ybc.year::text AS year,
+    COALESCE(yt.total_success, 0) AS total_success,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM
+    year_bank_combos ybc
+LEFT JOIN
+    yearly_transactions yt
+    ON ybc.year = yt.year
+    AND ybc.bank_id = yt.bank_id
+ORDER BY
+    ybc.year DESC
+`
+
+type GetYearAmountBankSuccessByIdParams struct {
+	Column1 int32 `json:"column_1"`
+	BankID  int32 `json:"bank_id"`
+}
+
+type GetYearAmountBankSuccessByIdRow struct {
+	BankID       int32  `json:"bank_id"`
+	BankName     string `json:"bank_name"`
+	Year         string `json:"year"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountBankSuccessById(ctx context.Context, arg GetYearAmountBankSuccessByIdParams) ([]*GetYearAmountBankSuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountBankSuccessById, arg.Column1, arg.BankID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountBankSuccessByIdRow
+	for rows.Next() {
+		var i GetYearAmountBankSuccessByIdRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.Year,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountBankSuccessByMerchant = `-- name: GetYearAmountBankSuccessByMerchant :many
+WITH
+    all_banks AS (
+        SELECT b.bank_id, b.name AS bank_name
+        FROM banks b
+        WHERE
+            b.deleted_at IS NULL
+    ),
+    all_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    bank_year_combos AS (
+        SELECT ab.bank_id, ab.bank_name, ay.year
+        FROM all_banks ab
+            CROSS JOIN all_years ay
+    ),
+    actual_data AS (
+        SELECT
+            b.bank_id,
+            b.name AS bank_name,
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )::integer AS year,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.merchant_id = $2
+            AND EXTRACT(
+                YEAR
+                FROM t.created_at
+            ) IN ($1::integer, $1::integer - 1)
+        GROUP BY
+            b.bank_id,
+            b.name,
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )
+    )
+SELECT
+    byc.bank_id,
+    byc.bank_name,
+    byc.year::text,
+    COALESCE(ad.total_success, 0) AS total_success,
+    COALESCE(ad.total_amount, 0) AS total_amount
+FROM
+    bank_year_combos byc
+    LEFT JOIN actual_data ad ON byc.bank_id = ad.bank_id
+    AND byc.year = ad.year
+ORDER BY byc.year DESC
+`
+
+type GetYearAmountBankSuccessByMerchantParams struct {
+	Column1    int32         `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearAmountBankSuccessByMerchantRow struct {
+	BankID       int32  `json:"bank_id"`
+	BankName     string `json:"bank_name"`
+	BycYear      string `json:"byc_year"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountBankSuccessByMerchant(ctx context.Context, arg GetYearAmountBankSuccessByMerchantParams) ([]*GetYearAmountBankSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountBankSuccessByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountBankSuccessByMerchantRow
+	for rows.Next() {
+		var i GetYearAmountBankSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.BankID,
+			&i.BankName,
+			&i.BycYear,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearBankMethodsFailed = `-- name: GetYearBankMethodsFailed :many
+WITH
+    -- Define the 5-year range
+    year_range AS (
+        SELECT EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int - 4 AS start_year, EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int AS end_year
+    ),
+    active_bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+    ),
+    all_years AS (
+        SELECT generate_series(
+                (
+                    SELECT start_year
+                    FROM year_range
+                ), (
+                    SELECT end_year
+                    FROM year_range
+                )
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT ay.year, abm.bank_id, abm.bank_name, abm.payment_method
+        FROM
+            all_years ay
+            CROSS JOIN active_bank_methods abm
+    ),
+    yearly_stats AS (
+        SELECT
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )::text AS year,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(*) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND EXTRACT(
+                YEAR
+                FROM t.created_at
+            ) BETWEEN (
+                SELECT start_year
+                FROM year_range
+            ) AND (
+                SELECT end_year
+                FROM year_range
+            )
+        GROUP BY
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            ),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(ys.total_transactions, 0) AS total_transactions,
+    COALESCE(ys.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN yearly_stats ys ON ac.year = ys.year
+    AND ac.bank_id = ys.bank_id
+    AND ac.payment_method = ys.payment_method
+ORDER BY ac.year DESC, ac.bank_name, ac.payment_method
+`
+
+type GetYearBankMethodsFailedRow struct {
+	Year              string  `json:"year"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearBankMethodsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetYearBankMethodsFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearBankMethodsFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearBankMethodsFailedRow
+	for rows.Next() {
+		var i GetYearBankMethodsFailedRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearBankMethodsFailedById = `-- name: GetYearBankMethodsFailedById :many
+WITH
+    year_range AS (
+        SELECT EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int - 4 AS start_year, EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int AS end_year
+    ),
+    bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND b.bank_id = $2
+    ),
+    all_years AS (
+        SELECT generate_series(
+                (
+                    SELECT start_year
+                    FROM year_range
+                ), (
+                    SELECT end_year
+                    FROM year_range
+                )
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT ay.year, bm.bank_id, bm.bank_name, bm.payment_method
+        FROM all_years ay
+            CROSS JOIN bank_methods bm
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )::text AS year,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND b.bank_id = $2
+            AND EXTRACT(
+                YEAR
+                FROM t.created_at
+            ) BETWEEN (
+                SELECT start_year
+                FROM year_range
+            ) AND (
+                SELECT end_year
+                FROM year_range
+            )
+        GROUP BY
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            ),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN yearly_transactions yt ON ac.year = yt.year
+    AND ac.bank_id = yt.bank_id
+    AND ac.payment_method = yt.payment_method
+ORDER BY ac.year DESC, ac.payment_method
+`
+
+type GetYearBankMethodsFailedByIdParams struct {
+	Column1 time.Time `json:"column_1"`
+	BankID  int32     `json:"bank_id"`
+}
+
+type GetYearBankMethodsFailedByIdRow struct {
+	Year              string  `json:"year"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearBankMethodsFailedById(ctx context.Context, arg GetYearBankMethodsFailedByIdParams) ([]*GetYearBankMethodsFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearBankMethodsFailedById, arg.Column1, arg.BankID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearBankMethodsFailedByIdRow
+	for rows.Next() {
+		var i GetYearBankMethodsFailedByIdRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearBankMethodsFailedByMerchant = `-- name: GetYearBankMethodsFailedByMerchant :many
+WITH
+    year_range AS (
+        SELECT EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int - 4 AS start_year, EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int AS end_year
+    ),
+    bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.merchant_id = $2
+    ),
+    all_years AS (
+        SELECT generate_series(
+                (
+                    SELECT start_year
+                    FROM year_range
+                ), (
+                    SELECT end_year
+                    FROM year_range
+                )
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT ay.year, bm.bank_id, bm.bank_name, bm.payment_method
+        FROM all_years ay
+            CROSS JOIN bank_methods bm
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )::text AS year,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.merchant_id = $2
+            AND EXTRACT(
+                YEAR
+                FROM t.created_at
+            ) BETWEEN (
+                SELECT start_year
+                FROM year_range
+            ) AND (
+                SELECT end_year
+                FROM year_range
+            )
+        GROUP BY
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            ),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN yearly_transactions yt ON ac.year = yt.year
+    AND ac.bank_id = yt.bank_id
+    AND ac.payment_method = yt.payment_method
+ORDER BY ac.year DESC, ac.bank_name, ac.payment_method
+`
+
+type GetYearBankMethodsFailedByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearBankMethodsFailedByMerchantRow struct {
+	Year              string  `json:"year"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearBankMethodsFailedByMerchant(ctx context.Context, arg GetYearBankMethodsFailedByMerchantParams) ([]*GetYearBankMethodsFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearBankMethodsFailedByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearBankMethodsFailedByMerchantRow
+	for rows.Next() {
+		var i GetYearBankMethodsFailedByMerchantRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearBankMethodsSuccess = `-- name: GetYearBankMethodsSuccess :many
+WITH
+    year_range AS (
+        SELECT EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int - 4 AS start_year, EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int AS end_year
+    ),
+    active_bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+    ),
+    all_years AS (
+        SELECT generate_series(
+                (
+                    SELECT start_year
+                    FROM year_range
+                ), (
+                    SELECT end_year
+                    FROM year_range
+                )
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT ay.year, abm.bank_id, abm.bank_name, abm.payment_method
+        FROM
+            all_years ay
+            CROSS JOIN active_bank_methods abm
+    ),
+    yearly_stats AS (
+        SELECT
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )::text AS year,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(*) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+            AND EXTRACT(
+                YEAR
+                FROM t.created_at
+            ) BETWEEN (
+                SELECT start_year
+                FROM year_range
+            ) AND (
+                SELECT end_year
+                FROM year_range
+            )
+        GROUP BY
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            ),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(ys.total_transactions, 0) AS total_transactions,
+    COALESCE(ys.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN yearly_stats ys ON ac.year = ys.year
+    AND ac.bank_id = ys.bank_id
+    AND ac.payment_method = ys.payment_method
+ORDER BY ac.year DESC, ac.bank_name, ac.payment_method
+`
+
+type GetYearBankMethodsSuccessRow struct {
+	Year              string  `json:"year"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearBankMethodsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetYearBankMethodsSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearBankMethodsSuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearBankMethodsSuccessRow
+	for rows.Next() {
+		var i GetYearBankMethodsSuccessRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearBankMethodsSuccessById = `-- name: GetYearBankMethodsSuccessById :many
+WITH
+    year_range AS (
+        SELECT EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int - 4 AS start_year, EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int AS end_year
+    ),
+    bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND b.bank_id = $2
+    ),
+    all_years AS (
+        SELECT generate_series(
+                (
+                    SELECT start_year
+                    FROM year_range
+                ), (
+                    SELECT end_year
+                    FROM year_range
+                )
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT ay.year, bm.bank_id, bm.bank_name, bm.payment_method
+        FROM all_years ay
+            CROSS JOIN bank_methods bm
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )::text AS year,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+            AND b.bank_id = $2
+            AND EXTRACT(
+                YEAR
+                FROM t.created_at
+            ) BETWEEN (
+                SELECT start_year
+                FROM year_range
+            ) AND (
+                SELECT end_year
+                FROM year_range
+            )
+        GROUP BY
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            ),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN yearly_transactions yt ON ac.year = yt.year
+    AND ac.bank_id = yt.bank_id
+    AND ac.payment_method = yt.payment_method
+ORDER BY ac.year DESC, ac.payment_method
+`
+
+type GetYearBankMethodsSuccessByIdParams struct {
+	Column1 time.Time `json:"column_1"`
+	BankID  int32     `json:"bank_id"`
+}
+
+type GetYearBankMethodsSuccessByIdRow struct {
+	Year              string  `json:"year"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearBankMethodsSuccessById(ctx context.Context, arg GetYearBankMethodsSuccessByIdParams) ([]*GetYearBankMethodsSuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearBankMethodsSuccessById, arg.Column1, arg.BankID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearBankMethodsSuccessByIdRow
+	for rows.Next() {
+		var i GetYearBankMethodsSuccessByIdRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearBankMethodsSuccessByMerchant = `-- name: GetYearBankMethodsSuccessByMerchant :many
+WITH
+    year_range AS (
+        SELECT EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int - 4 AS start_year, EXTRACT(
+                YEAR
+                FROM $1::timestamp
+            )::int AS end_year
+    ),
+    bank_methods AS (
+        SELECT DISTINCT
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.merchant_id = $2
+    ),
+    all_years AS (
+        SELECT generate_series(
+                (
+                    SELECT start_year
+                    FROM year_range
+                ), (
+                    SELECT end_year
+                    FROM year_range
+                )
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT ay.year, bm.bank_id, bm.bank_name, bm.payment_method
+        FROM all_years ay
+            CROSS JOIN bank_methods bm
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            )::text AS year,
+            b.bank_id,
+            b.name AS bank_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+            JOIN banks b ON t.bank_id = b.bank_id
+        WHERE
+            t.deleted_at IS NULL
+            AND b.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.merchant_id = $2
+            AND EXTRACT(
+                YEAR
+                FROM t.created_at
+            ) BETWEEN (
+                SELECT start_year
+                FROM year_range
+            ) AND (
+                SELECT end_year
+                FROM year_range
+            )
+        GROUP BY
+            EXTRACT(
+                YEAR
+                FROM t.created_at
+            ),
+            b.bank_id,
+            b.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.bank_id,
+    ac.bank_name,
+    ac.payment_method,
+    COALESCE(yt.total_transactions, 0) AS total_transactions,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM
+    all_combinations ac
+    LEFT JOIN yearly_transactions yt ON ac.year = yt.year
+    AND ac.bank_id = yt.bank_id
+    AND ac.payment_method = yt.payment_method
+ORDER BY ac.year DESC, ac.bank_name, ac.payment_method
+`
+
+type GetYearBankMethodsSuccessByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearBankMethodsSuccessByMerchantRow struct {
+	Year              string  `json:"year"`
+	BankID            int32   `json:"bank_id"`
+	BankName          string  `json:"bank_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearBankMethodsSuccessByMerchant(ctx context.Context, arg GetYearBankMethodsSuccessByMerchantParams) ([]*GetYearBankMethodsSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearBankMethodsSuccessByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearBankMethodsSuccessByMerchantRow
+	for rows.Next() {
+		var i GetYearBankMethodsSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.BankID,
+			&i.BankName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const restoreAllBanks = `-- name: RestoreAllBanks :exec
-UPDATE banks
-SET deleted_at = NULL
-WHERE deleted_at IS NOT NULL
+UPDATE banks SET deleted_at = NULL WHERE deleted_at IS NOT NULL
 `
 
 // Restore All Trashed Banks
@@ -256,10 +3188,13 @@ func (q *Queries) RestoreAllBanks(ctx context.Context) error {
 
 const restoreBank = `-- name: RestoreBank :one
 UPDATE banks
-SET deleted_at = NULL
-WHERE bank_id = $1
-  AND deleted_at IS NOT NULL
-  RETURNING bank_id, name, created_at, updated_at, deleted_at
+SET
+    deleted_at = NULL
+WHERE
+    bank_id = $1
+    AND deleted_at IS NOT NULL
+RETURNING
+    bank_id, name, created_at, updated_at, deleted_at
 `
 
 // Restore Trashed Bank
@@ -278,10 +3213,13 @@ func (q *Queries) RestoreBank(ctx context.Context, bankID int32) (*Bank, error) 
 
 const trashBank = `-- name: TrashBank :one
 UPDATE banks
-SET deleted_at = CURRENT_TIMESTAMP
-WHERE bank_id = $1
-  AND deleted_at IS NULL
-  RETURNING bank_id, name, created_at, updated_at, deleted_at
+SET
+    deleted_at = CURRENT_TIMESTAMP
+WHERE
+    bank_id = $1
+    AND deleted_at IS NULL
+RETURNING
+    bank_id, name, created_at, updated_at, deleted_at
 `
 
 // Trash Bank (Soft Delete)
@@ -300,11 +3238,14 @@ func (q *Queries) TrashBank(ctx context.Context, bankID int32) (*Bank, error) {
 
 const updateBank = `-- name: UpdateBank :one
 UPDATE banks
-SET name = $2,
+SET
+    name = $2,
     updated_at = CURRENT_TIMESTAMP
-WHERE bank_id = $1
-  AND deleted_at IS NULL
-  RETURNING bank_id, name, created_at, updated_at, deleted_at
+WHERE
+    bank_id = $1
+    AND deleted_at IS NULL
+RETURNING
+    bank_id, name, created_at, updated_at, deleted_at
 `
 
 type UpdateBankParams struct {

@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"strconv"
 	"topup_game/internal/domain/requests"
-	"topup_game/internal/domain/response"
 	response_api "topup_game/internal/mapper/response/api"
 	"topup_game/internal/pb"
+	"topup_game/pkg/errors/category_errors"
+	"topup_game/pkg/errors/merchant_errors"
 	"topup_game/pkg/logger"
 
 	"github.com/labstack/echo/v4"
@@ -89,10 +90,7 @@ func (h *merchantHandleApi) FindAllMerchant(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Failed to retrieve merchant data", zap.Error(err))
-		return c.JSON(http.StatusInternalServerError, response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to retrieve merchant data: ",
-		})
+		return merchant_errors.ErrApiFailedFindAll(c)
 	}
 
 	so := h.mapping.ToApiResponsePaginationMerchant(res)
@@ -116,10 +114,7 @@ func (h *merchantHandleApi) FindById(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Invalid user ID", zap.Error(err))
-		return c.JSON(http.StatusBadRequest, response.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid user ID",
-		})
+		return merchant_errors.ErrApiMerchantInvalidId(c)
 	}
 
 	ctx := c.Request().Context()
@@ -132,10 +127,7 @@ func (h *merchantHandleApi) FindById(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Failed to retrieve merchant data", zap.Error(err))
-		return c.JSON(http.StatusInternalServerError, response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to retrieve merchant data: ",
-		})
+		return merchant_errors.ErrApiMerchantNotFound(c)
 	}
 
 	so := h.mapping.ToApiResponseMerchant(res)
@@ -149,7 +141,7 @@ func (h *merchantHandleApi) FindById(c echo.Context) error {
 // @Description Retrieve a list of active merchant
 // @Accept json
 // @Produce json
-// @Success 200 {object} pb.ApiResponsesUser "List of active merchant"
+// @Success 200 {object} response.ApiResponsePaginationMerchantDeleteAt "List of active merchant"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve merchant data"
 // @Router /api/merchant/active [get]
 func (h *merchantHandleApi) FindByActive(c echo.Context) error {
@@ -177,12 +169,12 @@ func (h *merchantHandleApi) FindByActive(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Failed to retrieve merchant data", zap.Error(err))
-		return c.JSON(http.StatusInternalServerError, response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to retrieve merchant data: ",
-		})
+		return category_errors.ErrApiFailedFindActive(c)
 	}
-	return c.JSON(http.StatusOK, res)
+
+	so := h.mapping.ToApiResponsePaginationMerchantDeleteAt(res)
+
+	return c.JSON(http.StatusOK, so)
 }
 
 // @Security Bearer
@@ -192,7 +184,7 @@ func (h *merchantHandleApi) FindByActive(c echo.Context) error {
 // @Description Retrieve a list of trashed merchant records
 // @Accept json
 // @Produce json
-// @Success 200 {object} pb.ApiResponsesUser "List of trashed merchant data"
+// @Success 200 {object} response.ApiResponsePaginationMerchantDeleteAt "List of trashed merchant data"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve merchant data"
 // @Router /api/merchant/trashed [get]
 func (h *merchantHandleApi) FindByTrashed(c echo.Context) error {
@@ -220,10 +212,7 @@ func (h *merchantHandleApi) FindByTrashed(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Failed to retrieve merchant data", zap.Error(err))
-		return c.JSON(http.StatusInternalServerError, response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to retrieve merchant data: ",
-		})
+		return category_errors.ErrApiFailedFindTrashed(c)
 	}
 
 	so := h.mapping.ToApiResponsePaginationMerchantDeleteAt(res)
@@ -248,18 +237,12 @@ func (h *merchantHandleApi) Create(c echo.Context) error {
 
 	if err := c.Bind(&body); err != nil {
 		h.logger.Debug("Invalid request body", zap.Error(err))
-		return c.JSON(http.StatusBadRequest, response.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid request body",
-		})
+		return merchant_errors.ErrApiBindCreateMerchant(c)
 	}
 
 	if err := body.Validate(); err != nil {
 		h.logger.Debug("Validation Error", zap.Error(err))
-		return c.JSON(http.StatusBadRequest, response.ErrorResponse{
-			Status:  "error",
-			Message: "Validation Error: " + err.Error(),
-		})
+		return merchant_errors.ErrApiValidateCreateMerchant(c)
 	}
 
 	ctx := c.Request().Context()
@@ -278,10 +261,7 @@ func (h *merchantHandleApi) Create(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Failed to create merchant", zap.Error(err))
-		return c.JSON(http.StatusInternalServerError, response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to create merchant: " + err.Error(),
-		})
+		return merchant_errors.ErrApiFailedCreateMerchant(c)
 	}
 
 	so := h.mapping.ToApiResponseMerchant(res)
@@ -302,22 +282,21 @@ func (h *merchantHandleApi) Create(c echo.Context) error {
 // @Failure 500 {object} response.ErrorResponse "Failed to update merchant"
 // @Router /api/merchant/update [post]
 func (h *merchantHandleApi) Update(c echo.Context) error {
+	BankID, err := strconv.Atoi(c.Param("id"))
+	if err != nil || BankID <= 0 {
+		return merchant_errors.ErrInvalidMerchantId(c)
+	}
+
 	var body requests.UpdateMerchantRequest
 
 	if err := c.Bind(&body); err != nil {
 		h.logger.Debug("Invalid request body", zap.Error(err))
-		return c.JSON(http.StatusBadRequest, response.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid request body",
-		})
+		return merchant_errors.ErrApiBindUpdateMerchant(c)
 	}
 
 	if err := body.Validate(); err != nil {
 		h.logger.Debug("Validation Error", zap.Error(err))
-		return c.JSON(http.StatusBadRequest, response.ErrorResponse{
-			Status:  "error",
-			Message: "Validation Error: " + err.Error(),
-		})
+		return merchant_errors.ErrApiFailedUpdateMerchant(c)
 	}
 
 	ctx := c.Request().Context()
@@ -337,10 +316,7 @@ func (h *merchantHandleApi) Update(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Failed to update merchant", zap.Error(err))
-		return c.JSON(http.StatusInternalServerError, response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to update merchant: " + err.Error(),
-		})
+		return category_errors.ErrApiFailedUpdateCategory(c)
 	}
 
 	so := h.mapping.ToApiResponseMerchant(res)
@@ -365,10 +341,7 @@ func (h *merchantHandleApi) TrashedMerchant(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Invalid merchant ID", zap.Error(err))
-		return c.JSON(http.StatusBadRequest, response.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid merchant ID",
-		})
+		return merchant_errors.ErrInvalidMerchantId(c)
 	}
 
 	ctx := c.Request().Context()
@@ -381,10 +354,7 @@ func (h *merchantHandleApi) TrashedMerchant(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Failed to trashed merchant", zap.Error(err))
-		return c.JSON(http.StatusInternalServerError, response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to trashed merchant: ",
-		})
+		return merchant_errors.ErrApiFailedTrashedMerchant(c)
 	}
 
 	so := h.mapping.ToApiResponseMerchantDeleteAt(res)
@@ -409,10 +379,7 @@ func (h *merchantHandleApi) RestoreMerchant(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Invalid merchant ID", zap.Error(err))
-		return c.JSON(http.StatusBadRequest, response.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid merchant ID",
-		})
+		return merchant_errors.ErrInvalidMerchantId(c)
 	}
 
 	ctx := c.Request().Context()
@@ -425,10 +392,7 @@ func (h *merchantHandleApi) RestoreMerchant(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Failed to restore merchant", zap.Error(err))
-		return c.JSON(http.StatusInternalServerError, response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to restore merchant: ",
-		})
+		return merchant_errors.ErrApiFailedRestoreMerchant(c)
 	}
 
 	so := h.mapping.ToApiResponseMerchantDeleteAt(res)
@@ -453,10 +417,7 @@ func (h *merchantHandleApi) DeleteMerchantPermanent(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Invalid merchant ID", zap.Error(err))
-		return c.JSON(http.StatusBadRequest, response.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid merchant ID",
-		})
+		return merchant_errors.ErrInvalidMerchantId(c)
 	}
 
 	ctx := c.Request().Context()
@@ -469,10 +430,7 @@ func (h *merchantHandleApi) DeleteMerchantPermanent(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Failed to delete merchant", zap.Error(err))
-		return c.JSON(http.StatusInternalServerError, response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to delete merchant: ",
-		})
+		return merchant_errors.ErrApiFailedDeletePermanent(c)
 	}
 
 	so := h.mapping.ToApiResponseMerchantDelete(res)
@@ -499,10 +457,7 @@ func (h *merchantHandleApi) RestoreAllMerchant(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Error("Failed to restore all merchant", zap.Error(err))
-		return c.JSON(http.StatusInternalServerError, response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to permanently restore all merchant",
-		})
+		return merchant_errors.ErrApiFailedRestoreAll(c)
 	}
 
 	so := h.mapping.ToApiResponseMerchantAll(res)
@@ -532,10 +487,7 @@ func (h *merchantHandleApi) DeleteAllMerchantPermanent(c echo.Context) error {
 	if err != nil {
 		h.logger.Error("Failed to permanently delete all merchant", zap.Error(err))
 
-		return c.JSON(http.StatusInternalServerError, response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to permanently delete all merchant",
-		})
+		return merchant_errors.ErrApiFailedDeleteAll(c)
 	}
 
 	so := h.mapping.ToApiResponseMerchantAll(res)

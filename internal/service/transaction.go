@@ -1,11 +1,14 @@
 package service
 
 import (
+	"math"
 	"reflect"
 	"topup_game/internal/domain/requests"
 	"topup_game/internal/domain/response"
 	response_service "topup_game/internal/mapper/response/service"
 	"topup_game/internal/repository"
+	"topup_game/pkg/errors/nominal_errors"
+	"topup_game/pkg/errors/transaction_errors"
 	"topup_game/pkg/logger"
 
 	"go.uber.org/zap"
@@ -47,7 +50,11 @@ func NewTransactionService(
 	}
 }
 
-func (s *transactionService) FindAll(page int, pageSize int, search string) ([]*response.TransactionResponse, int, *response.ErrorResponse) {
+func (s *transactionService) FindAll(request *requests.FindAllTransactions) ([]*response.TransactionResponse, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
 	s.logger.Debug("Fetching transaction",
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize),
@@ -60,7 +67,7 @@ func (s *transactionService) FindAll(page int, pageSize int, search string) ([]*
 		pageSize = 10
 	}
 
-	res, totalRecords, err := s.transactionRepository.FindAllTransactions(search, page, pageSize)
+	res, totalRecords, err := s.transactionRepository.FindAllTransactions(request)
 
 	if err != nil {
 		s.logger.Error("Failed to fetch transaction",
@@ -69,20 +76,329 @@ func (s *transactionService) FindAll(page int, pageSize int, search string) ([]*
 			zap.Int("pageSize", pageSize),
 			zap.String("search", search))
 
-		return nil, 0, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch transaction records",
-		}
+		return nil, nil, transaction_errors.ErrFailedFindAll
 	}
 
 	s.logger.Debug("Successfully fetched transaction",
-		zap.Int("totalRecords", totalRecords),
+		zap.Int("totalRecords", *totalRecords),
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize))
 
 	so := s.mapping.ToTransactionsResponse(res)
 
 	return so, totalRecords, nil
+}
+
+func (s *transactionService) FindMonthAmountTransactionSuccess(req *requests.MonthAmountTransactionRequest) ([]*response.MonthAmountTransactionSuccessResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly transaction success amounts", zap.Any("request", req))
+
+	records, err := s.transactionRepository.FindMonthAmountTransactionSuccess(req)
+	if err != nil {
+		s.logger.Error("Failed to fetch monthly transaction success amounts", zap.Error(err))
+		return nil, transaction_errors.ErrFailedFindMonthAmountTransactionSuccess
+	}
+
+	responses := s.mapping.ToTransactionsResponseMonthAmountSuccess(records)
+
+	s.logger.Debug("Successfully fetched monthly transaction success amounts",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindYearAmountTransactionSuccess(year int) ([]*response.YearAmountTransactionSuccessResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly transaction success amounts", zap.Int("year", year))
+
+	records, err := s.transactionRepository.FindYearAmountTransactionSuccess(year)
+	if err != nil {
+		s.logger.Error("Failed to fetch yearly transaction success amounts", zap.Error(err))
+		return nil, transaction_errors.ErrFailedFindYearAmountTransactionSuccess
+	}
+
+	responses := s.mapping.ToTransactionsResponseYearAmountSuccess(records)
+
+	s.logger.Debug("Successfully fetched yearly transaction success amounts",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindMonthAmountTransactionFailed(req *requests.MonthAmountTransactionRequest) ([]*response.MonthAmountTransactionFailedResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly transaction failed amounts", zap.Any("request", req))
+
+	records, err := s.transactionRepository.FindMonthAmountTransactionFailed(req)
+	if err != nil {
+		s.logger.Error("Failed to fetch monthly transaction failed amounts", zap.Error(err))
+		return nil, transaction_errors.ErrFailedFindMonthAmountTransactionFailed
+	}
+
+	responses := s.mapping.ToTransactionsResponseMonthAmountFailed(records)
+
+	s.logger.Debug("Successfully fetched monthly transaction failed amounts",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindYearAmountTransactionFailed(year int) ([]*response.YearAmountTransactionFailedResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly transaction failed amounts", zap.Int("year", year))
+
+	records, err := s.transactionRepository.FindYearAmountTransactionFailed(year)
+	if err != nil {
+		s.logger.Error("Failed to fetch yearly transaction failed amounts", zap.Error(err))
+		return nil, transaction_errors.ErrFailedFindYearAmountTransactionFailed
+	}
+
+	responses := s.mapping.ToTransactionsResponseYearAmountFailed(records)
+
+	s.logger.Debug("Successfully fetched yearly transaction failed amounts",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindMonthMethodTransactionSuccess(year int) ([]*response.MonthMethodTransactionResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly transaction success methods", zap.Int("year", year))
+
+	records, err := s.transactionRepository.FindMonthMethodTransactionSuccess(year)
+	if err != nil {
+		s.logger.Error("Failed to fetch monthly transaction success methods", zap.Error(err))
+		return nil, transaction_errors.ErrFailedFindMonthMethodTransactionSuccess
+	}
+
+	responses := s.mapping.ToTransactionsResponseMonthMethod(records)
+
+	s.logger.Debug("Successfully fetched monthly transaction success methods",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindYearMethodTransactionSuccess(year int) ([]*response.YearMethodTransactionResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly transaction success methods", zap.Int("year", year))
+
+	records, err := s.transactionRepository.FindYearMethodTransactionSuccess(year)
+	if err != nil {
+		s.logger.Error("Failed to fetch yearly transaction success methods", zap.Error(err))
+		return nil, transaction_errors.ErrFailedFindYearMethodTransactionSuccess
+	}
+
+	responses := s.mapping.ToTransactionsResponseYearMethod(records)
+
+	s.logger.Debug("Successfully fetched yearly transaction success methods",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindMonthMethodTransactionFailed(year int) ([]*response.MonthMethodTransactionResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly transaction failed methods", zap.Int("year", year))
+
+	records, err := s.transactionRepository.FindMonthMethodTransactionFailed(year)
+	if err != nil {
+		s.logger.Error("Failed to fetch monthly transaction failed methods", zap.Error(err))
+		return nil, transaction_errors.ErrFailedFindMonthMethodTransactionFailed
+	}
+
+	responses := s.mapping.ToTransactionsResponseMonthMethod(records)
+
+	s.logger.Debug("Successfully fetched monthly transaction failed methods",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindYearMethodTransactionFailed(year int) ([]*response.YearMethodTransactionResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly transaction failed methods", zap.Int("year", year))
+
+	records, err := s.transactionRepository.FindYearMethodTransactionFailed(year)
+	if err != nil {
+		s.logger.Error("Failed to fetch yearly transaction failed methods", zap.Error(err))
+		return nil, transaction_errors.ErrFailedFindYearMethodTransactionFailed
+	}
+
+	responses := s.mapping.ToTransactionsResponseYearMethod(records)
+
+	s.logger.Debug("Successfully fetched yearly transaction failed methods",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindMonthAmountTransactionSuccessByMerchant(req *requests.MonthAmountTransactionByMerchantRequest) ([]*response.MonthAmountTransactionSuccessResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly transaction success amounts by merchant",
+		zap.Any("request", req),
+		zap.Int("merchant_id", req.MerchantID))
+
+	records, err := s.transactionRepository.FindMonthAmountTransactionSuccessByMerchant(req)
+	if err != nil {
+		s.logger.Error("Failed to fetch monthly transaction success amounts by merchant",
+			zap.Error(err),
+			zap.Int("merchant_id", req.MerchantID))
+		return nil, transaction_errors.ErrFailedFindMonthAmountTransactionSuccessByMerchant
+	}
+
+	responses := s.mapping.ToTransactionsResponseMonthAmountSuccess(records)
+
+	s.logger.Debug("Successfully fetched monthly transaction success amounts by merchant",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindYearAmountTransactionSuccessByMerchant(req *requests.YearAmountTransactionByMerchantRequest) ([]*response.YearAmountTransactionSuccessResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly transaction success amounts by merchant",
+		zap.Any("request", req),
+		zap.Int("merchant_id", req.MerchantID))
+
+	records, err := s.transactionRepository.FindYearAmountTransactionSuccessByMerchant(req)
+	if err != nil {
+		s.logger.Error("Failed to fetch yearly transaction success amounts by merchant",
+			zap.Error(err),
+			zap.Int("merchant_id", req.MerchantID))
+		return nil, transaction_errors.ErrFailedFindYearAmountTransactionSuccessByMerchant
+	}
+
+	responses := s.mapping.ToTransactionsResponseYearAmountSuccess(records)
+
+	s.logger.Debug("Successfully fetched yearly transaction success amounts by merchant",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindMonthAmountTransactionFailedByMerchant(req *requests.MonthAmountTransactionByMerchantRequest) ([]*response.MonthAmountTransactionFailedResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly transaction failed amounts by merchant",
+		zap.Any("request", req),
+		zap.Int("merchant_id", req.MerchantID))
+
+	records, err := s.transactionRepository.FindMonthAmountTransactionFailedByMerchant(req)
+	if err != nil {
+		s.logger.Error("Failed to fetch monthly transaction failed amounts by merchant",
+			zap.Error(err),
+			zap.Int("merchant_id", req.MerchantID))
+		return nil, transaction_errors.ErrFailedFindMonthAmountTransactionFailedByMerchant
+	}
+
+	responses := s.mapping.ToTransactionsResponseMonthAmountFailed(records)
+
+	s.logger.Debug("Successfully fetched monthly transaction failed amounts by merchant",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindYearAmountTransactionFailedByMerchant(req *requests.YearAmountTransactionByMerchantRequest) ([]*response.YearAmountTransactionFailedResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly transaction failed amounts by merchant",
+		zap.Any("request", req),
+		zap.Int("merchant_id", req.MerchantID))
+
+	records, err := s.transactionRepository.FindYearAmountTransactionFailedByMerchant(req)
+	if err != nil {
+		s.logger.Error("Failed to fetch yearly transaction failed amounts by merchant",
+			zap.Error(err),
+			zap.Int("merchant_id", req.MerchantID))
+		return nil, transaction_errors.ErrFailedFindYearAmountTransactionFailedByMerchant
+	}
+
+	responses := s.mapping.ToTransactionsResponseYearAmountFailed(records)
+
+	s.logger.Debug("Successfully fetched yearly transaction failed amounts by merchant",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindMonthMethodTransactionSuccessByMerchant(req *requests.MonthMethodTransactionByMerchantRequest) ([]*response.MonthMethodTransactionResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly transaction success methods by merchant",
+		zap.Any("request", req),
+		zap.Int("merchant_id", req.MerchantID))
+
+	records, err := s.transactionRepository.FindMonthMethodTransactionSuccessByMerchant(req)
+	if err != nil {
+		s.logger.Error("Failed to fetch monthly transaction success methods by merchant",
+			zap.Error(err),
+			zap.Int("merchant_id", req.MerchantID))
+		return nil, transaction_errors.ErrFailedFindMonthMethodTransactionSuccessByMerchant
+	}
+
+	responses := s.mapping.ToTransactionsResponseMonthMethod(records)
+
+	s.logger.Debug("Successfully fetched monthly transaction success methods by merchant",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindYearMethodTransactionSuccessByMerchant(req *requests.YearMethodTransactionByMerchantRequest) ([]*response.YearMethodTransactionResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly transaction success methods by merchant",
+		zap.Any("request", req),
+		zap.Int("merchant_id", req.MerchantID))
+
+	records, err := s.transactionRepository.FindYearMethodTransactionSuccessByMerchant(req)
+	if err != nil {
+		s.logger.Error("Failed to fetch yearly transaction success methods by merchant",
+			zap.Error(err),
+			zap.Int("merchant_id", req.MerchantID))
+		return nil, transaction_errors.ErrFailedFindYearMethodTransactionSuccessByMerchant
+	}
+
+	responses := s.mapping.ToTransactionsResponseYearMethod(records)
+
+	s.logger.Debug("Successfully fetched yearly transaction success methods by merchant",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindMonthMethodTransactionFailedByMerchant(req *requests.MonthMethodTransactionByMerchantRequest) ([]*response.MonthMethodTransactionResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly transaction failed methods by merchant",
+		zap.Any("request", req),
+		zap.Int("merchant_id", req.MerchantID))
+
+	records, err := s.transactionRepository.FindMonthMethodTransactionFailedByMerchant(req)
+	if err != nil {
+		s.logger.Error("Failed to fetch monthly transaction failed methods by merchant",
+			zap.Error(err),
+			zap.Int("merchant_id", req.MerchantID))
+		return nil, transaction_errors.ErrFailedFindMonthMethodTransactionFailedByMerchant
+	}
+
+	responses := s.mapping.ToTransactionsResponseMonthMethod(records)
+
+	s.logger.Debug("Successfully fetched monthly transaction failed methods by merchant",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *transactionService) FindYearMethodTransactionFailedByMerchant(req *requests.YearMethodTransactionByMerchantRequest) ([]*response.YearMethodTransactionResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly transaction failed methods by merchant",
+		zap.Any("request", req),
+		zap.Int("merchant_id", req.MerchantID))
+
+	records, err := s.transactionRepository.FindYearMethodTransactionFailedByMerchant(req)
+	if err != nil {
+		s.logger.Error("Failed to fetch yearly transaction failed methods by merchant",
+			zap.Error(err),
+			zap.Int("merchant_id", req.MerchantID))
+		return nil, transaction_errors.ErrFailedFindYearMethodTransactionFailedByMerchant
+	}
+
+	responses := s.mapping.ToTransactionsResponseYearMethod(records)
+
+	s.logger.Debug("Successfully fetched yearly transaction failed methods by merchant",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
 }
 
 func (s *transactionService) FindById(id int) (*response.TransactionResponse, *response.ErrorResponse) {
@@ -93,10 +409,7 @@ func (s *transactionService) FindById(id int) (*response.TransactionResponse, *r
 	if err != nil {
 		s.logger.Error("Failed to fetch transaction record by ID", zap.Error(err))
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch transaction record by ID",
-		}
+		return nil, transaction_errors.ErrTransactionNotFoundRes
 	}
 
 	s.logger.Debug("Successfully fetched transaction", zap.Int("id", id))
@@ -106,7 +419,11 @@ func (s *transactionService) FindById(id int) (*response.TransactionResponse, *r
 	return so, nil
 }
 
-func (s *transactionService) FindByActive(page int, pageSize int, search string) ([]*response.TransactionResponseDeleteAt, int, *response.ErrorResponse) {
+func (s *transactionService) FindByActive(request *requests.FindAllTransactions) ([]*response.TransactionResponseDeleteAt, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
 	s.logger.Debug("Fetching active transaction",
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize),
@@ -119,7 +436,7 @@ func (s *transactionService) FindByActive(page int, pageSize int, search string)
 		pageSize = 10
 	}
 
-	res, totalRecords, err := s.transactionRepository.FindByActive(search, page, pageSize)
+	res, totalRecords, err := s.transactionRepository.FindByActive(request)
 
 	if err != nil {
 		s.logger.Error("Failed to fetch active transaction",
@@ -128,14 +445,11 @@ func (s *transactionService) FindByActive(page int, pageSize int, search string)
 			zap.Int("pageSize", pageSize),
 			zap.String("search", search))
 
-		return nil, 0, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch transaction records",
-		}
+		return nil, nil, transaction_errors.ErrFailedFindActive
 	}
 
 	s.logger.Debug("Successfully fetched active transaction",
-		zap.Int("totalRecords", totalRecords),
+		zap.Int("totalRecords", *totalRecords),
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize))
 
@@ -144,7 +458,11 @@ func (s *transactionService) FindByActive(page int, pageSize int, search string)
 	return so, totalRecords, nil
 }
 
-func (s *transactionService) FindByTrashed(page int, pageSize int, search string) ([]*response.TransactionResponseDeleteAt, int, *response.ErrorResponse) {
+func (s *transactionService) FindByTrashed(request *requests.FindAllTransactions) ([]*response.TransactionResponseDeleteAt, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
 	s.logger.Debug("Fetching trashed role",
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize),
@@ -157,7 +475,7 @@ func (s *transactionService) FindByTrashed(page int, pageSize int, search string
 		pageSize = 10
 	}
 
-	res, totalRecords, err := s.transactionRepository.FindByTrashed(search, page, pageSize)
+	res, totalRecords, err := s.transactionRepository.FindByTrashed(request)
 
 	if err != nil {
 		s.logger.Error("Failed to fetch trashed transaction",
@@ -166,14 +484,11 @@ func (s *transactionService) FindByTrashed(page int, pageSize int, search string
 			zap.Int("pageSize", pageSize),
 			zap.String("search", search))
 
-		return nil, 0, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch transaction records",
-		}
+		return nil, nil, transaction_errors.ErrFailedFindTrashed
 	}
 
 	s.logger.Debug("Successfully fetched trashed transaction",
-		zap.Int("totalRecords", totalRecords),
+		zap.Int("totalRecords", *totalRecords),
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize))
 
@@ -197,13 +512,23 @@ func (s *transactionService) Create(request *requests.CreateTransactionRequest) 
 		return nil, err
 	}
 
+	nominal, err := s.nominalRepository.FindById(request.NominalID)
+	if err != nil {
+		s.logger.Error("Failed to find nominal", zap.Error(err))
+		return nil, nominal_errors.ErrNominalNotFoundRes
+	}
+
+	basePrice := nominal.Price
+	ppn := basePrice * 0.11
+	totalAmount := basePrice + ppn
+
+	amountInt := int(math.Round(totalAmount))
+	request.Amount = &amountInt
+
 	res, err := s.transactionRepository.CreateTransaction(request, "pending")
 	if err != nil {
 		s.logger.Error("Failed to create transaction", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to create transaction",
-		}
+		return nil, transaction_errors.ErrFailedCreateTransaction
 	}
 
 	transactionSuccess := true
@@ -212,30 +537,20 @@ func (s *transactionService) Create(request *requests.CreateTransactionRequest) 
 		_, err = s.nominalRepository.UpdateQuantity(request.NominalID, 1)
 		if err != nil {
 			s.logger.Error("Failed to decrease voucher quantity", zap.Error(err))
-			return nil, &response.ErrorResponse{
-				Status:  "error",
-				Message: "Failed to update voucher stock",
-			}
+			return nil, nominal_errors.ErrFailedUpdateNominal
 		}
 
 		_, err = s.transactionRepository.UpdateTransactionStatus(res.ID, "success")
 		if err != nil {
 			s.logger.Error("Failed to update transaction status", zap.Error(err))
-			return nil, &response.ErrorResponse{
-				Status:  "error",
-				Message: "Failed to update transaction status",
-			}
+			return nil, transaction_errors.ErrFailedUpdateTransaction
 		}
 		res.Status = "success"
 	} else {
-
 		_, err = s.transactionRepository.UpdateTransactionStatus(res.ID, "failed")
 		if err != nil {
 			s.logger.Error("Failed to update transaction status", zap.Error(err))
-			return nil, &response.ErrorResponse{
-				Status:  "error",
-				Message: "Failed to update transaction status",
-			}
+			return nil, transaction_errors.ErrFailedUpdateTransaction
 		}
 		res.Status = "failed"
 	}
@@ -266,22 +581,23 @@ func (s *transactionService) Update(request *requests.UpdateTransactionRequest) 
 		return nil, err
 	}
 
-	_, err := s.transactionRepository.FindById(request.ID)
+	nominal, err := s.nominalRepository.FindById(request.NominalID)
 	if err != nil {
-		s.logger.Error("Failed to find transaction", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Transaction not found",
-		}
+		s.logger.Error("Failed to find nominal", zap.Error(err))
+		return nil, nominal_errors.ErrNominalNotFoundRes
 	}
+
+	basePrice := nominal.Price
+	ppn := basePrice * 0.11
+	totalAmount := basePrice + ppn
+
+	amountInt := int(math.Round(totalAmount))
+	request.Amount = &amountInt
 
 	updatedTransaction, err := s.transactionRepository.UpdateTransaction(request)
 	if err != nil {
 		s.logger.Error("Failed to update transaction", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to update transaction",
-		}
+		return nil, transaction_errors.ErrFailedUpdateTransaction
 	}
 
 	s.logger.Debug("Update Transaction process completed",
@@ -307,10 +623,7 @@ func (s *transactionService) Trashed(id int) (*response.TransactionResponseDelet
 			zap.Error(err),
 		)
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to trashed category record",
-		}
+		return nil, transaction_errors.ErrFailedTrashedTransaction
 	}
 
 	so := s.mapping.ToTransactionResponseDeleteAt(res)
@@ -332,10 +645,7 @@ func (s *transactionService) Restore(id int) (*response.TransactionResponseDelet
 	if err != nil {
 		s.logger.Error("Failed to restore transaction", zap.Error(err))
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to restore transaction record",
-		}
+		return nil, transaction_errors.ErrFailedRestoreTransaction
 	}
 
 	so := s.mapping.ToTransactionResponseDeleteAt(res)
@@ -360,10 +670,7 @@ func (s *transactionService) DeletePermanent(id int) (bool, *response.ErrorRespo
 			zap.Error(err),
 		)
 
-		return false, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to delete transaction record",
-		}
+		return false, transaction_errors.ErrFailedDeletePermanent
 	}
 
 	s.logger.Debug("DeleteTransactionPermanent process completed",
@@ -380,10 +687,7 @@ func (s *transactionService) RestoreAll() (bool, *response.ErrorResponse) {
 
 	if err != nil {
 		s.logger.Error("Failed to restore all Transaction", zap.Error(err))
-		return false, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to restore all Transaction: " + err.Error(),
-		}
+		return false, transaction_errors.ErrFailedRestoreAll
 	}
 
 	s.logger.Debug("Successfully restored all Transaction")
@@ -397,10 +701,7 @@ func (s *transactionService) DeleteAllPermanent() (bool, *response.ErrorResponse
 
 	if err != nil {
 		s.logger.Error("Failed to permanently delete all Transaction", zap.Error(err))
-		return false, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to permanently delete all Transaction: " + err.Error(),
-		}
+		return false, transaction_errors.ErrFailedDeleteAll
 	}
 
 	s.logger.Debug("Successfully deleted all Transaction permanently")

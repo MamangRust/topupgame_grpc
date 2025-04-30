@@ -5,6 +5,8 @@ import (
 	"topup_game/internal/domain/response"
 	response_service "topup_game/internal/mapper/response/service"
 	"topup_game/internal/repository"
+	"topup_game/pkg/errors/nominal_errors"
+	"topup_game/pkg/errors/voucher_errors"
 	"topup_game/pkg/logger"
 
 	"go.uber.org/zap"
@@ -26,7 +28,11 @@ func NewNominalService(nominalRepository repository.NominalRepository, voucherRe
 	}
 }
 
-func (s *nominalService) FindAll(page int, pageSize int, search string) ([]*response.NominalResponse, int, *response.ErrorResponse) {
+func (s *nominalService) FindAll(request *requests.FindAllNominals) ([]*response.NominalResponse, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
 	s.logger.Debug("Fetching nominals",
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize),
@@ -40,7 +46,7 @@ func (s *nominalService) FindAll(page int, pageSize int, search string) ([]*resp
 		pageSize = 10
 	}
 
-	banks, totalRecords, err := s.nominalRepository.FindAllNominals(page, pageSize, search)
+	banks, totalRecords, err := s.nominalRepository.FindAllNominals(request)
 
 	if err != nil {
 		s.logger.Error("Failed to fetch nominals",
@@ -49,20 +55,441 @@ func (s *nominalService) FindAll(page int, pageSize int, search string) ([]*resp
 			zap.Int("pageSize", pageSize),
 			zap.String("search", search))
 
-		return nil, 0, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to fetch nominals",
-		}
+		return nil, nil, nominal_errors.ErrFailedFindAll
 	}
 
 	nominalResponses := s.mapping.ToNominalsResponse(banks)
 
 	s.logger.Debug("Successfully fetched banks",
-		zap.Int("totalRecords", totalRecords),
+		zap.Int("totalRecords", *totalRecords),
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize))
 
-	return nominalResponses, int(totalRecords), nil
+	return nominalResponses, totalRecords, nil
+}
+
+func (s *nominalService) FindMonthAmountNominalSuccess(req *requests.MonthAmountNominalRequest) ([]*response.MonthAmountNominalSuccessResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal success amounts", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindMonthAmountNominalSuccess(req)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal success amounts", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthAmountNominalSuccess
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthAmountSuccess(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal success amounts",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearAmountNominalSuccess(year int) ([]*response.YearAmountNominalSuccessResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal success amounts", zap.Int("year", year))
+
+	records, err := s.nominalRepository.FindYearAmountNominalSuccess(year)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal success amounts", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearAmountNominalSuccess
+	}
+
+	responses := s.mapping.ToNominalsResponseYearAmountSuccess(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal success amounts",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindMonthAmountNominalFailed(req *requests.MonthAmountNominalRequest) ([]*response.MonthAmountNominalFailedResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal failed amounts", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindMonthAmountNominalFailed(req)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal failed amounts", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthAmountNominalFailed
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthAmountFailed(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal failed amounts",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearAmountNominalFailed(year int) ([]*response.YearAmountNominalFailedResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal failed amounts", zap.Int("year", year))
+
+	records, err := s.nominalRepository.FindYearAmountNominalFailed(year)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal failed amounts", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearAmountNominalFailed
+	}
+
+	responses := s.mapping.ToNominalsResponseYearAmountFailed(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal failed amounts",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindMonthMethodNominalSuccess(year int) ([]*response.MonthMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal success methods", zap.Int("year", year))
+
+	records, err := s.nominalRepository.FindMonthMethodNominalSuccess(year)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal success methods", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthMethodNominalSuccess
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthMethodSuccess(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal success methods",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearMethodNominalSuccess(year int) ([]*response.YearMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal success methods", zap.Int("year", year))
+
+	records, err := s.nominalRepository.FindYearMethodNominalSuccess(year)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal success methods", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearMethodNominalSuccess
+	}
+
+	responses := s.mapping.ToNominalsResponseYearMethod(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal success methods",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindMonthMethodNominalFailed(year int) ([]*response.MonthMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal failed methods", zap.Int("year", year))
+
+	records, err := s.nominalRepository.FindMonthMethodNominalFailed(year)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal failed methods", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthMethodNominalFailed
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthMethodFailed(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal failed methods",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearMethodNominalFailed(year int) ([]*response.YearMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal failed methods", zap.Int("year", year))
+
+	records, err := s.nominalRepository.FindYearMethodNominalFailed(year)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal failed methods", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearMethodNominalFailed
+	}
+
+	responses := s.mapping.ToNominalsResponseYearMethod(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal failed methods",
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindMonthAmountNominalSuccessById(req *requests.MonthAmountNominalByIdRequest) ([]*response.MonthAmountNominalSuccessResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal success amounts by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindMonthAmountNominalSuccessById(req)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal success amounts by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthAmountNominalSuccessById
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthAmountSuccess(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal success amounts by ID",
+		zap.Int("nominal_id", req.ID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearAmountNominalSuccessById(req *requests.YearAmountNominalByIdRequest) ([]*response.YearAmountNominalSuccessResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal success amounts by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindYearAmountNominalSuccessById(req)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal success amounts by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearAmountNominalSuccessById
+	}
+
+	responses := s.mapping.ToNominalsResponseYearAmountSuccess(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal success amounts by ID",
+		zap.Int("nominal_id", req.ID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindMonthAmountNominalFailedById(req *requests.MonthAmountNominalByIdRequest) ([]*response.MonthAmountNominalFailedResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal failed amounts by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindMonthAmountNominalFailedById(req)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal failed amounts by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthAmountNominalFailedById
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthAmountFailed(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal failed amounts by ID",
+		zap.Int("nominal_id", req.ID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearAmountNominalFailedById(req *requests.YearAmountNominalByIdRequest) ([]*response.YearAmountNominalFailedResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal failed amounts by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindYearAmountNominalFailedById(req)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal failed amounts by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearAmountNominalFailedById
+	}
+
+	responses := s.mapping.ToNominalsResponseYearAmountFailed(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal failed amounts by ID",
+		zap.Int("nominal_id", req.ID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindMonthMethodNominalSuccessById(req *requests.MonthMethodNominalByIdRequest) ([]*response.MonthMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal success methods by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindMonthMethodNominalSuccessById(req)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal success methods by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthMethodNominalSuccessById
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthMethodSuccess(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal success methods by ID",
+		zap.Int("nominal_id", req.ID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearMethodNominalSuccessById(req *requests.YearMethodNominalByIdRequest) ([]*response.YearMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal success methods by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindYearMethodNominalSuccessById(req)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal success methods by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearMethodNominalSuccessById
+	}
+
+	responses := s.mapping.ToNominalsResponseYearMethod(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal success methods by ID",
+		zap.Int("nominal_id", req.ID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindMonthMethodNominalFailedById(req *requests.MonthMethodNominalByIdRequest) ([]*response.MonthMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal failed methods by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindMonthMethodNominalFailedById(req)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal failed methods by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthMethodNominalFailedById
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthMethodFailed(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal failed methods by ID",
+		zap.Int("nominal_id", req.ID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearMethodNominalFailedById(req *requests.YearMethodNominalByIdRequest) ([]*response.YearMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal failed methods by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindYearMethodNominalFailedById(req)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal failed methods by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearMethodNominalFailedById
+	}
+
+	responses := s.mapping.ToNominalsResponseYearMethod(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal failed methods by ID",
+		zap.Int("nominal_id", req.ID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindMonthAmountNominalSuccessByMerchant(req *requests.MonthAmountNominalByMerchantRequest) ([]*response.MonthAmountNominalSuccessResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal success amounts by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindMonthAmountNominalSuccessByMerchant(req)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal success amounts by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthAmountNominalSuccessByMerchant
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthAmountSuccess(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal success amounts by ID",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearAmountNominalSuccessByMerchant(req *requests.YearAmountNominalByMerchantRequest) ([]*response.YearAmountNominalSuccessResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal success amounts by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindYearAmountNominalSuccessByMerchant(req)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal success amounts by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearAmountNominalSuccessByMerchant
+	}
+
+	responses := s.mapping.ToNominalsResponseYearAmountSuccess(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal success amounts by ID",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindMonthAmountNominalFailedByMerchant(req *requests.MonthAmountNominalByMerchantRequest) ([]*response.MonthAmountNominalFailedResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal failed amounts by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindMonthAmountNominalFailedByMerchant(req)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal failed amounts by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthAmountNominalFailedByMerchant
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthAmountFailed(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal failed amounts by ID",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearAmountNominalFailedByMerchant(req *requests.YearAmountNominalByMerchantRequest) ([]*response.YearAmountNominalFailedResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal failed amounts by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindYearAmountNominalFailedByMerchant(req)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal failed amounts by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearAmountNominalFailedByMerchant
+	}
+
+	responses := s.mapping.ToNominalsResponseYearAmountFailed(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal failed amounts by ID",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindMonthMethodNominalSuccessByMerchant(req *requests.MonthMethodNominalByMerchantRequest) ([]*response.MonthMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal success methods by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindMonthMethodNominalSuccessByMerchant(req)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal success methods by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthMethodNominalSuccessByMerchant
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthMethodSuccess(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal success methods by ID",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearMethodNominalSuccessByMerchant(req *requests.YearMethodNominalByMerchantRequest) ([]*response.YearMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal success methods by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindYearMethodNominalSuccessByMerchant(req)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal success methods by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearMethodNominalSuccessByMerchant
+	}
+
+	responses := s.mapping.ToNominalsResponseYearMethod(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal success methods by ID",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindMonthMethodNominalFailedByMerchant(req *requests.MonthMethodNominalByMerchantRequest) ([]*response.MonthMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching monthly nominal failed methods by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindMonthMethodNominalFailedByMerchant(req)
+	if err != nil {
+		s.logger.Error("failed to find monthly nominal failed methods by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindMonthMethodNominalFailedByMerchant
+	}
+
+	responses := s.mapping.ToNominalsResponseMonthMethodFailed(records)
+
+	s.logger.Debug("Successfully fetched monthly nominal failed methods by ID",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
+}
+
+func (s *nominalService) FindYearMethodNominalFailedByMerchant(req *requests.YearMethodNominalByMerchantRequest) ([]*response.YearMethodNominalResponse, *response.ErrorResponse) {
+	s.logger.Debug("Fetching yearly nominal failed methods by ID", zap.Any("request", req))
+
+	records, err := s.nominalRepository.FindYearMethodNominalFailedByMerchant(req)
+	if err != nil {
+		s.logger.Error("failed to find yearly nominal failed methods by ID", zap.Error(err))
+		return nil, nominal_errors.ErrFailedFindYearMethodNominalFailedByMerchant
+	}
+
+	responses := s.mapping.ToNominalsResponseYearMethod(records)
+
+	s.logger.Debug("Successfully fetched yearly nominal failed methods by ID",
+		zap.Int("merchant_id", req.MerchantID),
+		zap.Int("count", len(responses)))
+
+	return responses, nil
 }
 
 func (s *nominalService) FindByID(id int) (*response.NominalResponse, *response.ErrorResponse) {
@@ -72,10 +499,7 @@ func (s *nominalService) FindByID(id int) (*response.NominalResponse, *response.
 
 	if err != nil {
 		s.logger.Error("failed to find nominal by ID", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "nominal not found",
-		}
+		return nil, nominal_errors.ErrNominalNotFoundRes
 	}
 
 	so := s.mapping.ToNominalResponse(user)
@@ -85,7 +509,11 @@ func (s *nominalService) FindByID(id int) (*response.NominalResponse, *response.
 	return so, nil
 }
 
-func (s *nominalService) FindByActive(page int, pageSize int, search string) ([]*response.NominalResponseDeleteAt, int, *response.ErrorResponse) {
+func (s *nominalService) FindByActive(request *requests.FindAllNominals) ([]*response.NominalResponseDeleteAt, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
 	s.logger.Debug("Fetching active nominals",
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize),
@@ -99,7 +527,7 @@ func (s *nominalService) FindByActive(page int, pageSize int, search string) ([]
 		pageSize = 10
 	}
 
-	users, totalRecords, err := s.nominalRepository.FindByActiveNominal(page, pageSize, search)
+	users, totalRecords, err := s.nominalRepository.FindByActiveNominal(request)
 
 	if err != nil {
 		s.logger.Error("Failed to fetch active nominals",
@@ -108,23 +536,24 @@ func (s *nominalService) FindByActive(page int, pageSize int, search string) ([]
 			zap.Int("pageSize", pageSize),
 			zap.String("search", search))
 
-		return nil, 0, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to find active nominals",
-		}
+		return nil, nil, nominal_errors.ErrFailedFindActive
 	}
 
 	so := s.mapping.ToNominalsResponseDeleteAt(users)
 
 	s.logger.Debug("Successfully fetched active nominals",
-		zap.Int("totalRecords", totalRecords),
+		zap.Int("totalRecords", *totalRecords),
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize))
 
 	return so, totalRecords, nil
 }
 
-func (s *nominalService) FindByTrashed(page int, pageSize int, search string) ([]*response.NominalResponseDeleteAt, int, *response.ErrorResponse) {
+func (s *nominalService) FindByTrashed(request *requests.FindAllNominals) ([]*response.NominalResponseDeleteAt, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
 	s.logger.Debug("Fetching trashed nominals",
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize),
@@ -138,21 +567,18 @@ func (s *nominalService) FindByTrashed(page int, pageSize int, search string) ([
 		pageSize = 10
 	}
 
-	banks, totalRecords, err := s.nominalRepository.FindByTrashedNominal(page, pageSize, search)
+	banks, totalRecords, err := s.nominalRepository.FindByTrashedNominal(request)
 
 	if err != nil {
 		s.logger.Error("Failed to find trashed nominals", zap.Error(err))
 
-		return nil, 0, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to find trashed nominals",
-		}
+		return nil, nil, nominal_errors.ErrFailedFindTrashed
 	}
 
 	so := s.mapping.ToNominalsResponseDeleteAt(banks)
 
 	s.logger.Debug("Successfully fetched trashed nominals",
-		zap.Int("totalRecords", totalRecords),
+		zap.Int("totalRecords", *totalRecords),
 		zap.Int("page", page),
 		zap.Int("pageSize", pageSize))
 
@@ -172,10 +598,7 @@ func (s *nominalService) Create(request *requests.CreateNominalRequest) (*respon
 			zap.Error(err),
 		)
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid voucher ID",
-		}
+		return nil, nominal_errors.ErrFailedCreateNominal
 	}
 
 	res, err := s.nominalRepository.CreateNominal(request)
@@ -218,10 +641,7 @@ func (s *nominalService) Update(request *requests.UpdateNominalRequest) (*respon
 				zap.Error(err),
 			)
 
-			return nil, &response.ErrorResponse{
-				Status:  "error",
-				Message: "Invalid voucher ID",
-			}
+			return nil, voucher_errors.ErrVoucherNotFoundRes
 		}
 	}
 
@@ -235,10 +655,7 @@ func (s *nominalService) Update(request *requests.UpdateNominalRequest) (*respon
 			zap.Error(err),
 		)
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to update nominal record",
-		}
+		return nil, nominal_errors.ErrFailedUpdateNominal
 	}
 
 	so := s.mapping.ToNominalResponse(res)
@@ -264,10 +681,7 @@ func (s *nominalService) Trashed(id int) (*response.NominalResponseDeleteAt, *re
 			zap.Error(err),
 		)
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to trashed nominal record",
-		}
+		return nil, nominal_errors.ErrFailedTrashedNominal
 	}
 
 	so := s.mapping.ToNominalResponseDeleteAt(res)
@@ -289,10 +703,7 @@ func (s *nominalService) Restore(id int) (*response.NominalResponseDeleteAt, *re
 	if err != nil {
 		s.logger.Error("Failed to restore nominal", zap.Error(err))
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to restore nominal record",
-		}
+		return nil, nominal_errors.ErrFailedRestoreNominal
 	}
 
 	so := s.mapping.ToNominalResponseDeleteAt(res)
@@ -317,10 +728,7 @@ func (s *nominalService) DeletePermanent(id int) (bool, *response.ErrorResponse)
 			zap.Error(err),
 		)
 
-		return false, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to delete nominal record",
-		}
+		return false, nominal_errors.ErrFailedDeletePermanent
 	}
 
 	s.logger.Debug("DeleteNominalPermanent process completed",
@@ -337,10 +745,7 @@ func (s *nominalService) RestoreAll() (bool, *response.ErrorResponse) {
 
 	if err != nil {
 		s.logger.Error("Failed to restore all nominals", zap.Error(err))
-		return false, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to restore all nominals: " + err.Error(),
-		}
+		return false, nominal_errors.ErrFailedRestoreAll
 	}
 
 	s.logger.Debug("Successfully restored all nominals")
@@ -354,10 +759,7 @@ func (s *nominalService) DeleteAllPermanent() (bool, *response.ErrorResponse) {
 
 	if err != nil {
 		s.logger.Error("Failed to permanently delete all nominals", zap.Error(err))
-		return false, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to permanently delete all nominals: " + err.Error(),
-		}
+		return false, nominal_errors.ErrFailedDeleteAll
 	}
 
 	s.logger.Debug("Successfully deleted all nominals permanently")

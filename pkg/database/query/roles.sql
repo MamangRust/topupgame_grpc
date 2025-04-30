@@ -128,20 +128,22 @@ RETURNING
     deleted_at;
 
 
--- name: TrashRole :exec
+-- name: TrashRole :one
 UPDATE roles
 SET
     deleted_at = current_timestamp
 WHERE
-    role_id = $1;
+    role_id = $1
+RETURNING *;
 
 
--- name: RestoreRole :exec
+-- name: RestoreRole :one
 UPDATE roles
 SET
     deleted_at = NULL
 WHERE
-    role_id = $1;
+    role_id = $1
+RETURNING *;
 
 
 -- name: DeletePermanentRole :exec

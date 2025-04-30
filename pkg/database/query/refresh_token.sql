@@ -28,10 +28,11 @@ LIMIT 1;
 
 
 
--- name: UpdateRefreshTokenByUserId :exec
+-- name: UpdateRefreshTokenByUserId :one
 UPDATE refresh_tokens
 SET token = $2, expiration = $3, updated_at = current_timestamp
-WHERE user_id = $1 AND deleted_at IS NULL;
+WHERE user_id = $1 AND deleted_at IS NULL
+RETURNING *;
 
 
 -- name: DeleteRefreshToken :exec

@@ -5,6 +5,7 @@ import (
 	"topup_game/internal/domain/response"
 	response_service "topup_game/internal/mapper/response/service"
 	"topup_game/internal/repository"
+	"topup_game/pkg/errors/merchant_errors"
 	"topup_game/pkg/logger"
 
 	"go.uber.org/zap"
@@ -28,8 +29,15 @@ func NewMerchantService(
 	}
 }
 
-func (s *merchantService) FindAll(page, pageSize int, search string) ([]*response.MerchantResponse, int, *response.ErrorResponse) {
-	s.logger.Debug("Fetching all merchants", zap.Int("page", page), zap.Int("pageSize", pageSize), zap.String("search", search))
+func (s *merchantService) FindAll(request *requests.FindAllMerchants) ([]*response.MerchantResponse, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
+	s.logger.Debug("Fetching all merchants",
+		zap.Int("page", page),
+		zap.Int("pageSize", pageSize),
+		zap.String("search", search))
 
 	if page <= 0 {
 		page = 1
@@ -38,16 +46,20 @@ func (s *merchantService) FindAll(page, pageSize int, search string) ([]*respons
 		pageSize = 10
 	}
 
-	merchants, totalRecords, err := s.merchantRepository.FindAllMerchants(search, page, pageSize)
+	merchants, totalRecords, err := s.merchantRepository.FindAllMerchants(request)
 	if err != nil {
 		s.logger.Error("Failed to fetch merchants", zap.Error(err))
-		return nil, 0, &response.ErrorResponse{Status: "error", Message: "Failed to fetch merchants"}
+		return nil, nil, merchant_errors.ErrFailedFindAll
 	}
 
 	return s.mapping.ToMerchantsResponse(merchants), totalRecords, nil
 }
 
-func (s *merchantService) FindByActive(search string, page, pageSize int) ([]*response.MerchantResponseDeleteAt, int, *response.ErrorResponse) {
+func (s *merchantService) FindByActive(request *requests.FindAllMerchants) ([]*response.MerchantResponseDeleteAt, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
 	s.logger.Debug("Fetching active merchants", zap.String("search", search), zap.Int("page", page), zap.Int("pageSize", pageSize))
 
 	if page <= 0 {
@@ -57,16 +69,20 @@ func (s *merchantService) FindByActive(search string, page, pageSize int) ([]*re
 		pageSize = 10
 	}
 
-	merchants, totalRecords, err := s.merchantRepository.FindByActive(search, page, pageSize)
+	merchants, totalRecords, err := s.merchantRepository.FindByActive(request)
 	if err != nil {
 		s.logger.Error("Failed to fetch active merchants", zap.Error(err))
-		return nil, 0, &response.ErrorResponse{Status: "error", Message: "Failed to fetch active merchants"}
+		return nil, nil, merchant_errors.ErrFailedFindActive
 	}
 
 	return s.mapping.ToMerchantsResponseDeleteAt(merchants), totalRecords, nil
 }
 
-func (s *merchantService) FindByTrashed(search string, page, pageSize int) ([]*response.MerchantResponseDeleteAt, int, *response.ErrorResponse) {
+func (s *merchantService) FindByTrashed(request *requests.FindAllMerchants) ([]*response.MerchantResponseDeleteAt, *int, *response.ErrorResponse) {
+	page := request.Page
+	pageSize := request.PageSize
+	search := request.Search
+
 	s.logger.Debug("Fetching trashed merchants", zap.String("search", search), zap.Int("page", page), zap.Int("pageSize", pageSize))
 
 	if page <= 0 {
@@ -76,10 +92,10 @@ func (s *merchantService) FindByTrashed(search string, page, pageSize int) ([]*r
 		pageSize = 10
 	}
 
-	merchants, totalRecords, err := s.merchantRepository.FindByTrashed(search, page, pageSize)
+	merchants, totalRecords, err := s.merchantRepository.FindByTrashed(request)
 	if err != nil {
 		s.logger.Error("Failed to fetch trashed merchants", zap.Error(err))
-		return nil, 0, &response.ErrorResponse{Status: "error", Message: "Failed to fetch trashed merchants"}
+		return nil, nil, merchant_errors.ErrFailedFindTrashed
 	}
 
 	return s.mapping.ToMerchantsResponseDeleteAt(merchants), totalRecords, nil
@@ -91,7 +107,7 @@ func (s *merchantService) FindById(merchantID int) (*response.MerchantResponse, 
 	merchant, err := s.merchantRepository.FindById(merchantID)
 	if err != nil {
 		s.logger.Error("Merchant not found", zap.Error(err))
-		return nil, &response.ErrorResponse{Status: "error", Message: "Merchant not found"}
+		return nil, merchant_errors.ErrMerchantNotFoundRes
 	}
 
 	return s.mapping.ToMerchantResponse(merchant), nil
@@ -103,7 +119,7 @@ func (s *merchantService) Create(req *requests.CreateMerchantRequest) (*response
 	merchant, err := s.merchantRepository.CreateMerchant(req)
 	if err != nil {
 		s.logger.Error("Failed to create merchant", zap.Error(err))
-		return nil, &response.ErrorResponse{Status: "error", Message: "Failed to create merchant"}
+		return nil, merchant_errors.ErrFailedCreateMerchant
 	}
 
 	return s.mapping.ToMerchantResponse(merchant), nil
@@ -115,7 +131,7 @@ func (s *merchantService) Update(req *requests.UpdateMerchantRequest) (*response
 	merchant, err := s.merchantRepository.UpdateMerchant(req)
 	if err != nil {
 		s.logger.Error("Failed to update merchant", zap.Error(err))
-		return nil, &response.ErrorResponse{Status: "error", Message: "Failed to update merchant"}
+		return nil, merchant_errors.ErrFailedUpdateMerchant
 	}
 
 	return s.mapping.ToMerchantResponse(merchant), nil
@@ -127,7 +143,7 @@ func (s *merchantService) Trashed(merchantID int) (*response.MerchantResponseDel
 	merchant, err := s.merchantRepository.TrashedMerchant(merchantID)
 	if err != nil {
 		s.logger.Error("Failed to trash merchant", zap.Error(err))
-		return nil, &response.ErrorResponse{Status: "error", Message: "Failed to trash merchant"}
+		return nil, merchant_errors.ErrFailedTrashedMerchant
 	}
 
 	return s.mapping.ToMerchantResponseDeleteAt(merchant), nil
@@ -139,7 +155,7 @@ func (s *merchantService) Restore(merchantID int) (*response.MerchantResponseDel
 	merchant, err := s.merchantRepository.RestoreMerchant(merchantID)
 	if err != nil {
 		s.logger.Error("Failed to restore merchant", zap.Error(err))
-		return nil, &response.ErrorResponse{Status: "error", Message: "Failed to restore merchant"}
+		return nil, merchant_errors.ErrFailedRestoreMerchant
 	}
 
 	return s.mapping.ToMerchantResponseDeleteAt(merchant), nil
@@ -151,7 +167,7 @@ func (s *merchantService) DeletePermanent(merchantID int) (bool, *response.Error
 	success, err := s.merchantRepository.DeleteMerchantPermanent(merchantID)
 	if err != nil {
 		s.logger.Error("Failed to delete merchant permanently", zap.Error(err))
-		return false, &response.ErrorResponse{Status: "error", Message: "Failed to delete merchant permanently"}
+		return false, merchant_errors.ErrFailedDeletePermanent
 	}
 
 	return success, nil
@@ -163,7 +179,7 @@ func (s *merchantService) RestoreAll() (bool, *response.ErrorResponse) {
 	success, err := s.merchantRepository.RestoreAllMerchant()
 	if err != nil {
 		s.logger.Error("Failed to restore all merchants", zap.Error(err))
-		return false, &response.ErrorResponse{Status: "error", Message: "Failed to restore all merchants"}
+		return false, merchant_errors.ErrFailedRestoreAll
 	}
 
 	return success, nil
@@ -175,7 +191,7 @@ func (s *merchantService) DeleteAllPermanent() (bool, *response.ErrorResponse) {
 	success, err := s.merchantRepository.DeleteAllMerchantPermanent()
 	if err != nil {
 		s.logger.Error("Failed to permanently delete all merchants", zap.Error(err))
-		return false, &response.ErrorResponse{Status: "error", Message: "Failed to permanently delete all merchants"}
+		return false, merchant_errors.ErrFailedDeleteAll
 	}
 
 	return success, nil

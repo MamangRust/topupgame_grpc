@@ -10,6 +10,10 @@ import (
 	response_service "topup_game/internal/mapper/response/service"
 	"topup_game/internal/repository"
 	"topup_game/pkg/auth"
+	refreshtoken_errors "topup_game/pkg/errors/refresh_token_errors"
+	"topup_game/pkg/errors/role_errors"
+	"topup_game/pkg/errors/user_errors"
+	userrole_errors "topup_game/pkg/errors/user_role_errors"
 	"topup_game/pkg/hash"
 	"topup_game/pkg/logger"
 
@@ -42,40 +46,28 @@ func (s *authService) Register(request *requests.CreateUserRequest) (*response.U
 
 	if err == nil {
 		s.logger.Error("Email already exists", zap.String("email", request.Email))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Email already exists",
-		}
+		return nil, user_errors.ErrUserEmailAlready
 	}
 
 	passwordHash, err := s.hash.HashPassword(request.Password)
 
 	if err != nil {
 		s.logger.Error("Failed to hash password", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to hash password",
-		}
+		return nil, user_errors.ErrUserPassword
 	}
 	request.Password = passwordHash
+
+	_, err = s.role.FindByName("Cashier")
+
+	if err != nil {
+		s.logger.Error("Failed to find role", zap.Error(err))
+		return nil, role_errors.ErrRoleNotFoundRes
+	}
 
 	res, err := s.auth.CreateUser(request)
 	if err != nil {
 		s.logger.Error("Failed to create user", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to create user: ",
-		}
-	}
-
-	_, err = s.role.FindByName("User Permission 2")
-
-	if err != nil {
-		s.logger.Error("Failed to find role", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to find role: ",
-		}
+		return nil, user_errors.ErrFailedCreateUser
 	}
 
 	_, err = s.userRole.AssignRoleToUser(&requests.CreateUserRoleRequest{
@@ -85,10 +77,7 @@ func (s *authService) Register(request *requests.CreateUserRequest) (*response.U
 
 	if err != nil {
 		s.logger.Error("Failed to assign role to user", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to assign role to user: ",
-		}
+		return nil, userrole_errors.ErrFailedAssignRoleToUser
 	}
 
 	s.logger.Debug("User registered successfully", zap.String("email", request.Email))
@@ -107,40 +96,28 @@ func (s *authService) Login(request *requests.AuthRequest) (*response.TokenRespo
 
 	if err != nil {
 		s.logger.Error("Failed to get user", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to get user: " + err.Error(),
-		}
+		return nil, user_errors.ErrUserNotFoundRes
 	}
 
 	err = s.hash.ComparePassword(res.Password, request.Password)
 
 	if err != nil {
 		s.logger.Error("Failed to compare password", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid password",
-		}
+		return nil, user_errors.ErrUserPassword
 	}
 
 	token, err := s.createAccessToken(res.ID)
 
 	if err != nil {
 		s.logger.Error("Failed to generate JWT token", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to generate token: " + err.Error(),
-		}
+		return nil, refreshtoken_errors.ErrFailedCreateAccess
 	}
 
 	refreshToken, err := s.createRefreshToken(res.ID)
 
 	if err != nil {
 		s.logger.Error("Failed to generate refresh token", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to generate refresh token: " + err.Error(),
-		}
+		return nil, refreshtoken_errors.ErrFailedCreateRefresh
 	}
 
 	s.logger.Debug("User logged in successfully", zap.String("email", request.Email))
@@ -160,24 +137,15 @@ func (s *authService) RefreshToken(token string) (*response.TokenResponse, *resp
 			if err := s.refreshToken.DeleteRefreshToken(token); err != nil {
 				s.logger.Error("Failed to delete expired refresh token", zap.Error(err))
 
-				return nil, &response.ErrorResponse{
-					Status:  "error",
-					Message: "Failed to delete expired refresh token",
-				}
+				return nil, refreshtoken_errors.ErrFailedDeleteRefreshToken
 			}
 
 			s.logger.Error("Refresh token has expired", zap.Error(err))
 
-			return nil, &response.ErrorResponse{
-				Status:  "error",
-				Message: "Refresh token has expired",
-			}
+			return nil, refreshtoken_errors.ErrFailedExpire
 		}
 		s.logger.Error("Invalid refresh token", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid refresh token",
-		}
+		return nil, refreshtoken_errors.ErrRefreshTokenNotFound
 	}
 
 	userId, err := strconv.Atoi(userIdStr)
@@ -194,20 +162,14 @@ func (s *authService) RefreshToken(token string) (*response.TokenResponse, *resp
 	if err != nil {
 		s.logger.Error("Failed to generate new access token", zap.Error(err))
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to generate new access token",
-		}
+		return nil, refreshtoken_errors.ErrFailedCreateAccess
 	}
 
 	refreshToken, err := s.createRefreshToken(userId)
 	if err != nil {
 		s.logger.Error("Failed to generate new refresh token", zap.Error(err))
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to generate new refresh token",
-		}
+		return nil, refreshtoken_errors.ErrFailedCreateRefreshToken
 	}
 
 	expiryTime := time.Now().Add(24 * time.Hour)
@@ -221,10 +183,7 @@ func (s *authService) RefreshToken(token string) (*response.TokenResponse, *resp
 	if _, err = s.refreshToken.UpdateRefreshToken(updateRequest); err != nil {
 		s.logger.Error("Failed to update refresh token in storage", zap.Error(err))
 
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to update refresh token in storage",
-		}
+		return nil, refreshtoken_errors.ErrFailedUpdateRefreshToken
 	}
 
 	s.logger.Debug("Refresh token refreshed successfully")
@@ -244,29 +203,20 @@ func (s *authService) GetMe(token string) (*response.UserResponse, *response.Err
 
 	if err != nil {
 		s.logger.Error("Invalid access token", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid access token",
-		}
+		return nil, refreshtoken_errors.ErrFailedInValidToken
 	}
 
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
 		s.logger.Error("Invalid user ID format in token", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid user ID format in token",
-		}
+		return nil, refreshtoken_errors.ErrFailedInValidUserId
 	}
 
 	user, err := s.auth.FindById(userId)
 
 	if err != nil {
 		s.logger.Error("Failed to find user by ID", zap.Error(err))
-		return nil, &response.ErrorResponse{
-			Status:  "error",
-			Message: "Failed to find user by ID",
-		}
+		return nil, user_errors.ErrUserNotFoundRes
 	}
 
 	so := s.mapping.ToUserResponse(user)

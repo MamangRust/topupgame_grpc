@@ -74,9 +74,9 @@ type Transaction struct {
 	MerchantID    sql.NullInt32  `json:"merchant_id"`
 	VoucherID     sql.NullInt32  `json:"voucher_id"`
 	NominalID     sql.NullInt32  `json:"nominal_id"`
-	CategoryID    sql.NullInt32  `json:"category_id"`
 	BankID        sql.NullInt32  `json:"bank_id"`
 	PaymentMethod string         `json:"payment_method"`
+	Amount        int32          `json:"amount"`
 	Status        sql.NullString `json:"status"`
 	CreatedAt     sql.NullTime   `json:"created_at"`
 	UpdatedAt     sql.NullTime   `json:"updated_at"`

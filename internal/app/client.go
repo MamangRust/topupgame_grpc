@@ -7,12 +7,14 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	_ "topup_game/docs"
 	"topup_game/internal/handler/api"
 	response_api "topup_game/internal/mapper/response/api"
 	middlewares "topup_game/internal/middleware"
 	"topup_game/pkg/auth"
 	"topup_game/pkg/dotenv"
 	"topup_game/pkg/logger"
+	"topup_game/pkg/upload_image"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -86,13 +88,15 @@ func RunClient() {
 	}
 
 	mapping := response_api.NewResponseApiMapper()
+	imageUpload := upload_image.NewImageUpload()
 
 	depsHandler := api.Deps{
-		Conn:    conn,
-		Token:   token,
-		E:       e,
-		Logger:  logger,
-		Mapping: *mapping,
+		Conn:        conn,
+		Token:       token,
+		E:           e,
+		Logger:      logger,
+		Mapping:     mapping,
+		ImageUpload: imageUpload,
 	}
 
 	api.NewHandler(depsHandler)

@@ -34,6 +34,7 @@ func (r *transactionSeeder) Seed() error {
 		BankID        sql.NullInt32
 		PaymentMethod string
 		Status        sql.NullString
+		Amount        int32
 	}{
 		{
 			UserID:        1,
@@ -44,6 +45,7 @@ func (r *transactionSeeder) Seed() error {
 			BankID:        sql.NullInt32{Int32: 1, Valid: true},
 			PaymentMethod: "Credit Card",
 			Status:        sql.NullString{String: "Completed", Valid: true},
+			Amount:        80000,
 		},
 		{
 			UserID:        2,
@@ -54,6 +56,7 @@ func (r *transactionSeeder) Seed() error {
 			BankID:        sql.NullInt32{Int32: 2, Valid: true},
 			PaymentMethod: "PayPal",
 			Status:        sql.NullString{String: "Pending", Valid: true},
+			Amount:        80000,
 		},
 		{
 			UserID:        3,
@@ -64,6 +67,7 @@ func (r *transactionSeeder) Seed() error {
 			BankID:        sql.NullInt32{Int32: 3, Valid: true},
 			PaymentMethod: "Bank Transfer",
 			Status:        sql.NullString{String: "Failed", Valid: true},
+			Amount:        80000,
 		},
 	}
 
@@ -75,7 +79,6 @@ func (r *transactionSeeder) Seed() error {
 			MerchantID:    transaction.MerchantID,
 			VoucherID:     transaction.VoucherID,
 			NominalID:     transaction.NominalID,
-			CategoryID:    transaction.CategoryID,
 			BankID:        transaction.BankID,
 			PaymentMethod: transaction.PaymentMethod,
 			Status:        transaction.Status,

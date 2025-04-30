@@ -8,12 +8,11 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createCategory = `-- name: CreateCategory :one
-INSERT INTO categories (name)
-VALUES ($1)
-  RETURNING category_id, name, created_at, updated_at, deleted_at
+INSERT INTO categories (name) VALUES ($1) RETURNING category_id, name, created_at, updated_at, deleted_at
 `
 
 // Create Category
@@ -41,7 +40,10 @@ func (q *Queries) DeleteAllPermanentCategories(ctx context.Context) error {
 }
 
 const deleteCategoryPermanently = `-- name: DeleteCategoryPermanently :exec
-DELETE FROM categories WHERE category_id = $1 AND deleted_at IS NOT NULL
+DELETE FROM categories
+WHERE
+    category_id = $1
+    AND deleted_at IS NOT NULL
 `
 
 // Delete Category Permanently
@@ -51,14 +53,18 @@ func (q *Queries) DeleteCategoryPermanently(ctx context.Context, categoryID int3
 }
 
 const getCategories = `-- name: GetCategories :many
-SELECT
-    category_id, name, created_at, updated_at, deleted_at,
-    COUNT(*) OVER() AS total_count
+SELECT category_id, name, created_at, updated_at, deleted_at, COUNT(*) OVER () AS total_count
 FROM categories
-WHERE deleted_at IS NULL
-AND ($1::TEXT IS NULL OR name ILIKE '%' || $1 || '%')
+WHERE
+    deleted_at IS NULL
+    AND (
+        $1::TEXT IS NULL
+        OR name ILIKE '%' || $1 || '%'
+    )
 ORDER BY created_at DESC
-LIMIT $2 OFFSET $3
+LIMIT $2
+OFFSET
+    $3
 `
 
 type GetCategoriesParams struct {
@@ -108,14 +114,18 @@ func (q *Queries) GetCategories(ctx context.Context, arg GetCategoriesParams) ([
 }
 
 const getCategoriesActive = `-- name: GetCategoriesActive :many
-SELECT
-    category_id, name, created_at, updated_at, deleted_at,
-    COUNT(*) OVER() AS total_count
+SELECT category_id, name, created_at, updated_at, deleted_at, COUNT(*) OVER () AS total_count
 FROM categories
-WHERE deleted_at IS NULL
-AND ($1::TEXT IS NULL OR name ILIKE '%' || $1 || '%')
+WHERE
+    deleted_at IS NULL
+    AND (
+        $1::TEXT IS NULL
+        OR name ILIKE '%' || $1 || '%'
+    )
 ORDER BY created_at DESC
-LIMIT $2 OFFSET $3
+LIMIT $2
+OFFSET
+    $3
 `
 
 type GetCategoriesActiveParams struct {
@@ -165,14 +175,18 @@ func (q *Queries) GetCategoriesActive(ctx context.Context, arg GetCategoriesActi
 }
 
 const getCategoriesTrashed = `-- name: GetCategoriesTrashed :many
-SELECT
-    category_id, name, created_at, updated_at, deleted_at,
-    COUNT(*) OVER() AS total_count
+SELECT category_id, name, created_at, updated_at, deleted_at, COUNT(*) OVER () AS total_count
 FROM categories
-WHERE deleted_at IS NOT NULL
-AND ($1::TEXT IS NULL OR name ILIKE '%' || $1 || '%')
+WHERE
+    deleted_at IS NOT NULL
+    AND (
+        $1::TEXT IS NULL
+        OR name ILIKE '%' || $1 || '%'
+    )
 ORDER BY created_at DESC
-LIMIT $2 OFFSET $3
+LIMIT $2
+OFFSET
+    $3
 `
 
 type GetCategoriesTrashedParams struct {
@@ -222,10 +236,16 @@ func (q *Queries) GetCategoriesTrashed(ctx context.Context, arg GetCategoriesTra
 }
 
 const getCategoryByID = `-- name: GetCategoryByID :one
-SELECT category_id, name, created_at, updated_at, deleted_at
+SELECT
+    category_id,
+    name,
+    created_at,
+    updated_at,
+    deleted_at
 FROM categories
-WHERE category_id = $1
-  AND deleted_at IS NULL
+WHERE
+    category_id = $1
+    AND deleted_at IS NULL
 `
 
 // Get Category by ID
@@ -242,10 +262,2908 @@ func (q *Queries) GetCategoryByID(ctx context.Context, categoryID int32) (*Categ
 	return &i, err
 }
 
+const getMonthAmountCategoryFailed = `-- name: GetMonthAmountCategoryFailed :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    active_categories AS (
+        SELECT category_id, name AS category_name
+        FROM categories
+        WHERE deleted_at IS NULL
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_category_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            ac.category_id,
+            ac.category_name
+        FROM report_months rm
+        CROSS JOIN active_categories ac
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'failed'
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    mcc.category_id,
+    mcc.category_name,
+    mcc.year::text,
+    TO_CHAR(TO_DATE(mcc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_failed, 0) AS total_failed,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_category_combos mcc
+LEFT JOIN monthly_transactions mt ON
+    mcc.year = mt.year AND
+    mcc.month = mt.month AND
+    mcc.category_id = mt.category_id
+ORDER BY 
+    mcc.category_name ASC,
+    mcc.year DESC,
+    mcc.month DESC
+`
+
+type GetMonthAmountCategoryFailedParams struct {
+	Column1 time.Time `json:"column_1"`
+	Column2 time.Time `json:"column_2"`
+	Column3 time.Time `json:"column_3"`
+	Column4 time.Time `json:"column_4"`
+}
+
+type GetMonthAmountCategoryFailedRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	MccYear      string `json:"mcc_year"`
+	Month        string `json:"month"`
+	TotalFailed  int64  `json:"total_failed"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountCategoryFailed(ctx context.Context, arg GetMonthAmountCategoryFailedParams) ([]*GetMonthAmountCategoryFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountCategoryFailed,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountCategoryFailedRow
+	for rows.Next() {
+		var i GetMonthAmountCategoryFailedRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.MccYear,
+			&i.Month,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountCategoryFailedById = `-- name: GetMonthAmountCategoryFailedById :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    active_categories AS (
+        SELECT 
+            c.category_id,
+            c.name AS category_name
+        FROM categories c
+        WHERE c.deleted_at IS NULL
+        AND c.category_id = $5 
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_category_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            ac.category_id,
+            ac.category_name
+        FROM report_months rm
+        CROSS JOIN active_categories ac
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND c.category_id = $5 
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    mcc.category_id,
+    mcc.category_name,
+    mcc.year::text,
+    TO_CHAR(TO_DATE(mcc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_failed, 0) AS total_failed,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_category_combos mcc
+LEFT JOIN monthly_transactions mt ON
+    mcc.year = mt.year AND
+    mcc.month = mt.month AND
+    mcc.category_id = mt.category_id
+ORDER BY 
+    mcc.category_name ASC,
+    mcc.year DESC,
+    mcc.month DESC
+`
+
+type GetMonthAmountCategoryFailedByIdParams struct {
+	Column1    time.Time `json:"column_1"`
+	Column2    time.Time `json:"column_2"`
+	Column3    time.Time `json:"column_3"`
+	Column4    time.Time `json:"column_4"`
+	CategoryID int32     `json:"category_id"`
+}
+
+type GetMonthAmountCategoryFailedByIdRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	MccYear      string `json:"mcc_year"`
+	Month        string `json:"month"`
+	TotalFailed  int64  `json:"total_failed"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountCategoryFailedById(ctx context.Context, arg GetMonthAmountCategoryFailedByIdParams) ([]*GetMonthAmountCategoryFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountCategoryFailedById,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.CategoryID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountCategoryFailedByIdRow
+	for rows.Next() {
+		var i GetMonthAmountCategoryFailedByIdRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.MccYear,
+			&i.Month,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountCategoryFailedByMerchant = `-- name: GetMonthAmountCategoryFailedByMerchant :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    merchant_categories AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name
+        FROM vouchers v
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE 
+            v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND v.merchant_id = $5
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_category_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            mc.category_id,
+            mc.category_name
+        FROM report_months rm
+        CROSS JOIN merchant_categories mc
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND v.merchant_id = $5
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    mcc.category_id,
+    mcc.category_name,
+    mcc.year::text,
+    TO_CHAR(TO_DATE(mcc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_failed, 0) AS total_failed,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_category_combos mcc
+LEFT JOIN monthly_transactions mt ON
+    mcc.year = mt.year AND
+    mcc.month = mt.month AND
+    mcc.category_id = mt.category_id
+ORDER BY 
+    mcc.category_name ASC,
+    mcc.year DESC,
+    mcc.month DESC
+`
+
+type GetMonthAmountCategoryFailedByMerchantParams struct {
+	Column1    time.Time `json:"column_1"`
+	Column2    time.Time `json:"column_2"`
+	Column3    time.Time `json:"column_3"`
+	Column4    time.Time `json:"column_4"`
+	MerchantID int32     `json:"merchant_id"`
+}
+
+type GetMonthAmountCategoryFailedByMerchantRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	MccYear      string `json:"mcc_year"`
+	Month        string `json:"month"`
+	TotalFailed  int64  `json:"total_failed"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountCategoryFailedByMerchant(ctx context.Context, arg GetMonthAmountCategoryFailedByMerchantParams) ([]*GetMonthAmountCategoryFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountCategoryFailedByMerchant,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.MerchantID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountCategoryFailedByMerchantRow
+	for rows.Next() {
+		var i GetMonthAmountCategoryFailedByMerchantRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.MccYear,
+			&i.Month,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountCategorySuccess = `-- name: GetMonthAmountCategorySuccess :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    active_categories AS (
+        SELECT category_id, name AS category_name
+        FROM categories
+        WHERE deleted_at IS NULL
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_category_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            ac.category_id,
+            ac.category_name
+        FROM report_months rm
+        CROSS JOIN active_categories ac
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    mcc.category_id,
+    mcc.category_name,
+    mcc.year::text,
+    TO_CHAR(TO_DATE(mcc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_success, 0) AS total_success,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_category_combos mcc
+LEFT JOIN monthly_transactions mt ON
+    mcc.year = mt.year AND
+    mcc.month = mt.month AND
+    mcc.category_id = mt.category_id
+ORDER BY 
+    mcc.category_name ASC,
+    mcc.year DESC,
+    mcc.month DESC
+`
+
+type GetMonthAmountCategorySuccessParams struct {
+	Column1 time.Time `json:"column_1"`
+	Column2 time.Time `json:"column_2"`
+	Column3 time.Time `json:"column_3"`
+	Column4 time.Time `json:"column_4"`
+}
+
+type GetMonthAmountCategorySuccessRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	MccYear      string `json:"mcc_year"`
+	Month        string `json:"month"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountCategorySuccess(ctx context.Context, arg GetMonthAmountCategorySuccessParams) ([]*GetMonthAmountCategorySuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountCategorySuccess,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountCategorySuccessRow
+	for rows.Next() {
+		var i GetMonthAmountCategorySuccessRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.MccYear,
+			&i.Month,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountCategorySuccessById = `-- name: GetMonthAmountCategorySuccessById :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    active_categories AS (
+        SELECT 
+            c.category_id,
+            c.name AS category_name
+        FROM categories c
+        WHERE c.deleted_at IS NULL
+        AND c.category_id = $5 
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_category_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            ac.category_id,
+            ac.category_name
+        FROM report_months rm
+        CROSS JOIN active_categories ac
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND c.category_id = $5 
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    mcc.category_id,
+    mcc.category_name,
+    mcc.year::text,
+    TO_CHAR(TO_DATE(mcc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_success, 0) AS total_success,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_category_combos mcc
+LEFT JOIN monthly_transactions mt ON
+    mcc.year = mt.year AND
+    mcc.month = mt.month AND
+    mcc.category_id = mt.category_id
+ORDER BY 
+    mcc.category_name ASC,
+    mcc.year DESC,
+    mcc.month DESC
+`
+
+type GetMonthAmountCategorySuccessByIdParams struct {
+	Column1    time.Time `json:"column_1"`
+	Column2    time.Time `json:"column_2"`
+	Column3    time.Time `json:"column_3"`
+	Column4    time.Time `json:"column_4"`
+	CategoryID int32     `json:"category_id"`
+}
+
+type GetMonthAmountCategorySuccessByIdRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	MccYear      string `json:"mcc_year"`
+	Month        string `json:"month"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountCategorySuccessById(ctx context.Context, arg GetMonthAmountCategorySuccessByIdParams) ([]*GetMonthAmountCategorySuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountCategorySuccessById,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.CategoryID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountCategorySuccessByIdRow
+	for rows.Next() {
+		var i GetMonthAmountCategorySuccessByIdRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.MccYear,
+			&i.Month,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthAmountCategorySuccessByMerchant = `-- name: GetMonthAmountCategorySuccessByMerchant :many
+WITH 
+    date_ranges AS (
+        SELECT
+            $1::timestamp AS range1_start,
+            $2::timestamp AS range1_end,
+            $3::timestamp AS range2_start,
+            $4::timestamp AS range2_end
+    ),
+    merchant_categories AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name
+        FROM vouchers v
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE 
+            v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND v.merchant_id = $5
+    ),
+    report_months AS (
+        SELECT 
+            EXTRACT(YEAR FROM range1_start)::integer AS year,
+            EXTRACT(MONTH FROM range1_start)::integer AS month
+        FROM date_ranges
+        UNION
+        SELECT 
+            EXTRACT(YEAR FROM range2_start)::integer AS year,
+            EXTRACT(MONTH FROM range2_start)::integer AS month
+        FROM date_ranges
+    ),
+    month_category_combos AS (
+        SELECT
+            rm.year,
+            rm.month,
+            mc.category_id,
+            mc.category_name
+        FROM report_months rm
+        CROSS JOIN merchant_categories mc
+    ),
+    monthly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            EXTRACT(MONTH FROM t.created_at)::integer AS month,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        JOIN date_ranges dr ON (
+            (t.created_at BETWEEN dr.range1_start AND dr.range1_end) OR
+            (t.created_at BETWEEN dr.range2_start AND dr.range2_end)
+        )
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND v.merchant_id = $5
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            EXTRACT(MONTH FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    mcc.category_id,
+    mcc.category_name,
+    mcc.year::text,
+    TO_CHAR(TO_DATE(mcc.month::text, 'MM'), 'Mon') AS month,
+    COALESCE(mt.total_success, 0) AS total_success,
+    COALESCE(mt.total_amount, 0) AS total_amount
+FROM month_category_combos mcc
+LEFT JOIN monthly_transactions mt ON
+    mcc.year = mt.year AND
+    mcc.month = mt.month AND
+    mcc.category_id = mt.category_id
+ORDER BY 
+    mcc.category_name ASC,
+    mcc.year DESC,
+    mcc.month DESC
+`
+
+type GetMonthAmountCategorySuccessByMerchantParams struct {
+	Column1    time.Time `json:"column_1"`
+	Column2    time.Time `json:"column_2"`
+	Column3    time.Time `json:"column_3"`
+	Column4    time.Time `json:"column_4"`
+	MerchantID int32     `json:"merchant_id"`
+}
+
+type GetMonthAmountCategorySuccessByMerchantRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	MccYear      string `json:"mcc_year"`
+	Month        string `json:"month"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthAmountCategorySuccessByMerchant(ctx context.Context, arg GetMonthAmountCategorySuccessByMerchantParams) ([]*GetMonthAmountCategorySuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthAmountCategorySuccessByMerchant,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.MerchantID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthAmountCategorySuccessByMerchantRow
+	for rows.Next() {
+		var i GetMonthAmountCategorySuccessByMerchantRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.MccYear,
+			&i.Month,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodCategoriesFailed = `-- name: GetMonthMethodCategoriesFailed :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    active_category_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'failed'
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            acm.category_id,
+            acm.category_name,
+            acm.payment_method
+        FROM all_months am
+        CROSS JOIN active_category_methods acm
+    ),
+    monthly_stats AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ms.total_transactions, 0) AS total_transactions,
+    COALESCE(ms.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_stats ms ON 
+    ac.activity_month = ms.activity_month AND
+    ac.category_id = ms.category_id AND
+    ac.payment_method = ms.payment_method
+WHERE 
+    EXISTS (
+        SELECT 1 FROM active_category_methods 
+        WHERE category_id = ac.category_id 
+        AND payment_method = ac.payment_method
+    )
+ORDER BY 
+    ac.activity_month,
+    ac.category_name,
+    ac.payment_method
+`
+
+type GetMonthMethodCategoriesFailedRow struct {
+	Month             string  `json:"month"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodCategoriesFailed(ctx context.Context, dollar_1 time.Time) ([]*GetMonthMethodCategoriesFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodCategoriesFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodCategoriesFailedRow
+	for rows.Next() {
+		var i GetMonthMethodCategoriesFailedRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodCategoriesFailedById = `-- name: GetMonthMethodCategoriesFailedById :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    category_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND c.category_id = $2  
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            cm.category_id,
+            cm.category_name,
+            cm.payment_method
+        FROM all_months am
+        CROSS JOIN category_methods cm
+    ),
+    monthly_stats AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND c.category_id = $2  
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ms.total_transactions, 0) AS total_transactions,
+    COALESCE(ms.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_stats ms ON 
+    ac.activity_month = ms.activity_month AND
+    ac.category_id = ms.category_id AND
+    ac.payment_method = ms.payment_method
+ORDER BY 
+    ac.activity_month,
+    ac.payment_method
+`
+
+type GetMonthMethodCategoriesFailedByIdParams struct {
+	Column1    time.Time `json:"column_1"`
+	CategoryID int32     `json:"category_id"`
+}
+
+type GetMonthMethodCategoriesFailedByIdRow struct {
+	Month             string  `json:"month"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodCategoriesFailedById(ctx context.Context, arg GetMonthMethodCategoriesFailedByIdParams) ([]*GetMonthMethodCategoriesFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodCategoriesFailedById, arg.Column1, arg.CategoryID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodCategoriesFailedByIdRow
+	for rows.Next() {
+		var i GetMonthMethodCategoriesFailedByIdRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodCategoriesFailedByMerchant = `-- name: GetMonthMethodCategoriesFailedByMerchant :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    merchant_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.merchant_id = $2  
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            mm.category_id,
+            mm.category_name,
+            mm.payment_method
+        FROM all_months am
+        CROSS JOIN merchant_methods mm
+    ),
+    monthly_stats AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.merchant_id = $2  
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ms.total_transactions, 0) AS total_transactions,
+    COALESCE(ms.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_stats ms ON 
+    ac.activity_month = ms.activity_month AND
+    ac.category_id = ms.category_id AND
+    ac.payment_method = ms.payment_method
+ORDER BY 
+    ac.activity_month,
+    ac.category_name,
+    ac.payment_method
+`
+
+type GetMonthMethodCategoriesFailedByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthMethodCategoriesFailedByMerchantRow struct {
+	Month             string  `json:"month"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodCategoriesFailedByMerchant(ctx context.Context, arg GetMonthMethodCategoriesFailedByMerchantParams) ([]*GetMonthMethodCategoriesFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodCategoriesFailedByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodCategoriesFailedByMerchantRow
+	for rows.Next() {
+		var i GetMonthMethodCategoriesFailedByMerchantRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodCategoriesSuccess = `-- name: GetMonthMethodCategoriesSuccess :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    active_category_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            acm.category_id,
+            acm.category_name,
+            acm.payment_method
+        FROM all_months am
+        CROSS JOIN active_category_methods acm
+    ),
+    monthly_stats AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ms.total_transactions, 0) AS total_transactions,
+    COALESCE(ms.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_stats ms ON 
+    ac.activity_month = ms.activity_month AND
+    ac.category_id = ms.category_id AND
+    ac.payment_method = ms.payment_method
+WHERE 
+    EXISTS (
+        SELECT 1 FROM active_category_methods 
+        WHERE category_id = ac.category_id 
+        AND payment_method = ac.payment_method
+    )
+ORDER BY 
+    ac.activity_month,
+    ac.category_name,
+    ac.payment_method
+`
+
+type GetMonthMethodCategoriesSuccessRow struct {
+	Month             string  `json:"month"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodCategoriesSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetMonthMethodCategoriesSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodCategoriesSuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodCategoriesSuccessRow
+	for rows.Next() {
+		var i GetMonthMethodCategoriesSuccessRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodCategoriesSuccessById = `-- name: GetMonthMethodCategoriesSuccessById :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    category_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND c.category_id = $2  
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            cm.category_id,
+            cm.category_name,
+            cm.payment_method
+        FROM all_months am
+        CROSS JOIN category_methods cm
+    ),
+    monthly_stats AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND c.category_id = $2  
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ms.total_transactions, 0) AS total_transactions,
+    COALESCE(ms.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_stats ms ON 
+    ac.activity_month = ms.activity_month AND
+    ac.category_id = ms.category_id AND
+    ac.payment_method = ms.payment_method
+ORDER BY 
+    ac.activity_month,
+    ac.payment_method
+`
+
+type GetMonthMethodCategoriesSuccessByIdParams struct {
+	Column1    time.Time `json:"column_1"`
+	CategoryID int32     `json:"category_id"`
+}
+
+type GetMonthMethodCategoriesSuccessByIdRow struct {
+	Month             string  `json:"month"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodCategoriesSuccessById(ctx context.Context, arg GetMonthMethodCategoriesSuccessByIdParams) ([]*GetMonthMethodCategoriesSuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodCategoriesSuccessById, arg.Column1, arg.CategoryID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodCategoriesSuccessByIdRow
+	for rows.Next() {
+		var i GetMonthMethodCategoriesSuccessByIdRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMonthMethodCategoriesSuccessByMerchant = `-- name: GetMonthMethodCategoriesSuccessByMerchant :many
+WITH 
+    date_range AS (
+        SELECT 
+            date_trunc('month', $1::timestamp) AS start_date, 
+            date_trunc('month', $1::timestamp) + interval '1 year' - interval '1 day' AS end_date
+    ),
+    merchant_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.merchant_id = $2  
+    ),
+    all_months AS (
+        SELECT 
+            generate_series(
+                (SELECT start_date FROM date_range),
+                (SELECT end_date FROM date_range),
+                interval '1 month'
+            )::date AS activity_month
+    ),
+    all_combinations AS (
+        SELECT 
+            am.activity_month,
+            mm.category_id,
+            mm.category_name,
+            mm.payment_method
+        FROM all_months am
+        CROSS JOIN merchant_methods mm
+    ),
+    monthly_stats AS (
+        SELECT
+            date_trunc('month', t.created_at) AS activity_month,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.merchant_id = $2  
+            AND t.created_at BETWEEN (SELECT start_date FROM date_range) 
+                                AND (SELECT end_date FROM date_range)
+        GROUP BY
+            date_trunc('month', t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    TO_CHAR(ac.activity_month, 'Mon') AS month,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ms.total_transactions, 0) AS total_transactions,
+    COALESCE(ms.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN monthly_stats ms ON 
+    ac.activity_month = ms.activity_month AND
+    ac.category_id = ms.category_id AND
+    ac.payment_method = ms.payment_method
+ORDER BY 
+    ac.activity_month,
+    ac.category_name,
+    ac.payment_method
+`
+
+type GetMonthMethodCategoriesSuccessByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetMonthMethodCategoriesSuccessByMerchantRow struct {
+	Month             string  `json:"month"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetMonthMethodCategoriesSuccessByMerchant(ctx context.Context, arg GetMonthMethodCategoriesSuccessByMerchantParams) ([]*GetMonthMethodCategoriesSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMonthMethodCategoriesSuccessByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetMonthMethodCategoriesSuccessByMerchantRow
+	for rows.Next() {
+		var i GetMonthMethodCategoriesSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountCategoryFailed = `-- name: GetYearAmountCategoryFailed :many
+WITH
+    active_categories AS (
+        SELECT category_id, name AS category_name
+        FROM categories
+        WHERE deleted_at IS NULL
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_category_combos AS (
+        SELECT
+            ry.year,
+            ac.category_id,
+            ac.category_name
+        FROM report_years ry
+        CROSS JOIN active_categories ac
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    ycc.category_id,
+    ycc.category_name,
+    ycc.year::text,
+    COALESCE(yt.total_failed, 0) AS total_failed,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_category_combos ycc
+LEFT JOIN yearly_transactions yt ON
+    ycc.year = yt.year AND
+    ycc.category_id = yt.category_id
+ORDER BY 
+    ycc.category_name ASC,
+    ycc.year DESC
+`
+
+type GetYearAmountCategoryFailedRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	YccYear      string `json:"ycc_year"`
+	TotalFailed  int64  `json:"total_failed"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountCategoryFailed(ctx context.Context, dollar_1 int32) ([]*GetYearAmountCategoryFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountCategoryFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountCategoryFailedRow
+	for rows.Next() {
+		var i GetYearAmountCategoryFailedRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.YccYear,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountCategoryFailedById = `-- name: GetYearAmountCategoryFailedById :many
+WITH
+    active_categories AS (
+        SELECT 
+            c.category_id,
+            c.name AS category_name
+        FROM categories c
+        WHERE c.deleted_at IS NULL
+        AND c.category_id = $2  
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_category_combos AS (
+        SELECT
+            ry.year,
+            ac.category_id,
+            ac.category_name
+        FROM report_years ry
+        CROSS JOIN active_categories ac
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+            AND c.category_id = $2  
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    ycc.category_id,
+    ycc.category_name,
+    ycc.year::text,
+    COALESCE(yt.total_failed, 0) AS total_failed,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_category_combos ycc
+LEFT JOIN yearly_transactions yt ON
+    ycc.year = yt.year AND
+    ycc.category_id = yt.category_id
+ORDER BY 
+    ycc.category_name ASC,
+    ycc.year DESC
+`
+
+type GetYearAmountCategoryFailedByIdParams struct {
+	Column1    int32 `json:"column_1"`
+	CategoryID int32 `json:"category_id"`
+}
+
+type GetYearAmountCategoryFailedByIdRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	YccYear      string `json:"ycc_year"`
+	TotalFailed  int64  `json:"total_failed"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountCategoryFailedById(ctx context.Context, arg GetYearAmountCategoryFailedByIdParams) ([]*GetYearAmountCategoryFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountCategoryFailedById, arg.Column1, arg.CategoryID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountCategoryFailedByIdRow
+	for rows.Next() {
+		var i GetYearAmountCategoryFailedByIdRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.YccYear,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountCategoryFailedByMerchant = `-- name: GetYearAmountCategoryFailedByMerchant :many
+WITH
+    merchant_categories AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name
+        FROM vouchers v
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE 
+            v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND v.merchant_id = $2
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_category_combos AS (
+        SELECT
+            ry.year,
+            mc.category_id,
+            mc.category_name
+        FROM report_years ry
+        CROSS JOIN merchant_categories mc
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_failed,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+            AND v.merchant_id = $2
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    ycc.category_id,
+    ycc.category_name,
+    ycc.year::text,
+    COALESCE(yt.total_failed, 0) AS total_failed,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_category_combos ycc
+LEFT JOIN yearly_transactions yt ON
+    ycc.year = yt.year AND
+    ycc.category_id = yt.category_id
+ORDER BY 
+    ycc.category_name ASC,
+    ycc.year DESC
+`
+
+type GetYearAmountCategoryFailedByMerchantParams struct {
+	Column1    int32 `json:"column_1"`
+	MerchantID int32 `json:"merchant_id"`
+}
+
+type GetYearAmountCategoryFailedByMerchantRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	YccYear      string `json:"ycc_year"`
+	TotalFailed  int64  `json:"total_failed"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountCategoryFailedByMerchant(ctx context.Context, arg GetYearAmountCategoryFailedByMerchantParams) ([]*GetYearAmountCategoryFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountCategoryFailedByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountCategoryFailedByMerchantRow
+	for rows.Next() {
+		var i GetYearAmountCategoryFailedByMerchantRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.YccYear,
+			&i.TotalFailed,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountCategorySuccess = `-- name: GetYearAmountCategorySuccess :many
+WITH
+    active_categories AS (
+        SELECT category_id, name AS category_name
+        FROM categories
+        WHERE deleted_at IS NULL
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_category_combos AS (
+        SELECT
+            ry.year,
+            ac.category_id,
+            ac.category_name
+        FROM report_years ry
+        CROSS JOIN active_categories ac
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    ycc.category_id,
+    ycc.category_name,
+    ycc.year::text,
+    COALESCE(yt.total_success, 0) AS total_success,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_category_combos ycc
+LEFT JOIN yearly_transactions yt ON
+    ycc.year = yt.year AND
+    ycc.category_id = yt.category_id
+ORDER BY 
+    ycc.category_name ASC,
+    ycc.year DESC
+`
+
+type GetYearAmountCategorySuccessRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	YccYear      string `json:"ycc_year"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountCategorySuccess(ctx context.Context, dollar_1 int32) ([]*GetYearAmountCategorySuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountCategorySuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountCategorySuccessRow
+	for rows.Next() {
+		var i GetYearAmountCategorySuccessRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.YccYear,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountCategorySuccessById = `-- name: GetYearAmountCategorySuccessById :many
+WITH
+    active_categories AS (
+        SELECT 
+            c.category_id,
+            c.name AS category_name
+        FROM categories c
+        WHERE c.deleted_at IS NULL
+        AND c.category_id = $2  
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_category_combos AS (
+        SELECT
+            ry.year,
+            ac.category_id,
+            ac.category_name
+        FROM report_years ry
+        CROSS JOIN active_categories ac
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+            AND c.category_id = $2  
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    ycc.category_id,
+    ycc.category_name,
+    ycc.year::text,
+    COALESCE(yt.total_success, 0) AS total_success,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_category_combos ycc
+LEFT JOIN yearly_transactions yt ON
+    ycc.year = yt.year AND
+    ycc.category_id = yt.category_id
+ORDER BY 
+    ycc.category_name ASC,
+    ycc.year DESC
+`
+
+type GetYearAmountCategorySuccessByIdParams struct {
+	Column1    int32 `json:"column_1"`
+	CategoryID int32 `json:"category_id"`
+}
+
+type GetYearAmountCategorySuccessByIdRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	YccYear      string `json:"ycc_year"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountCategorySuccessById(ctx context.Context, arg GetYearAmountCategorySuccessByIdParams) ([]*GetYearAmountCategorySuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountCategorySuccessById, arg.Column1, arg.CategoryID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountCategorySuccessByIdRow
+	for rows.Next() {
+		var i GetYearAmountCategorySuccessByIdRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.YccYear,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearAmountCategorySuccessByMerchant = `-- name: GetYearAmountCategorySuccessByMerchant :many
+WITH
+    merchant_categories AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name
+        FROM vouchers v
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE 
+            v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND v.merchant_id = $2
+    ),
+    report_years AS (
+        SELECT $1::integer AS year
+        UNION
+        SELECT $1::integer - 1 AS year
+    ),
+    year_category_combos AS (
+        SELECT
+            ry.year,
+            mc.category_id,
+            mc.category_name
+        FROM report_years ry
+        CROSS JOIN merchant_categories mc
+    ),
+    yearly_transactions AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::integer AS year,
+            c.category_id,
+            c.name AS category_name,
+            COUNT(*) AS total_success,
+            COALESCE(SUM(t.amount), 0)::integer AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) IN ($1::integer, $1::integer - 1)
+            AND v.merchant_id = $2
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name
+    )
+SELECT
+    ycc.category_id,
+    ycc.category_name,
+    ycc.year::text,
+    COALESCE(yt.total_success, 0) AS total_success,
+    COALESCE(yt.total_amount, 0) AS total_amount
+FROM year_category_combos ycc
+LEFT JOIN yearly_transactions yt ON
+    ycc.year = yt.year AND
+    ycc.category_id = yt.category_id
+ORDER BY 
+    ycc.category_name ASC,
+    ycc.year DESC
+`
+
+type GetYearAmountCategorySuccessByMerchantParams struct {
+	Column1    int32 `json:"column_1"`
+	MerchantID int32 `json:"merchant_id"`
+}
+
+type GetYearAmountCategorySuccessByMerchantRow struct {
+	CategoryID   int32  `json:"category_id"`
+	CategoryName string `json:"category_name"`
+	YccYear      string `json:"ycc_year"`
+	TotalSuccess int64  `json:"total_success"`
+	TotalAmount  int32  `json:"total_amount"`
+}
+
+func (q *Queries) GetYearAmountCategorySuccessByMerchant(ctx context.Context, arg GetYearAmountCategorySuccessByMerchantParams) ([]*GetYearAmountCategorySuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearAmountCategorySuccessByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearAmountCategorySuccessByMerchantRow
+	for rows.Next() {
+		var i GetYearAmountCategorySuccessByMerchantRow
+		if err := rows.Scan(
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.YccYear,
+			&i.TotalSuccess,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodCategoriesFailed = `-- name: GetYearMethodCategoriesFailed :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    active_category_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'failed'
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            acm.category_id,
+            acm.category_name,
+            acm.payment_method
+        FROM all_years ay
+        CROSS JOIN active_category_methods acm
+    ),
+    yearly_stats AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ys.total_transactions, 0) AS total_transactions,
+    COALESCE(ys.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_stats ys ON 
+    ac.year = ys.year AND
+    ac.category_id = ys.category_id AND
+    ac.payment_method = ys.payment_method
+WHERE 
+    EXISTS (
+        SELECT 1 FROM active_category_methods 
+        WHERE category_id = ac.category_id 
+        AND payment_method = ac.payment_method
+    )
+ORDER BY 
+    ac.year DESC,
+    ac.category_name,
+    ac.payment_method
+`
+
+type GetYearMethodCategoriesFailedRow struct {
+	Year              string  `json:"year"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodCategoriesFailed(ctx context.Context, dollar_1 time.Time) ([]*GetYearMethodCategoriesFailedRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodCategoriesFailed, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodCategoriesFailedRow
+	for rows.Next() {
+		var i GetYearMethodCategoriesFailedRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodCategoriesFailedById = `-- name: GetYearMethodCategoriesFailedById :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    category_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND c.category_id = $2 
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            cm.category_id,
+            cm.category_name,
+            cm.payment_method
+        FROM all_years ay
+        CROSS JOIN category_methods cm
+    ),
+    yearly_stats AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND c.category_id = $2  
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ys.total_transactions, 0) AS total_transactions,
+    COALESCE(ys.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_stats ys ON 
+    ac.year = ys.year AND
+    ac.category_id = ys.category_id AND
+    ac.payment_method = ys.payment_method
+ORDER BY 
+    ac.year DESC,
+    ac.payment_method
+`
+
+type GetYearMethodCategoriesFailedByIdParams struct {
+	Column1    time.Time `json:"column_1"`
+	CategoryID int32     `json:"category_id"`
+}
+
+type GetYearMethodCategoriesFailedByIdRow struct {
+	Year              string  `json:"year"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodCategoriesFailedById(ctx context.Context, arg GetYearMethodCategoriesFailedByIdParams) ([]*GetYearMethodCategoriesFailedByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodCategoriesFailedById, arg.Column1, arg.CategoryID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodCategoriesFailedByIdRow
+	for rows.Next() {
+		var i GetYearMethodCategoriesFailedByIdRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodCategoriesFailedByMerchant = `-- name: GetYearMethodCategoriesFailedByMerchant :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    merchant_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.merchant_id = $2 
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            mm.category_id,
+            mm.category_name,
+            mm.payment_method
+        FROM all_years ay
+        CROSS JOIN merchant_methods mm
+    ),
+    yearly_stats AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'failed'
+            AND t.merchant_id = $2  
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ys.total_transactions, 0) AS total_transactions,
+    COALESCE(ys.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_stats ys ON 
+    ac.year = ys.year AND
+    ac.category_id = ys.category_id AND
+    ac.payment_method = ys.payment_method
+ORDER BY 
+    ac.year DESC,
+    ac.category_name,
+    ac.payment_method
+`
+
+type GetYearMethodCategoriesFailedByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearMethodCategoriesFailedByMerchantRow struct {
+	Year              string  `json:"year"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodCategoriesFailedByMerchant(ctx context.Context, arg GetYearMethodCategoriesFailedByMerchantParams) ([]*GetYearMethodCategoriesFailedByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodCategoriesFailedByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodCategoriesFailedByMerchantRow
+	for rows.Next() {
+		var i GetYearMethodCategoriesFailedByMerchantRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodCategoriesSuccess = `-- name: GetYearMethodCategoriesSuccess :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    active_category_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            acm.category_id,
+            acm.category_name,
+            acm.payment_method
+        FROM all_years ay
+        CROSS JOIN active_category_methods acm
+    ),
+    yearly_stats AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ys.total_transactions, 0) AS total_transactions,
+    COALESCE(ys.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_stats ys ON 
+    ac.year = ys.year AND
+    ac.category_id = ys.category_id AND
+    ac.payment_method = ys.payment_method
+WHERE 
+    EXISTS (
+        SELECT 1 FROM active_category_methods 
+        WHERE category_id = ac.category_id 
+        AND payment_method = ac.payment_method
+    )
+ORDER BY 
+    ac.year DESC,
+    ac.category_name,
+    ac.payment_method
+`
+
+type GetYearMethodCategoriesSuccessRow struct {
+	Year              string  `json:"year"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodCategoriesSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetYearMethodCategoriesSuccessRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodCategoriesSuccess, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodCategoriesSuccessRow
+	for rows.Next() {
+		var i GetYearMethodCategoriesSuccessRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodCategoriesSuccessById = `-- name: GetYearMethodCategoriesSuccessById :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    category_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND c.category_id = $2 
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            cm.category_id,
+            cm.category_name,
+            cm.payment_method
+        FROM all_years ay
+        CROSS JOIN category_methods cm
+    ),
+    yearly_stats AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND c.category_id = $2  
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ys.total_transactions, 0) AS total_transactions,
+    COALESCE(ys.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_stats ys ON 
+    ac.year = ys.year AND
+    ac.category_id = ys.category_id AND
+    ac.payment_method = ys.payment_method
+ORDER BY 
+    ac.year DESC,
+    ac.payment_method
+`
+
+type GetYearMethodCategoriesSuccessByIdParams struct {
+	Column1    time.Time `json:"column_1"`
+	CategoryID int32     `json:"category_id"`
+}
+
+type GetYearMethodCategoriesSuccessByIdRow struct {
+	Year              string  `json:"year"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodCategoriesSuccessById(ctx context.Context, arg GetYearMethodCategoriesSuccessByIdParams) ([]*GetYearMethodCategoriesSuccessByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodCategoriesSuccessById, arg.Column1, arg.CategoryID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodCategoriesSuccessByIdRow
+	for rows.Next() {
+		var i GetYearMethodCategoriesSuccessByIdRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getYearMethodCategoriesSuccessByMerchant = `-- name: GetYearMethodCategoriesSuccessByMerchant :many
+WITH
+    year_range AS (
+        SELECT 
+            EXTRACT(YEAR FROM $1::timestamp)::int - 4 AS start_year,
+            EXTRACT(YEAR FROM $1::timestamp)::int AS end_year
+    ),
+    merchant_methods AS (
+        SELECT DISTINCT
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.merchant_id = $2 
+    ),
+    all_years AS (
+        SELECT 
+            generate_series(
+                (SELECT start_year FROM year_range),
+                (SELECT end_year FROM year_range)
+            )::text AS year
+    ),
+    all_combinations AS (
+        SELECT 
+            ay.year,
+            mm.category_id,
+            mm.category_name,
+            mm.payment_method
+        FROM all_years ay
+        CROSS JOIN merchant_methods mm
+    ),
+    yearly_stats AS (
+        SELECT
+            EXTRACT(YEAR FROM t.created_at)::text AS year,
+            c.category_id,
+            c.name AS category_name,
+            t.payment_method,
+            COUNT(t.transaction_id) AS total_transactions,
+            COALESCE(SUM(t.amount), 0)::NUMERIC AS total_amount
+        FROM transactions t
+        JOIN vouchers v ON t.voucher_id = v.voucher_id
+        JOIN categories c ON v.category_id = c.category_id
+        WHERE
+            t.deleted_at IS NULL
+            AND v.deleted_at IS NULL
+            AND c.deleted_at IS NULL
+            AND t.status = 'success'
+            AND t.merchant_id = $2  
+            AND EXTRACT(YEAR FROM t.created_at) BETWEEN 
+                (SELECT start_year FROM year_range) AND 
+                (SELECT end_year FROM year_range)
+        GROUP BY
+            EXTRACT(YEAR FROM t.created_at),
+            c.category_id,
+            c.name,
+            t.payment_method
+    )
+SELECT
+    ac.year,
+    ac.category_id,
+    ac.category_name,
+    ac.payment_method,
+    COALESCE(ys.total_transactions, 0) AS total_transactions,
+    COALESCE(ys.total_amount, 0) AS total_amount
+FROM all_combinations ac
+LEFT JOIN yearly_stats ys ON 
+    ac.year = ys.year AND
+    ac.category_id = ys.category_id AND
+    ac.payment_method = ys.payment_method
+ORDER BY 
+    ac.year DESC,
+    ac.category_name,
+    ac.payment_method
+`
+
+type GetYearMethodCategoriesSuccessByMerchantParams struct {
+	Column1    time.Time     `json:"column_1"`
+	MerchantID sql.NullInt32 `json:"merchant_id"`
+}
+
+type GetYearMethodCategoriesSuccessByMerchantRow struct {
+	Year              string  `json:"year"`
+	CategoryID        int32   `json:"category_id"`
+	CategoryName      string  `json:"category_name"`
+	PaymentMethod     string  `json:"payment_method"`
+	TotalTransactions int64   `json:"total_transactions"`
+	TotalAmount       float64 `json:"total_amount"`
+}
+
+func (q *Queries) GetYearMethodCategoriesSuccessByMerchant(ctx context.Context, arg GetYearMethodCategoriesSuccessByMerchantParams) ([]*GetYearMethodCategoriesSuccessByMerchantRow, error) {
+	rows, err := q.db.QueryContext(ctx, getYearMethodCategoriesSuccessByMerchant, arg.Column1, arg.MerchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetYearMethodCategoriesSuccessByMerchantRow
+	for rows.Next() {
+		var i GetYearMethodCategoriesSuccessByMerchantRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.CategoryID,
+			&i.CategoryName,
+			&i.PaymentMethod,
+			&i.TotalTransactions,
+			&i.TotalAmount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const restoreAllCategories = `-- name: RestoreAllCategories :exec
-UPDATE categories
-SET deleted_at = NULL
-WHERE deleted_at IS NOT NULL
+UPDATE categories SET deleted_at = NULL WHERE deleted_at IS NOT NULL
 `
 
 // Restore All Trashed Categories
@@ -256,10 +3174,13 @@ func (q *Queries) RestoreAllCategories(ctx context.Context) error {
 
 const restoreCategory = `-- name: RestoreCategory :one
 UPDATE categories
-SET deleted_at = NULL
-WHERE category_id = $1
-  AND deleted_at IS NOT NULL
-  RETURNING category_id, name, created_at, updated_at, deleted_at
+SET
+    deleted_at = NULL
+WHERE
+    category_id = $1
+    AND deleted_at IS NOT NULL
+RETURNING
+    category_id, name, created_at, updated_at, deleted_at
 `
 
 // Restore Trashed Category
@@ -278,10 +3199,13 @@ func (q *Queries) RestoreCategory(ctx context.Context, categoryID int32) (*Categ
 
 const trashCategory = `-- name: TrashCategory :one
 UPDATE categories
-SET deleted_at = CURRENT_TIMESTAMP
-WHERE category_id = $1
-  AND deleted_at IS NULL
-  RETURNING category_id, name, created_at, updated_at, deleted_at
+SET
+    deleted_at = CURRENT_TIMESTAMP
+WHERE
+    category_id = $1
+    AND deleted_at IS NULL
+RETURNING
+    category_id, name, created_at, updated_at, deleted_at
 `
 
 // Trash Category (Soft Delete)
@@ -300,11 +3224,14 @@ func (q *Queries) TrashCategory(ctx context.Context, categoryID int32) (*Categor
 
 const updateCategory = `-- name: UpdateCategory :one
 UPDATE categories
-SET name = $2,
+SET
+    name = $2,
     updated_at = CURRENT_TIMESTAMP
-WHERE category_id = $1
-  AND deleted_at IS NULL
-  RETURNING category_id, name, created_at, updated_at, deleted_at
+WHERE
+    category_id = $1
+    AND deleted_at IS NULL
+RETURNING
+    category_id, name, created_at, updated_at, deleted_at
 `
 
 type UpdateCategoryParams struct {

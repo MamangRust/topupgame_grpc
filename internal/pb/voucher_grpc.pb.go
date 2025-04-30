@@ -20,17 +20,41 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	VoucherService_FindAll_FullMethodName            = "/pb.VoucherService/FindAll"
-	VoucherService_FindById_FullMethodName           = "/pb.VoucherService/FindById"
-	VoucherService_FindByActive_FullMethodName       = "/pb.VoucherService/FindByActive"
-	VoucherService_FindByTrashed_FullMethodName      = "/pb.VoucherService/FindByTrashed"
-	VoucherService_Create_FullMethodName             = "/pb.VoucherService/Create"
-	VoucherService_Update_FullMethodName             = "/pb.VoucherService/Update"
-	VoucherService_Trashed_FullMethodName            = "/pb.VoucherService/Trashed"
-	VoucherService_Restore_FullMethodName            = "/pb.VoucherService/Restore"
-	VoucherService_DeletePermanent_FullMethodName    = "/pb.VoucherService/DeletePermanent"
-	VoucherService_RestoreAll_FullMethodName         = "/pb.VoucherService/RestoreAll"
-	VoucherService_DeleteAllPermanent_FullMethodName = "/pb.VoucherService/DeleteAllPermanent"
+	VoucherService_FindAll_FullMethodName                                 = "/pb.VoucherService/FindAll"
+	VoucherService_FindById_FullMethodName                                = "/pb.VoucherService/FindById"
+	VoucherService_FindByActive_FullMethodName                            = "/pb.VoucherService/FindByActive"
+	VoucherService_FindByTrashed_FullMethodName                           = "/pb.VoucherService/FindByTrashed"
+	VoucherService_Create_FullMethodName                                  = "/pb.VoucherService/Create"
+	VoucherService_Update_FullMethodName                                  = "/pb.VoucherService/Update"
+	VoucherService_Trashed_FullMethodName                                 = "/pb.VoucherService/Trashed"
+	VoucherService_Restore_FullMethodName                                 = "/pb.VoucherService/Restore"
+	VoucherService_DeletePermanent_FullMethodName                         = "/pb.VoucherService/DeletePermanent"
+	VoucherService_RestoreAll_FullMethodName                              = "/pb.VoucherService/RestoreAll"
+	VoucherService_DeleteAllPermanent_FullMethodName                      = "/pb.VoucherService/DeleteAllPermanent"
+	VoucherService_FindMonthAmountVoucherSuccess_FullMethodName           = "/pb.VoucherService/FindMonthAmountVoucherSuccess"
+	VoucherService_FindYearAmountVoucherSuccess_FullMethodName            = "/pb.VoucherService/FindYearAmountVoucherSuccess"
+	VoucherService_FindMonthAmountVoucherFailed_FullMethodName            = "/pb.VoucherService/FindMonthAmountVoucherFailed"
+	VoucherService_FindYearAmountVoucherFailed_FullMethodName             = "/pb.VoucherService/FindYearAmountVoucherFailed"
+	VoucherService_FindMonthMethodVoucherSuccess_FullMethodName           = "/pb.VoucherService/FindMonthMethodVoucherSuccess"
+	VoucherService_FindYearMethodVoucherSuccess_FullMethodName            = "/pb.VoucherService/FindYearMethodVoucherSuccess"
+	VoucherService_FindMonthMethodVoucherFailed_FullMethodName            = "/pb.VoucherService/FindMonthMethodVoucherFailed"
+	VoucherService_FindYearMethodVoucherFailed_FullMethodName             = "/pb.VoucherService/FindYearMethodVoucherFailed"
+	VoucherService_FindMonthAmountVoucherSuccessById_FullMethodName       = "/pb.VoucherService/FindMonthAmountVoucherSuccessById"
+	VoucherService_FindYearAmountVoucherSuccessById_FullMethodName        = "/pb.VoucherService/FindYearAmountVoucherSuccessById"
+	VoucherService_FindMonthAmountVoucherFailedById_FullMethodName        = "/pb.VoucherService/FindMonthAmountVoucherFailedById"
+	VoucherService_FindYearAmountVoucherFailedById_FullMethodName         = "/pb.VoucherService/FindYearAmountVoucherFailedById"
+	VoucherService_FindMonthMethodVoucherSuccessById_FullMethodName       = "/pb.VoucherService/FindMonthMethodVoucherSuccessById"
+	VoucherService_FindYearMethodVoucherSuccessById_FullMethodName        = "/pb.VoucherService/FindYearMethodVoucherSuccessById"
+	VoucherService_FindMonthMethodVoucherFailedById_FullMethodName        = "/pb.VoucherService/FindMonthMethodVoucherFailedById"
+	VoucherService_FindYearMethodVoucherFailedById_FullMethodName         = "/pb.VoucherService/FindYearMethodVoucherFailedById"
+	VoucherService_FindMonthAmountVoucherSuccessByMerchant_FullMethodName = "/pb.VoucherService/FindMonthAmountVoucherSuccessByMerchant"
+	VoucherService_FindYearAmountVoucherSuccessByMerchant_FullMethodName  = "/pb.VoucherService/FindYearAmountVoucherSuccessByMerchant"
+	VoucherService_FindMonthAmountVoucherFailedByMerchant_FullMethodName  = "/pb.VoucherService/FindMonthAmountVoucherFailedByMerchant"
+	VoucherService_FindYearAmountVoucherFailedByMerchant_FullMethodName   = "/pb.VoucherService/FindYearAmountVoucherFailedByMerchant"
+	VoucherService_FindMonthMethodVoucherSuccessByMerchant_FullMethodName = "/pb.VoucherService/FindMonthMethodVoucherSuccessByMerchant"
+	VoucherService_FindYearMethodVoucherSuccessByMerchant_FullMethodName  = "/pb.VoucherService/FindYearMethodVoucherSuccessByMerchant"
+	VoucherService_FindMonthMethodVoucherFailedByMerchant_FullMethodName  = "/pb.VoucherService/FindMonthMethodVoucherFailedByMerchant"
+	VoucherService_FindYearMethodVoucherFailedByMerchant_FullMethodName   = "/pb.VoucherService/FindYearMethodVoucherFailedByMerchant"
 )
 
 // VoucherServiceClient is the client API for VoucherService service.
@@ -48,6 +72,30 @@ type VoucherServiceClient interface {
 	DeletePermanent(ctx context.Context, in *FindByIdVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherDelete, error)
 	RestoreAll(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ApiResponseVoucherAll, error)
 	DeleteAllPermanent(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ApiResponseVoucherAll, error)
+	FindMonthAmountVoucherSuccess(ctx context.Context, in *MonthAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountSuccess, error)
+	FindYearAmountVoucherSuccess(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountSuccess, error)
+	FindMonthAmountVoucherFailed(ctx context.Context, in *MonthAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountFailed, error)
+	FindYearAmountVoucherFailed(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountFailed, error)
+	FindMonthMethodVoucherSuccess(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherSuccess(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error)
+	FindMonthMethodVoucherFailed(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherFailed(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error)
+	FindMonthAmountVoucherSuccessById(ctx context.Context, in *MonthAmountVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountSuccess, error)
+	FindYearAmountVoucherSuccessById(ctx context.Context, in *YearAmountVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountSuccess, error)
+	FindMonthAmountVoucherFailedById(ctx context.Context, in *MonthAmountVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountFailed, error)
+	FindYearAmountVoucherFailedById(ctx context.Context, in *YearAmountVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountFailed, error)
+	FindMonthMethodVoucherSuccessById(ctx context.Context, in *MonthMethodVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherSuccessById(ctx context.Context, in *YearMethodVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error)
+	FindMonthMethodVoucherFailedById(ctx context.Context, in *MonthMethodVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherFailedById(ctx context.Context, in *YearMethodVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error)
+	FindMonthAmountVoucherSuccessByMerchant(ctx context.Context, in *MonthAmountVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountSuccess, error)
+	FindYearAmountVoucherSuccessByMerchant(ctx context.Context, in *YearAmountVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountSuccess, error)
+	FindMonthAmountVoucherFailedByMerchant(ctx context.Context, in *MonthAmountVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountFailed, error)
+	FindYearAmountVoucherFailedByMerchant(ctx context.Context, in *YearAmountVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountFailed, error)
+	FindMonthMethodVoucherSuccessByMerchant(ctx context.Context, in *MonthMethodVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherSuccessByMerchant(ctx context.Context, in *YearMethodVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error)
+	FindMonthMethodVoucherFailedByMerchant(ctx context.Context, in *MonthMethodVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherFailedByMerchant(ctx context.Context, in *YearMethodVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error)
 }
 
 type voucherServiceClient struct {
@@ -168,6 +216,246 @@ func (c *voucherServiceClient) DeleteAllPermanent(ctx context.Context, in *empty
 	return out, nil
 }
 
+func (c *voucherServiceClient) FindMonthAmountVoucherSuccess(ctx context.Context, in *MonthAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthAmountVoucherSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearAmountVoucherSuccess(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearAmountSuccess)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearAmountVoucherSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindMonthAmountVoucherFailed(ctx context.Context, in *MonthAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthAmountFailed)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthAmountVoucherFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearAmountVoucherFailed(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearAmountFailed)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearAmountVoucherFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindMonthMethodVoucherSuccess(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthMethodVoucherSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearMethodVoucherSuccess(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearMethodVoucherSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindMonthMethodVoucherFailed(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthMethodVoucherFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearMethodVoucherFailed(ctx context.Context, in *YearAmountVoucherRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearMethodVoucherFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindMonthAmountVoucherSuccessById(ctx context.Context, in *MonthAmountVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthAmountVoucherSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearAmountVoucherSuccessById(ctx context.Context, in *YearAmountVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearAmountSuccess)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearAmountVoucherSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindMonthAmountVoucherFailedById(ctx context.Context, in *MonthAmountVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthAmountFailed)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthAmountVoucherFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearAmountVoucherFailedById(ctx context.Context, in *YearAmountVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearAmountFailed)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearAmountVoucherFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindMonthMethodVoucherSuccessById(ctx context.Context, in *MonthMethodVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthMethodVoucherSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearMethodVoucherSuccessById(ctx context.Context, in *YearMethodVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearMethodVoucherSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindMonthMethodVoucherFailedById(ctx context.Context, in *MonthMethodVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthMethodVoucherFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearMethodVoucherFailedById(ctx context.Context, in *YearMethodVoucherByIdRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearMethodVoucherFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindMonthAmountVoucherSuccessByMerchant(ctx context.Context, in *MonthAmountVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthAmountVoucherSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearAmountVoucherSuccessByMerchant(ctx context.Context, in *YearAmountVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearAmountSuccess)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearAmountVoucherSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindMonthAmountVoucherFailedByMerchant(ctx context.Context, in *MonthAmountVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthAmountFailed)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthAmountVoucherFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearAmountVoucherFailedByMerchant(ctx context.Context, in *YearAmountVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearAmountFailed)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearAmountVoucherFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindMonthMethodVoucherSuccessByMerchant(ctx context.Context, in *MonthMethodVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthMethodVoucherSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearMethodVoucherSuccessByMerchant(ctx context.Context, in *YearMethodVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearMethodVoucherSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindMonthMethodVoucherFailedByMerchant(ctx context.Context, in *MonthMethodVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherMonthMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindMonthMethodVoucherFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *voucherServiceClient) FindYearMethodVoucherFailedByMerchant(ctx context.Context, in *YearMethodVoucherByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseVoucherYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseVoucherYearMethod)
+	err := c.cc.Invoke(ctx, VoucherService_FindYearMethodVoucherFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VoucherServiceServer is the server API for VoucherService service.
 // All implementations must embed UnimplementedVoucherServiceServer
 // for forward compatibility.
@@ -183,6 +471,30 @@ type VoucherServiceServer interface {
 	DeletePermanent(context.Context, *FindByIdVoucherRequest) (*ApiResponseVoucherDelete, error)
 	RestoreAll(context.Context, *emptypb.Empty) (*ApiResponseVoucherAll, error)
 	DeleteAllPermanent(context.Context, *emptypb.Empty) (*ApiResponseVoucherAll, error)
+	FindMonthAmountVoucherSuccess(context.Context, *MonthAmountVoucherRequest) (*ApiResponseVoucherMonthAmountSuccess, error)
+	FindYearAmountVoucherSuccess(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherYearAmountSuccess, error)
+	FindMonthAmountVoucherFailed(context.Context, *MonthAmountVoucherRequest) (*ApiResponseVoucherMonthAmountFailed, error)
+	FindYearAmountVoucherFailed(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherYearAmountFailed, error)
+	FindMonthMethodVoucherSuccess(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherSuccess(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherYearMethod, error)
+	FindMonthMethodVoucherFailed(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherFailed(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherYearMethod, error)
+	FindMonthAmountVoucherSuccessById(context.Context, *MonthAmountVoucherByIdRequest) (*ApiResponseVoucherMonthAmountSuccess, error)
+	FindYearAmountVoucherSuccessById(context.Context, *YearAmountVoucherByIdRequest) (*ApiResponseVoucherYearAmountSuccess, error)
+	FindMonthAmountVoucherFailedById(context.Context, *MonthAmountVoucherByIdRequest) (*ApiResponseVoucherMonthAmountFailed, error)
+	FindYearAmountVoucherFailedById(context.Context, *YearAmountVoucherByIdRequest) (*ApiResponseVoucherYearAmountFailed, error)
+	FindMonthMethodVoucherSuccessById(context.Context, *MonthMethodVoucherByIdRequest) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherSuccessById(context.Context, *YearMethodVoucherByIdRequest) (*ApiResponseVoucherYearMethod, error)
+	FindMonthMethodVoucherFailedById(context.Context, *MonthMethodVoucherByIdRequest) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherFailedById(context.Context, *YearMethodVoucherByIdRequest) (*ApiResponseVoucherYearMethod, error)
+	FindMonthAmountVoucherSuccessByMerchant(context.Context, *MonthAmountVoucherByMerchantRequest) (*ApiResponseVoucherMonthAmountSuccess, error)
+	FindYearAmountVoucherSuccessByMerchant(context.Context, *YearAmountVoucherByMerchantRequest) (*ApiResponseVoucherYearAmountSuccess, error)
+	FindMonthAmountVoucherFailedByMerchant(context.Context, *MonthAmountVoucherByMerchantRequest) (*ApiResponseVoucherMonthAmountFailed, error)
+	FindYearAmountVoucherFailedByMerchant(context.Context, *YearAmountVoucherByMerchantRequest) (*ApiResponseVoucherYearAmountFailed, error)
+	FindMonthMethodVoucherSuccessByMerchant(context.Context, *MonthMethodVoucherByMerchantRequest) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherSuccessByMerchant(context.Context, *YearMethodVoucherByMerchantRequest) (*ApiResponseVoucherYearMethod, error)
+	FindMonthMethodVoucherFailedByMerchant(context.Context, *MonthMethodVoucherByMerchantRequest) (*ApiResponseVoucherMonthMethod, error)
+	FindYearMethodVoucherFailedByMerchant(context.Context, *YearMethodVoucherByMerchantRequest) (*ApiResponseVoucherYearMethod, error)
 	mustEmbedUnimplementedVoucherServiceServer()
 }
 
@@ -225,6 +537,78 @@ func (UnimplementedVoucherServiceServer) RestoreAll(context.Context, *emptypb.Em
 }
 func (UnimplementedVoucherServiceServer) DeleteAllPermanent(context.Context, *emptypb.Empty) (*ApiResponseVoucherAll, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAllPermanent not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthAmountVoucherSuccess(context.Context, *MonthAmountVoucherRequest) (*ApiResponseVoucherMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountVoucherSuccess not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearAmountVoucherSuccess(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountVoucherSuccess not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthAmountVoucherFailed(context.Context, *MonthAmountVoucherRequest) (*ApiResponseVoucherMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountVoucherFailed not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearAmountVoucherFailed(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountVoucherFailed not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthMethodVoucherSuccess(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodVoucherSuccess not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearMethodVoucherSuccess(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodVoucherSuccess not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthMethodVoucherFailed(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodVoucherFailed not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearMethodVoucherFailed(context.Context, *YearAmountVoucherRequest) (*ApiResponseVoucherYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodVoucherFailed not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthAmountVoucherSuccessById(context.Context, *MonthAmountVoucherByIdRequest) (*ApiResponseVoucherMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountVoucherSuccessById not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearAmountVoucherSuccessById(context.Context, *YearAmountVoucherByIdRequest) (*ApiResponseVoucherYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountVoucherSuccessById not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthAmountVoucherFailedById(context.Context, *MonthAmountVoucherByIdRequest) (*ApiResponseVoucherMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountVoucherFailedById not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearAmountVoucherFailedById(context.Context, *YearAmountVoucherByIdRequest) (*ApiResponseVoucherYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountVoucherFailedById not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthMethodVoucherSuccessById(context.Context, *MonthMethodVoucherByIdRequest) (*ApiResponseVoucherMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodVoucherSuccessById not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearMethodVoucherSuccessById(context.Context, *YearMethodVoucherByIdRequest) (*ApiResponseVoucherYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodVoucherSuccessById not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthMethodVoucherFailedById(context.Context, *MonthMethodVoucherByIdRequest) (*ApiResponseVoucherMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodVoucherFailedById not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearMethodVoucherFailedById(context.Context, *YearMethodVoucherByIdRequest) (*ApiResponseVoucherYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodVoucherFailedById not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthAmountVoucherSuccessByMerchant(context.Context, *MonthAmountVoucherByMerchantRequest) (*ApiResponseVoucherMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountVoucherSuccessByMerchant not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearAmountVoucherSuccessByMerchant(context.Context, *YearAmountVoucherByMerchantRequest) (*ApiResponseVoucherYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountVoucherSuccessByMerchant not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthAmountVoucherFailedByMerchant(context.Context, *MonthAmountVoucherByMerchantRequest) (*ApiResponseVoucherMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountVoucherFailedByMerchant not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearAmountVoucherFailedByMerchant(context.Context, *YearAmountVoucherByMerchantRequest) (*ApiResponseVoucherYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountVoucherFailedByMerchant not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthMethodVoucherSuccessByMerchant(context.Context, *MonthMethodVoucherByMerchantRequest) (*ApiResponseVoucherMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodVoucherSuccessByMerchant not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearMethodVoucherSuccessByMerchant(context.Context, *YearMethodVoucherByMerchantRequest) (*ApiResponseVoucherYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodVoucherSuccessByMerchant not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindMonthMethodVoucherFailedByMerchant(context.Context, *MonthMethodVoucherByMerchantRequest) (*ApiResponseVoucherMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodVoucherFailedByMerchant not implemented")
+}
+func (UnimplementedVoucherServiceServer) FindYearMethodVoucherFailedByMerchant(context.Context, *YearMethodVoucherByMerchantRequest) (*ApiResponseVoucherYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodVoucherFailedByMerchant not implemented")
 }
 func (UnimplementedVoucherServiceServer) mustEmbedUnimplementedVoucherServiceServer() {}
 func (UnimplementedVoucherServiceServer) testEmbeddedByValue()                        {}
@@ -445,6 +829,438 @@ func _VoucherService_DeleteAllPermanent_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VoucherService_FindMonthAmountVoucherSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountVoucherRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthAmountVoucherSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherSuccess(ctx, req.(*MonthAmountVoucherRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearAmountVoucherSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountVoucherRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearAmountVoucherSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherSuccess(ctx, req.(*YearAmountVoucherRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindMonthAmountVoucherFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountVoucherRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthAmountVoucherFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherFailed(ctx, req.(*MonthAmountVoucherRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearAmountVoucherFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountVoucherRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearAmountVoucherFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherFailed(ctx, req.(*YearAmountVoucherRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindMonthMethodVoucherSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountVoucherRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthMethodVoucherSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherSuccess(ctx, req.(*YearAmountVoucherRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearMethodVoucherSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountVoucherRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearMethodVoucherSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherSuccess(ctx, req.(*YearAmountVoucherRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindMonthMethodVoucherFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountVoucherRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthMethodVoucherFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherFailed(ctx, req.(*YearAmountVoucherRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearMethodVoucherFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountVoucherRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearMethodVoucherFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherFailed(ctx, req.(*YearAmountVoucherRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindMonthAmountVoucherSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountVoucherByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthAmountVoucherSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherSuccessById(ctx, req.(*MonthAmountVoucherByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearAmountVoucherSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountVoucherByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearAmountVoucherSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherSuccessById(ctx, req.(*YearAmountVoucherByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindMonthAmountVoucherFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountVoucherByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthAmountVoucherFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherFailedById(ctx, req.(*MonthAmountVoucherByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearAmountVoucherFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountVoucherByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearAmountVoucherFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherFailedById(ctx, req.(*YearAmountVoucherByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindMonthMethodVoucherSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodVoucherByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthMethodVoucherSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherSuccessById(ctx, req.(*MonthMethodVoucherByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearMethodVoucherSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodVoucherByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearMethodVoucherSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherSuccessById(ctx, req.(*YearMethodVoucherByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindMonthMethodVoucherFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodVoucherByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthMethodVoucherFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherFailedById(ctx, req.(*MonthMethodVoucherByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearMethodVoucherFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodVoucherByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearMethodVoucherFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherFailedById(ctx, req.(*YearMethodVoucherByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindMonthAmountVoucherSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountVoucherByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthAmountVoucherSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherSuccessByMerchant(ctx, req.(*MonthAmountVoucherByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearAmountVoucherSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountVoucherByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearAmountVoucherSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherSuccessByMerchant(ctx, req.(*YearAmountVoucherByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindMonthAmountVoucherFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountVoucherByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthAmountVoucherFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthAmountVoucherFailedByMerchant(ctx, req.(*MonthAmountVoucherByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearAmountVoucherFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountVoucherByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearAmountVoucherFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearAmountVoucherFailedByMerchant(ctx, req.(*YearAmountVoucherByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindMonthMethodVoucherSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodVoucherByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthMethodVoucherSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherSuccessByMerchant(ctx, req.(*MonthMethodVoucherByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearMethodVoucherSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodVoucherByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearMethodVoucherSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherSuccessByMerchant(ctx, req.(*YearMethodVoucherByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindMonthMethodVoucherFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodVoucherByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindMonthMethodVoucherFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindMonthMethodVoucherFailedByMerchant(ctx, req.(*MonthMethodVoucherByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VoucherService_FindYearMethodVoucherFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodVoucherByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VoucherService_FindYearMethodVoucherFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VoucherServiceServer).FindYearMethodVoucherFailedByMerchant(ctx, req.(*YearMethodVoucherByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VoucherService_ServiceDesc is the grpc.ServiceDesc for VoucherService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -495,6 +1311,102 @@ var VoucherService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAllPermanent",
 			Handler:    _VoucherService_DeleteAllPermanent_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountVoucherSuccess",
+			Handler:    _VoucherService_FindMonthAmountVoucherSuccess_Handler,
+		},
+		{
+			MethodName: "FindYearAmountVoucherSuccess",
+			Handler:    _VoucherService_FindYearAmountVoucherSuccess_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountVoucherFailed",
+			Handler:    _VoucherService_FindMonthAmountVoucherFailed_Handler,
+		},
+		{
+			MethodName: "FindYearAmountVoucherFailed",
+			Handler:    _VoucherService_FindYearAmountVoucherFailed_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodVoucherSuccess",
+			Handler:    _VoucherService_FindMonthMethodVoucherSuccess_Handler,
+		},
+		{
+			MethodName: "FindYearMethodVoucherSuccess",
+			Handler:    _VoucherService_FindYearMethodVoucherSuccess_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodVoucherFailed",
+			Handler:    _VoucherService_FindMonthMethodVoucherFailed_Handler,
+		},
+		{
+			MethodName: "FindYearMethodVoucherFailed",
+			Handler:    _VoucherService_FindYearMethodVoucherFailed_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountVoucherSuccessById",
+			Handler:    _VoucherService_FindMonthAmountVoucherSuccessById_Handler,
+		},
+		{
+			MethodName: "FindYearAmountVoucherSuccessById",
+			Handler:    _VoucherService_FindYearAmountVoucherSuccessById_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountVoucherFailedById",
+			Handler:    _VoucherService_FindMonthAmountVoucherFailedById_Handler,
+		},
+		{
+			MethodName: "FindYearAmountVoucherFailedById",
+			Handler:    _VoucherService_FindYearAmountVoucherFailedById_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodVoucherSuccessById",
+			Handler:    _VoucherService_FindMonthMethodVoucherSuccessById_Handler,
+		},
+		{
+			MethodName: "FindYearMethodVoucherSuccessById",
+			Handler:    _VoucherService_FindYearMethodVoucherSuccessById_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodVoucherFailedById",
+			Handler:    _VoucherService_FindMonthMethodVoucherFailedById_Handler,
+		},
+		{
+			MethodName: "FindYearMethodVoucherFailedById",
+			Handler:    _VoucherService_FindYearMethodVoucherFailedById_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountVoucherSuccessByMerchant",
+			Handler:    _VoucherService_FindMonthAmountVoucherSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearAmountVoucherSuccessByMerchant",
+			Handler:    _VoucherService_FindYearAmountVoucherSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountVoucherFailedByMerchant",
+			Handler:    _VoucherService_FindMonthAmountVoucherFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearAmountVoucherFailedByMerchant",
+			Handler:    _VoucherService_FindYearAmountVoucherFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodVoucherSuccessByMerchant",
+			Handler:    _VoucherService_FindMonthMethodVoucherSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearMethodVoucherSuccessByMerchant",
+			Handler:    _VoucherService_FindYearMethodVoucherSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodVoucherFailedByMerchant",
+			Handler:    _VoucherService_FindMonthMethodVoucherFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearMethodVoucherFailedByMerchant",
+			Handler:    _VoucherService_FindYearMethodVoucherFailedByMerchant_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -13,9 +13,66 @@ message FindAllCategoryRequest {
     string search = 3;
 }
 
+
+message MonthAmountCategoryRequest {
+    int32 year = 1;
+    int32 month = 2;
+}
+
+message YearAmountCategoryRequest {
+    int32 year = 1;
+}
+
+  
+message MonthAmountCategoryByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+    int32 month = 3;
+}
+
+message YearAmountCategoryByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+  
+  
+message MonthAmountCategoryByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+    int32 month = 3;
+}
+  
+
+message YearAmountCategoryByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+  
+message MonthMethodCategoryByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+  
+message YearMethodCategoryByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+  
+message MonthMethodCategoryByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+  
+message YearMethodCategoryByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+
+
 message FindByIdCategoryRequest {
     int32 id = 1;
 }
+
 
 message CreateCategoryRequest {
     string name = 1;
@@ -26,6 +83,66 @@ message UpdateCategoryRequest {
     string name = 2;
 }
 
+
+message MonthAmountCategorySuccessResponse {
+    int32 id = 1;
+    string category_name = 2;
+    string year = 3;
+    string month = 4;
+    int32 total_success = 5;
+    int32 total_amount = 6;
+}
+  
+
+message YearAmountCategorySuccessResponse {
+    int32 id = 1;
+    string category_name = 2;
+    string year = 3;
+    int32 total_success = 4;
+    int32 total_amount = 5;
+}
+  
+
+message MonthAmountCategoryFailedResponse {
+    int32 id = 1;
+    string category_name = 2;
+    string year = 3;
+    string month = 4;
+    int32 total_failed = 5;
+    int32 total_amount = 6;
+}
+  
+
+message YearAmountCategoryFailedResponse {
+    int32 id = 1;
+    string category_name = 2;
+    string year = 3;
+    int32 total_failed = 4;
+    int32 total_amount = 5;
+}
+  
+
+message MonthMethodCategoryResponse {
+    int32 id = 1;
+    string month = 2;
+    string category_name = 3;
+    string payment_method = 4;
+    int32 total_transactions = 5;
+    int32 total_amount = 6;
+}
+  
+
+message YearMethodCategoryResponse {
+    int32 id = 1;
+    string year = 2;
+    string category_name = 3;
+    string payment_method = 4;
+    int32 total_transactions = 5;
+    int32 total_amount = 6;
+}
+  
+
+  
 
 
 message CategoryResponse {
@@ -65,6 +182,42 @@ message ApiResponseCategoryDelete {
     string status = 1;
     string message = 2;
 }
+
+message ApiResponseCategoryMonthAmountSuccess {
+    string status = 1;
+    string message = 2;
+    repeated MonthAmountCategorySuccessResponse data = 3;
+}
+  
+message ApiResponseCategoryYearAmountSuccess {
+    string status = 1;
+    string message = 2;
+    repeated YearAmountCategorySuccessResponse data = 3;
+}
+  
+message ApiResponseCategoryMonthAmountFailed {
+    string status = 1;
+    string message = 2;
+    repeated MonthAmountCategoryFailedResponse data = 3;
+}
+  
+message ApiResponseCategoryYearAmountFailed {
+    string status = 1;
+    string message = 2;
+    repeated YearAmountCategoryFailedResponse data = 3;
+}
+  
+message ApiResponseCategoryMonthMethod {
+    string status = 1;
+    string message = 2;
+    repeated MonthMethodCategoryResponse data = 3;
+}
+  
+message ApiResponseCategoryYearMethod {
+    string status = 1;
+    string message = 2;
+    repeated YearMethodCategoryResponse data = 3;
+}
   
 message ApiResponseCategoryAll {
     string status = 1;
@@ -102,5 +255,37 @@ service CategoryService {
 
     rpc RestoreAll(google.protobuf.Empty) returns (ApiResponseCategoryAll){}
     rpc DeleteAllPermanent(google.protobuf.Empty) returns (ApiResponseCategoryAll){}
+
+
+    rpc FindMonthAmountCategorySuccess(MonthAmountCategoryRequest)returns(ApiResponseCategoryMonthAmountSuccess){}
+    rpc FindYearAmountCategorySuccess(YearAmountCategoryRequest)returns(ApiResponseCategoryYearAmountSuccess){}
+    rpc FindMonthAmountCategoryFailed(MonthAmountCategoryRequest)returns(ApiResponseCategoryMonthAmountFailed){}
+    rpc FindYearAmountCategoryFailed(YearAmountCategoryRequest)returns(ApiResponseCategoryYearAmountFailed){}
+
+    rpc FindMonthMethodCategorySuccess(YearAmountCategoryRequest)returns(ApiResponseCategoryMonthMethod){}
+    rpc FindYearMethodCategorySuccess(YearAmountCategoryRequest)returns(ApiResponseCategoryYearMethod){}
+    rpc FindMonthMethodCategoryFailed(YearAmountCategoryRequest)returns(ApiResponseCategoryMonthMethod){}
+    rpc FindYearMethodCategoryFailed(YearAmountCategoryRequest)returns(ApiResponseCategoryYearMethod){}
+
+
+    rpc FindMonthAmountCategorySuccessById(MonthAmountCategoryByIdRequest)returns(ApiResponseCategoryMonthAmountSuccess){}
+    rpc FindYearAmountCategorySuccessById(YearAmountCategoryByIdRequest)returns(ApiResponseCategoryYearAmountSuccess){}
+    rpc FindMonthAmountCategoryFailedById(MonthAmountCategoryByIdRequest)returns(ApiResponseCategoryMonthAmountFailed){}
+    rpc FindYearAmountCategoryFailedById(YearAmountCategoryByIdRequest)returns(ApiResponseCategoryYearAmountFailed){}
+
+    rpc FindMonthMethodCategorySuccessById(MonthMethodCategoryByIdRequest)returns(ApiResponseCategoryMonthMethod){}
+    rpc FindYearMethodCategorySuccessById(YearMethodCategoryByIdRequest)returns(ApiResponseCategoryYearMethod){}
+    rpc FindMonthMethodCategoryFailedById(MonthMethodCategoryByIdRequest)returns(ApiResponseCategoryMonthMethod){}
+    rpc FindYearMethodCategoryFailedById(YearMethodCategoryByIdRequest)returns(ApiResponseCategoryYearMethod){}
+
+    rpc FindMonthAmountCategorySuccessByMerchant(MonthAmountCategoryByMerchantRequest)returns(ApiResponseCategoryMonthAmountSuccess){}
+    rpc FindYearAmountCategorySuccessByMerchant(YearAmountCategoryByMerchantRequest)returns(ApiResponseCategoryYearAmountSuccess){}
+    rpc FindMonthAmountCategoryFailedByMerchant(MonthAmountCategoryByMerchantRequest)returns(ApiResponseCategoryMonthAmountFailed){}
+    rpc FindYearAmountCategoryFailedByMerchant(YearAmountCategoryByMerchantRequest)returns(ApiResponseCategoryYearAmountFailed){}
+
+    rpc FindMonthMethodCategorySuccessByMerchant(MonthMethodCategoryByMerchantRequest)returns(ApiResponseCategoryMonthMethod){}
+    rpc FindYearMethodCategorySuccessByMerchant(YearMethodCategoryByMerchantRequest)returns(ApiResponseCategoryYearMethod){}
+    rpc FindMonthMethodCategoryFailedByMerchant(MonthMethodCategoryByMerchantRequest)returns(ApiResponseCategoryMonthMethod){}
+    rpc FindYearMethodCategoryFailedByMerchant(YearMethodCategoryByMerchantRequest)returns(ApiResponseCategoryYearMethod){}
 }
 

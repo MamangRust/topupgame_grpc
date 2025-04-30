@@ -18,19 +18,57 @@ message FindByIdTransactionRequest {
     int32 id = 1;
 }
 
+message MonthAmountTransactionRequest {
+    int32 year = 1;
+    int32 month = 2;
+}
+
+message YearAmountTransactionRequest {
+    int32 year = 1;
+}
+
+  
+
+message MonthMethodTransactionByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+  
+
+message MonthAmountTransactionByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+    int32 month = 3;
+}
+
+  
+message YearAmountTransactionByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+  
+message MonthMethodTransactionByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+  
+message YearMethodTransactionByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+
 message TransactionResponse {
     int32 id = 1;
     int32 user_id = 2;
     int32 merchant_id = 3;
     int32 voucher_id = 4;
     int32 nominal_id = 5;
-    int32 category_id = 6;
-    int32 bank_id = 7;
-    string payment_method = 8;
-    string tax_rate = 9;
-    string status = 10;
-    string created_at = 11;
-    string updated_at = 12;
+    int32 bank_id = 6;
+    string payment_method = 7;
+    string tax_rate = 8;
+    string status = 9;
+    string created_at = 10;
+    string updated_at = 11;
 }
   
 
@@ -40,25 +78,68 @@ message TransactionResponseDeleteAt {
     int32 merchant_id = 3;
     int32 voucher_id = 4;
     int32 nominal_id = 5;
-    int32 category_id = 6;
-    int32 bank_id = 7;
-    string payment_method = 8;
-    string tax_rate = 9;
-    string status = 10;
-    string created_at = 11;
-    string updated_at = 12;
-    string deleted_at = 13;
+    int32 bank_id = 6;
+    string payment_method = 7;
+    string tax_rate = 8;
+    string status = 9;
+    string created_at = 10;
+    string updated_at = 11;
+    string deleted_at = 12;
 }
+
+
+message MonthAmountTransactionSuccessResponse {
+    string year = 1;
+    string month = 2;
+    int32 total_success = 3;
+    int32 total_amount = 4;
+}
+  
+message YearAmountTransactionSuccessResponse {
+    string year = 1;
+    int32 total_success = 2;
+    int32 total_amount = 3;
+}
+  
+message MonthAmountTransactionFailedResponse {
+    string year = 1;
+    string month = 2;
+    int32 total_failed = 3;
+    int32 total_amount = 4;
+}
+  
+message YearAmountTransactionFailedResponse {
+    string year = 1;
+    int32 total_failed = 2;
+    int32 total_amount = 3;
+}
+  
+message MonthMethodTransactionResponse {
+    string month = 1;
+    string payment_method = 2;
+    int32 total_transactions = 3;
+    int32 total_amount = 4;
+}
+  
+message YearMethodTransactionResponse {
+    string year = 1;
+    string payment_method = 2;
+    int32 total_transactions = 3;
+    int32 total_amount = 4;
+}
+  
+
+    
+
   
 message CreateTransactionRequest {
     int32 user_id = 1;
     int32 merchant_id = 2;
     int32 nominal_id = 3;
-    int32 category_id = 4;
-    int32 bank_id = 5;
-    string payment_method = 6;
-    string status = 7;
-    int32 voucher_id = 8; 
+    int32 bank_id = 4;
+    string payment_method = 5;
+    string status = 6;
+    int32 voucher_id = 7; 
 }
 
 message UpdateTransactionRequest {
@@ -66,17 +147,53 @@ message UpdateTransactionRequest {
     int32 user_id = 2;
     int32 merchant_id = 3;
     int32 nominal_id = 4; 
-    int32 category_id = 5; 
-    int32 bank_id = 6; 
-    string payment_method = 7; 
-    string status = 8; 
-    int32 voucher_id = 9; 
+    int32 bank_id = 5; 
+    string payment_method = 6; 
+    string status = 7; 
+    int32 voucher_id = 8; 
 }
 
 message ApiResponseTransaction {
     string status = 1;
     string message = 2;
     TransactionResponse data = 3;
+}
+
+
+message ApiResponseTransactionMonthAmountSuccess {
+    string status = 1;
+    string message = 2;
+    repeated MonthAmountTransactionSuccessResponse data = 3;
+}
+  
+message ApiResponseTransactionYearAmountSuccess {
+    string status = 1;
+    string message = 2;
+    repeated YearAmountTransactionSuccessResponse data = 3;
+}
+  
+message ApiResponseTransactionMonthAmountFailed {
+    string status = 1;
+    string message = 2;
+    repeated MonthAmountTransactionFailedResponse data = 3;
+}
+  
+message ApiResponseTransactionYearAmountFailed {
+    string status = 1;
+    string message = 2;
+    repeated YearAmountTransactionFailedResponse data = 3;
+}
+  
+message ApiResponseTransactionMonthMethod {
+    string status = 1;
+    string message = 2;
+    repeated MonthMethodTransactionResponse data = 3;
+}
+  
+message ApiResponseTransactionYearMethod {
+    string status = 1;
+    string message = 2;
+    repeated YearMethodTransactionResponse data = 3;
 }
 
 message ApiResponseTransactionDeleteAt {
@@ -132,4 +249,25 @@ service TransactionService {
 
     rpc RestoreAll(google.protobuf.Empty) returns (ApiResponseTransactionAll){}
     rpc DeleteAllPermanent(google.protobuf.Empty) returns (ApiResponseTransactionAll){}
+
+    rpc FindMonthAmountTransactionSuccess(MonthAmountTransactionRequest)returns(ApiResponseTransactionMonthAmountSuccess){}
+    rpc FindYearAmountTransactionSuccess(YearAmountTransactionRequest)returns(ApiResponseTransactionYearAmountSuccess){}
+    rpc FindMonthAmountTransactionFailed(MonthAmountTransactionRequest)returns(ApiResponseTransactionMonthAmountFailed){}
+    rpc FindYearAmountTransactionFailed(YearAmountTransactionRequest)returns(ApiResponseTransactionYearAmountFailed){}
+
+    rpc FindMonthMethodTransactionSuccess(YearAmountTransactionRequest)returns(ApiResponseTransactionMonthMethod){}
+    rpc FindYearMethodTransactionSuccess(YearAmountTransactionRequest)returns(ApiResponseTransactionYearMethod){}
+    rpc FindMonthMethodTransactionFailed(YearAmountTransactionRequest)returns(ApiResponseTransactionMonthMethod){}
+    rpc FindYearMethodTransactionFailed(YearAmountTransactionRequest)returns(ApiResponseTransactionYearMethod){}
+
+
+ rpc FindMonthAmountTransactionSuccessByMerchant(MonthAmountTransactionByMerchantRequest)returns(ApiResponseTransactionMonthAmountSuccess){}
+    rpc FindYearAmountTransactionSuccessByMerchant(YearAmountTransactionByMerchantRequest)returns(ApiResponseTransactionYearAmountSuccess){}
+    rpc FindMonthAmountTransactionFailedByMerchant(MonthAmountTransactionByMerchantRequest)returns(ApiResponseTransactionMonthAmountFailed){}
+    rpc FindYearAmountTransactionFailedByMerchant(YearAmountTransactionByMerchantRequest)returns(ApiResponseTransactionYearAmountFailed){}
+
+    rpc FindMonthMethodTransactionSuccessByMerchant(MonthMethodTransactionByMerchantRequest)returns(ApiResponseTransactionMonthMethod){}
+    rpc FindYearMethodTransactionSuccessByMerchant(YearMethodTransactionByMerchantRequest)returns(ApiResponseTransactionYearMethod){}
+    rpc FindMonthMethodTransactionFailedByMerchant(MonthMethodTransactionByMerchantRequest)returns(ApiResponseTransactionMonthMethod){}
+    rpc FindYearMethodTransactionFailedByMerchant(YearMethodTransactionByMerchantRequest)returns(ApiResponseTransactionYearMethod){}
 }

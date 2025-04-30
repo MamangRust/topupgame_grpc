@@ -21,6 +21,7 @@ type Seeder struct {
 	Role        *roleSeeder
 	UserRole    *userRoleSeeder
 	Bank        *bankSeeder
+	Merchant    *merchantSeeder
 	Category    *categorySeeder
 	Nominal     *nominalSeeder
 	Transaction *transactionSeeder
@@ -32,6 +33,7 @@ func NewSeeder(deps Deps) *Seeder {
 		User:        NewUserSeeder(deps.Db, deps.Hash, deps.Ctx, deps.Logger),
 		Role:        NewRoleSeeder(deps.Db, deps.Ctx, deps.Logger),
 		UserRole:    NewUserRoleSeeder(deps.Db, deps.Ctx, deps.Logger),
+		Merchant:    NewMerchantSeeder(deps.Db, deps.Ctx, deps.Logger),
 		Bank:        NewBankSeeder(deps.Db, deps.Ctx, deps.Logger),
 		Category:    NewCategorySeeder(deps.Db, deps.Ctx, deps.Logger),
 		Nominal:     NewNominalSeeder(deps.Db, deps.Ctx, deps.Logger),
@@ -53,6 +55,10 @@ func (s *Seeder) Run() error {
 		return err
 	}
 
+	if err := s.seedWithDelay("merchant", s.Merchant.Seed); err != nil {
+		return err
+	}
+
 	if err := s.seedWithDelay("bank", s.Bank.Seed); err != nil {
 		return err
 	}
@@ -61,15 +67,15 @@ func (s *Seeder) Run() error {
 		return err
 	}
 
+	if err := s.seedWithDelay("voucher", s.Voucher.Seed); err != nil {
+		return err
+	}
+
 	if err := s.seedWithDelay("nominal", s.Nominal.Seed); err != nil {
 		return err
 	}
 
 	if err := s.seedWithDelay("transaction", s.Transaction.Seed); err != nil {
-		return err
-	}
-
-	if err := s.seedWithDelay("voucher", s.Voucher.Seed); err != nil {
 		return err
 	}
 

@@ -20,17 +20,41 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BankService_FindAll_FullMethodName            = "/pb.BankService/FindAll"
-	BankService_FindById_FullMethodName           = "/pb.BankService/FindById"
-	BankService_FindByActive_FullMethodName       = "/pb.BankService/FindByActive"
-	BankService_FindByTrashed_FullMethodName      = "/pb.BankService/FindByTrashed"
-	BankService_Create_FullMethodName             = "/pb.BankService/Create"
-	BankService_Update_FullMethodName             = "/pb.BankService/Update"
-	BankService_Trashed_FullMethodName            = "/pb.BankService/Trashed"
-	BankService_Restore_FullMethodName            = "/pb.BankService/Restore"
-	BankService_DeletePermanent_FullMethodName    = "/pb.BankService/DeletePermanent"
-	BankService_RestoreAll_FullMethodName         = "/pb.BankService/RestoreAll"
-	BankService_DeleteAllPermanent_FullMethodName = "/pb.BankService/DeleteAllPermanent"
+	BankService_FindAll_FullMethodName                              = "/pb.BankService/FindAll"
+	BankService_FindById_FullMethodName                             = "/pb.BankService/FindById"
+	BankService_FindByActive_FullMethodName                         = "/pb.BankService/FindByActive"
+	BankService_FindByTrashed_FullMethodName                        = "/pb.BankService/FindByTrashed"
+	BankService_Create_FullMethodName                               = "/pb.BankService/Create"
+	BankService_Update_FullMethodName                               = "/pb.BankService/Update"
+	BankService_Trashed_FullMethodName                              = "/pb.BankService/Trashed"
+	BankService_Restore_FullMethodName                              = "/pb.BankService/Restore"
+	BankService_DeletePermanent_FullMethodName                      = "/pb.BankService/DeletePermanent"
+	BankService_RestoreAll_FullMethodName                           = "/pb.BankService/RestoreAll"
+	BankService_DeleteAllPermanent_FullMethodName                   = "/pb.BankService/DeleteAllPermanent"
+	BankService_FindMonthAmountBankSuccess_FullMethodName           = "/pb.BankService/FindMonthAmountBankSuccess"
+	BankService_FindYearAmountBankSuccess_FullMethodName            = "/pb.BankService/FindYearAmountBankSuccess"
+	BankService_FindMonthAmountBankFailed_FullMethodName            = "/pb.BankService/FindMonthAmountBankFailed"
+	BankService_FindYearAmountBankFailed_FullMethodName             = "/pb.BankService/FindYearAmountBankFailed"
+	BankService_FindMonthMethodBankSuccess_FullMethodName           = "/pb.BankService/FindMonthMethodBankSuccess"
+	BankService_FindYearMethodBankSuccess_FullMethodName            = "/pb.BankService/FindYearMethodBankSuccess"
+	BankService_FindMonthMethodBankFailed_FullMethodName            = "/pb.BankService/FindMonthMethodBankFailed"
+	BankService_FindYearMethodBankFailed_FullMethodName             = "/pb.BankService/FindYearMethodBankFailed"
+	BankService_FindMonthAmountBankSuccessById_FullMethodName       = "/pb.BankService/FindMonthAmountBankSuccessById"
+	BankService_FindYearAmountBankSuccessById_FullMethodName        = "/pb.BankService/FindYearAmountBankSuccessById"
+	BankService_FindMonthAmountBankFailedById_FullMethodName        = "/pb.BankService/FindMonthAmountBankFailedById"
+	BankService_FindYearAmountBankFailedById_FullMethodName         = "/pb.BankService/FindYearAmountBankFailedById"
+	BankService_FindMonthMethodBankSuccessById_FullMethodName       = "/pb.BankService/FindMonthMethodBankSuccessById"
+	BankService_FindYearMethodBankSuccessById_FullMethodName        = "/pb.BankService/FindYearMethodBankSuccessById"
+	BankService_FindMonthMethodBankFailedById_FullMethodName        = "/pb.BankService/FindMonthMethodBankFailedById"
+	BankService_FindYearMethodBankFailedById_FullMethodName         = "/pb.BankService/FindYearMethodBankFailedById"
+	BankService_FindMonthAmountBankSuccessByMerchant_FullMethodName = "/pb.BankService/FindMonthAmountBankSuccessByMerchant"
+	BankService_FindYearAmountBankSuccessByMerchant_FullMethodName  = "/pb.BankService/FindYearAmountBankSuccessByMerchant"
+	BankService_FindMonthAmountBankFailedByMerchant_FullMethodName  = "/pb.BankService/FindMonthAmountBankFailedByMerchant"
+	BankService_FindYearAmountBankFailedByMerchant_FullMethodName   = "/pb.BankService/FindYearAmountBankFailedByMerchant"
+	BankService_FindMonthMethodBankSuccessByMerchant_FullMethodName = "/pb.BankService/FindMonthMethodBankSuccessByMerchant"
+	BankService_FindYearMethodBankSuccessByMerchant_FullMethodName  = "/pb.BankService/FindYearMethodBankSuccessByMerchant"
+	BankService_FindMonthMethodBankFailedByMerchant_FullMethodName  = "/pb.BankService/FindMonthMethodBankFailedByMerchant"
+	BankService_FindYearMethodBankFailedByMerchant_FullMethodName   = "/pb.BankService/FindYearMethodBankFailedByMerchant"
 )
 
 // BankServiceClient is the client API for BankService service.
@@ -48,6 +72,30 @@ type BankServiceClient interface {
 	DeletePermanent(ctx context.Context, in *FindByIdBankRequest, opts ...grpc.CallOption) (*ApiResponseBankDelete, error)
 	RestoreAll(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ApiResponseBankAll, error)
 	DeleteAllPermanent(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ApiResponseBankAll, error)
+	FindMonthAmountBankSuccess(ctx context.Context, in *MonthAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountSuccess, error)
+	FindYearAmountBankSuccess(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountSuccess, error)
+	FindMonthAmountBankFailed(ctx context.Context, in *MonthAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountFailed, error)
+	FindYearAmountBankFailed(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountFailed, error)
+	FindMonthMethodBankSuccess(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankSuccess(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error)
+	FindMonthMethodBankFailed(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankFailed(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error)
+	FindMonthAmountBankSuccessById(ctx context.Context, in *MonthAmountBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountSuccess, error)
+	FindYearAmountBankSuccessById(ctx context.Context, in *YearAmountBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountSuccess, error)
+	FindMonthAmountBankFailedById(ctx context.Context, in *MonthAmountBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountFailed, error)
+	FindYearAmountBankFailedById(ctx context.Context, in *YearAmountBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountFailed, error)
+	FindMonthMethodBankSuccessById(ctx context.Context, in *MonthMethodBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankSuccessById(ctx context.Context, in *YearMethodBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error)
+	FindMonthMethodBankFailedById(ctx context.Context, in *MonthMethodBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankFailedById(ctx context.Context, in *YearMethodBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error)
+	FindMonthAmountBankSuccessByMerchant(ctx context.Context, in *MonthAmountBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountSuccess, error)
+	FindYearAmountBankSuccessByMerchant(ctx context.Context, in *YearAmountBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountSuccess, error)
+	FindMonthAmountBankFailedByMerchant(ctx context.Context, in *MonthAmountBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountFailed, error)
+	FindYearAmountBankFailedByMerchant(ctx context.Context, in *YearAmountBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountFailed, error)
+	FindMonthMethodBankSuccessByMerchant(ctx context.Context, in *MonthMethodBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankSuccessByMerchant(ctx context.Context, in *YearMethodBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error)
+	FindMonthMethodBankFailedByMerchant(ctx context.Context, in *MonthMethodBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankFailedByMerchant(ctx context.Context, in *YearMethodBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error)
 }
 
 type bankServiceClient struct {
@@ -168,6 +216,246 @@ func (c *bankServiceClient) DeleteAllPermanent(ctx context.Context, in *emptypb.
 	return out, nil
 }
 
+func (c *bankServiceClient) FindMonthAmountBankSuccess(ctx context.Context, in *MonthAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, BankService_FindMonthAmountBankSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearAmountBankSuccess(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearAmountSuccess)
+	err := c.cc.Invoke(ctx, BankService_FindYearAmountBankSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindMonthAmountBankFailed(ctx context.Context, in *MonthAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthAmountFailed)
+	err := c.cc.Invoke(ctx, BankService_FindMonthAmountBankFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearAmountBankFailed(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearAmountFailed)
+	err := c.cc.Invoke(ctx, BankService_FindYearAmountBankFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindMonthMethodBankSuccess(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthMethod)
+	err := c.cc.Invoke(ctx, BankService_FindMonthMethodBankSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearMethodBankSuccess(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearMethod)
+	err := c.cc.Invoke(ctx, BankService_FindYearMethodBankSuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindMonthMethodBankFailed(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthMethod)
+	err := c.cc.Invoke(ctx, BankService_FindMonthMethodBankFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearMethodBankFailed(ctx context.Context, in *YearAmountBankRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearMethod)
+	err := c.cc.Invoke(ctx, BankService_FindYearMethodBankFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindMonthAmountBankSuccessById(ctx context.Context, in *MonthAmountBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, BankService_FindMonthAmountBankSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearAmountBankSuccessById(ctx context.Context, in *YearAmountBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearAmountSuccess)
+	err := c.cc.Invoke(ctx, BankService_FindYearAmountBankSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindMonthAmountBankFailedById(ctx context.Context, in *MonthAmountBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthAmountFailed)
+	err := c.cc.Invoke(ctx, BankService_FindMonthAmountBankFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearAmountBankFailedById(ctx context.Context, in *YearAmountBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearAmountFailed)
+	err := c.cc.Invoke(ctx, BankService_FindYearAmountBankFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindMonthMethodBankSuccessById(ctx context.Context, in *MonthMethodBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthMethod)
+	err := c.cc.Invoke(ctx, BankService_FindMonthMethodBankSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearMethodBankSuccessById(ctx context.Context, in *YearMethodBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearMethod)
+	err := c.cc.Invoke(ctx, BankService_FindYearMethodBankSuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindMonthMethodBankFailedById(ctx context.Context, in *MonthMethodBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthMethod)
+	err := c.cc.Invoke(ctx, BankService_FindMonthMethodBankFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearMethodBankFailedById(ctx context.Context, in *YearMethodBankByIdRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearMethod)
+	err := c.cc.Invoke(ctx, BankService_FindYearMethodBankFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindMonthAmountBankSuccessByMerchant(ctx context.Context, in *MonthAmountBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, BankService_FindMonthAmountBankSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearAmountBankSuccessByMerchant(ctx context.Context, in *YearAmountBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearAmountSuccess)
+	err := c.cc.Invoke(ctx, BankService_FindYearAmountBankSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindMonthAmountBankFailedByMerchant(ctx context.Context, in *MonthAmountBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthAmountFailed)
+	err := c.cc.Invoke(ctx, BankService_FindMonthAmountBankFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearAmountBankFailedByMerchant(ctx context.Context, in *YearAmountBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearAmountFailed)
+	err := c.cc.Invoke(ctx, BankService_FindYearAmountBankFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindMonthMethodBankSuccessByMerchant(ctx context.Context, in *MonthMethodBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthMethod)
+	err := c.cc.Invoke(ctx, BankService_FindMonthMethodBankSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearMethodBankSuccessByMerchant(ctx context.Context, in *YearMethodBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearMethod)
+	err := c.cc.Invoke(ctx, BankService_FindYearMethodBankSuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindMonthMethodBankFailedByMerchant(ctx context.Context, in *MonthMethodBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankMonthMethod)
+	err := c.cc.Invoke(ctx, BankService_FindMonthMethodBankFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bankServiceClient) FindYearMethodBankFailedByMerchant(ctx context.Context, in *YearMethodBankByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseBankYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseBankYearMethod)
+	err := c.cc.Invoke(ctx, BankService_FindYearMethodBankFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BankServiceServer is the server API for BankService service.
 // All implementations must embed UnimplementedBankServiceServer
 // for forward compatibility.
@@ -183,6 +471,30 @@ type BankServiceServer interface {
 	DeletePermanent(context.Context, *FindByIdBankRequest) (*ApiResponseBankDelete, error)
 	RestoreAll(context.Context, *emptypb.Empty) (*ApiResponseBankAll, error)
 	DeleteAllPermanent(context.Context, *emptypb.Empty) (*ApiResponseBankAll, error)
+	FindMonthAmountBankSuccess(context.Context, *MonthAmountBankRequest) (*ApiResponseBankMonthAmountSuccess, error)
+	FindYearAmountBankSuccess(context.Context, *YearAmountBankRequest) (*ApiResponseBankYearAmountSuccess, error)
+	FindMonthAmountBankFailed(context.Context, *MonthAmountBankRequest) (*ApiResponseBankMonthAmountFailed, error)
+	FindYearAmountBankFailed(context.Context, *YearAmountBankRequest) (*ApiResponseBankYearAmountFailed, error)
+	FindMonthMethodBankSuccess(context.Context, *YearAmountBankRequest) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankSuccess(context.Context, *YearAmountBankRequest) (*ApiResponseBankYearMethod, error)
+	FindMonthMethodBankFailed(context.Context, *YearAmountBankRequest) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankFailed(context.Context, *YearAmountBankRequest) (*ApiResponseBankYearMethod, error)
+	FindMonthAmountBankSuccessById(context.Context, *MonthAmountBankByIdRequest) (*ApiResponseBankMonthAmountSuccess, error)
+	FindYearAmountBankSuccessById(context.Context, *YearAmountBankByIdRequest) (*ApiResponseBankYearAmountSuccess, error)
+	FindMonthAmountBankFailedById(context.Context, *MonthAmountBankByIdRequest) (*ApiResponseBankMonthAmountFailed, error)
+	FindYearAmountBankFailedById(context.Context, *YearAmountBankByIdRequest) (*ApiResponseBankYearAmountFailed, error)
+	FindMonthMethodBankSuccessById(context.Context, *MonthMethodBankByIdRequest) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankSuccessById(context.Context, *YearMethodBankByIdRequest) (*ApiResponseBankYearMethod, error)
+	FindMonthMethodBankFailedById(context.Context, *MonthMethodBankByIdRequest) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankFailedById(context.Context, *YearMethodBankByIdRequest) (*ApiResponseBankYearMethod, error)
+	FindMonthAmountBankSuccessByMerchant(context.Context, *MonthAmountBankByMerchantRequest) (*ApiResponseBankMonthAmountSuccess, error)
+	FindYearAmountBankSuccessByMerchant(context.Context, *YearAmountBankByMerchantRequest) (*ApiResponseBankYearAmountSuccess, error)
+	FindMonthAmountBankFailedByMerchant(context.Context, *MonthAmountBankByMerchantRequest) (*ApiResponseBankMonthAmountFailed, error)
+	FindYearAmountBankFailedByMerchant(context.Context, *YearAmountBankByMerchantRequest) (*ApiResponseBankYearAmountFailed, error)
+	FindMonthMethodBankSuccessByMerchant(context.Context, *MonthMethodBankByMerchantRequest) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankSuccessByMerchant(context.Context, *YearMethodBankByMerchantRequest) (*ApiResponseBankYearMethod, error)
+	FindMonthMethodBankFailedByMerchant(context.Context, *MonthMethodBankByMerchantRequest) (*ApiResponseBankMonthMethod, error)
+	FindYearMethodBankFailedByMerchant(context.Context, *YearMethodBankByMerchantRequest) (*ApiResponseBankYearMethod, error)
 	mustEmbedUnimplementedBankServiceServer()
 }
 
@@ -225,6 +537,78 @@ func (UnimplementedBankServiceServer) RestoreAll(context.Context, *emptypb.Empty
 }
 func (UnimplementedBankServiceServer) DeleteAllPermanent(context.Context, *emptypb.Empty) (*ApiResponseBankAll, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAllPermanent not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthAmountBankSuccess(context.Context, *MonthAmountBankRequest) (*ApiResponseBankMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountBankSuccess not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearAmountBankSuccess(context.Context, *YearAmountBankRequest) (*ApiResponseBankYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountBankSuccess not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthAmountBankFailed(context.Context, *MonthAmountBankRequest) (*ApiResponseBankMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountBankFailed not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearAmountBankFailed(context.Context, *YearAmountBankRequest) (*ApiResponseBankYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountBankFailed not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthMethodBankSuccess(context.Context, *YearAmountBankRequest) (*ApiResponseBankMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodBankSuccess not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearMethodBankSuccess(context.Context, *YearAmountBankRequest) (*ApiResponseBankYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodBankSuccess not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthMethodBankFailed(context.Context, *YearAmountBankRequest) (*ApiResponseBankMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodBankFailed not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearMethodBankFailed(context.Context, *YearAmountBankRequest) (*ApiResponseBankYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodBankFailed not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthAmountBankSuccessById(context.Context, *MonthAmountBankByIdRequest) (*ApiResponseBankMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountBankSuccessById not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearAmountBankSuccessById(context.Context, *YearAmountBankByIdRequest) (*ApiResponseBankYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountBankSuccessById not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthAmountBankFailedById(context.Context, *MonthAmountBankByIdRequest) (*ApiResponseBankMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountBankFailedById not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearAmountBankFailedById(context.Context, *YearAmountBankByIdRequest) (*ApiResponseBankYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountBankFailedById not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthMethodBankSuccessById(context.Context, *MonthMethodBankByIdRequest) (*ApiResponseBankMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodBankSuccessById not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearMethodBankSuccessById(context.Context, *YearMethodBankByIdRequest) (*ApiResponseBankYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodBankSuccessById not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthMethodBankFailedById(context.Context, *MonthMethodBankByIdRequest) (*ApiResponseBankMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodBankFailedById not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearMethodBankFailedById(context.Context, *YearMethodBankByIdRequest) (*ApiResponseBankYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodBankFailedById not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthAmountBankSuccessByMerchant(context.Context, *MonthAmountBankByMerchantRequest) (*ApiResponseBankMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountBankSuccessByMerchant not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearAmountBankSuccessByMerchant(context.Context, *YearAmountBankByMerchantRequest) (*ApiResponseBankYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountBankSuccessByMerchant not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthAmountBankFailedByMerchant(context.Context, *MonthAmountBankByMerchantRequest) (*ApiResponseBankMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountBankFailedByMerchant not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearAmountBankFailedByMerchant(context.Context, *YearAmountBankByMerchantRequest) (*ApiResponseBankYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountBankFailedByMerchant not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthMethodBankSuccessByMerchant(context.Context, *MonthMethodBankByMerchantRequest) (*ApiResponseBankMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodBankSuccessByMerchant not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearMethodBankSuccessByMerchant(context.Context, *YearMethodBankByMerchantRequest) (*ApiResponseBankYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodBankSuccessByMerchant not implemented")
+}
+func (UnimplementedBankServiceServer) FindMonthMethodBankFailedByMerchant(context.Context, *MonthMethodBankByMerchantRequest) (*ApiResponseBankMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodBankFailedByMerchant not implemented")
+}
+func (UnimplementedBankServiceServer) FindYearMethodBankFailedByMerchant(context.Context, *YearMethodBankByMerchantRequest) (*ApiResponseBankYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodBankFailedByMerchant not implemented")
 }
 func (UnimplementedBankServiceServer) mustEmbedUnimplementedBankServiceServer() {}
 func (UnimplementedBankServiceServer) testEmbeddedByValue()                     {}
@@ -445,6 +829,438 @@ func _BankService_DeleteAllPermanent_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BankService_FindMonthAmountBankSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountBankRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthAmountBankSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthAmountBankSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthAmountBankSuccess(ctx, req.(*MonthAmountBankRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearAmountBankSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountBankRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearAmountBankSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearAmountBankSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearAmountBankSuccess(ctx, req.(*YearAmountBankRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindMonthAmountBankFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountBankRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthAmountBankFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthAmountBankFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthAmountBankFailed(ctx, req.(*MonthAmountBankRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearAmountBankFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountBankRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearAmountBankFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearAmountBankFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearAmountBankFailed(ctx, req.(*YearAmountBankRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindMonthMethodBankSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountBankRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthMethodBankSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthMethodBankSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthMethodBankSuccess(ctx, req.(*YearAmountBankRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearMethodBankSuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountBankRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearMethodBankSuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearMethodBankSuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearMethodBankSuccess(ctx, req.(*YearAmountBankRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindMonthMethodBankFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountBankRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthMethodBankFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthMethodBankFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthMethodBankFailed(ctx, req.(*YearAmountBankRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearMethodBankFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountBankRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearMethodBankFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearMethodBankFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearMethodBankFailed(ctx, req.(*YearAmountBankRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindMonthAmountBankSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountBankByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthAmountBankSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthAmountBankSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthAmountBankSuccessById(ctx, req.(*MonthAmountBankByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearAmountBankSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountBankByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearAmountBankSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearAmountBankSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearAmountBankSuccessById(ctx, req.(*YearAmountBankByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindMonthAmountBankFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountBankByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthAmountBankFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthAmountBankFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthAmountBankFailedById(ctx, req.(*MonthAmountBankByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearAmountBankFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountBankByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearAmountBankFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearAmountBankFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearAmountBankFailedById(ctx, req.(*YearAmountBankByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindMonthMethodBankSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodBankByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthMethodBankSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthMethodBankSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthMethodBankSuccessById(ctx, req.(*MonthMethodBankByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearMethodBankSuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodBankByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearMethodBankSuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearMethodBankSuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearMethodBankSuccessById(ctx, req.(*YearMethodBankByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindMonthMethodBankFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodBankByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthMethodBankFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthMethodBankFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthMethodBankFailedById(ctx, req.(*MonthMethodBankByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearMethodBankFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodBankByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearMethodBankFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearMethodBankFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearMethodBankFailedById(ctx, req.(*YearMethodBankByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindMonthAmountBankSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountBankByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthAmountBankSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthAmountBankSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthAmountBankSuccessByMerchant(ctx, req.(*MonthAmountBankByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearAmountBankSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountBankByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearAmountBankSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearAmountBankSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearAmountBankSuccessByMerchant(ctx, req.(*YearAmountBankByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindMonthAmountBankFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountBankByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthAmountBankFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthAmountBankFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthAmountBankFailedByMerchant(ctx, req.(*MonthAmountBankByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearAmountBankFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountBankByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearAmountBankFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearAmountBankFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearAmountBankFailedByMerchant(ctx, req.(*YearAmountBankByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindMonthMethodBankSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodBankByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthMethodBankSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthMethodBankSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthMethodBankSuccessByMerchant(ctx, req.(*MonthMethodBankByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearMethodBankSuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodBankByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearMethodBankSuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearMethodBankSuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearMethodBankSuccessByMerchant(ctx, req.(*YearMethodBankByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindMonthMethodBankFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodBankByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindMonthMethodBankFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindMonthMethodBankFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindMonthMethodBankFailedByMerchant(ctx, req.(*MonthMethodBankByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BankService_FindYearMethodBankFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodBankByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankServiceServer).FindYearMethodBankFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankService_FindYearMethodBankFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankServiceServer).FindYearMethodBankFailedByMerchant(ctx, req.(*YearMethodBankByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BankService_ServiceDesc is the grpc.ServiceDesc for BankService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -495,6 +1311,102 @@ var BankService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAllPermanent",
 			Handler:    _BankService_DeleteAllPermanent_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountBankSuccess",
+			Handler:    _BankService_FindMonthAmountBankSuccess_Handler,
+		},
+		{
+			MethodName: "FindYearAmountBankSuccess",
+			Handler:    _BankService_FindYearAmountBankSuccess_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountBankFailed",
+			Handler:    _BankService_FindMonthAmountBankFailed_Handler,
+		},
+		{
+			MethodName: "FindYearAmountBankFailed",
+			Handler:    _BankService_FindYearAmountBankFailed_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodBankSuccess",
+			Handler:    _BankService_FindMonthMethodBankSuccess_Handler,
+		},
+		{
+			MethodName: "FindYearMethodBankSuccess",
+			Handler:    _BankService_FindYearMethodBankSuccess_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodBankFailed",
+			Handler:    _BankService_FindMonthMethodBankFailed_Handler,
+		},
+		{
+			MethodName: "FindYearMethodBankFailed",
+			Handler:    _BankService_FindYearMethodBankFailed_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountBankSuccessById",
+			Handler:    _BankService_FindMonthAmountBankSuccessById_Handler,
+		},
+		{
+			MethodName: "FindYearAmountBankSuccessById",
+			Handler:    _BankService_FindYearAmountBankSuccessById_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountBankFailedById",
+			Handler:    _BankService_FindMonthAmountBankFailedById_Handler,
+		},
+		{
+			MethodName: "FindYearAmountBankFailedById",
+			Handler:    _BankService_FindYearAmountBankFailedById_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodBankSuccessById",
+			Handler:    _BankService_FindMonthMethodBankSuccessById_Handler,
+		},
+		{
+			MethodName: "FindYearMethodBankSuccessById",
+			Handler:    _BankService_FindYearMethodBankSuccessById_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodBankFailedById",
+			Handler:    _BankService_FindMonthMethodBankFailedById_Handler,
+		},
+		{
+			MethodName: "FindYearMethodBankFailedById",
+			Handler:    _BankService_FindYearMethodBankFailedById_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountBankSuccessByMerchant",
+			Handler:    _BankService_FindMonthAmountBankSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearAmountBankSuccessByMerchant",
+			Handler:    _BankService_FindYearAmountBankSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountBankFailedByMerchant",
+			Handler:    _BankService_FindMonthAmountBankFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearAmountBankFailedByMerchant",
+			Handler:    _BankService_FindYearAmountBankFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodBankSuccessByMerchant",
+			Handler:    _BankService_FindMonthMethodBankSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearMethodBankSuccessByMerchant",
+			Handler:    _BankService_FindYearMethodBankSuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodBankFailedByMerchant",
+			Handler:    _BankService_FindMonthMethodBankFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearMethodBankFailedByMerchant",
+			Handler:    _BankService_FindYearMethodBankFailedByMerchant_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

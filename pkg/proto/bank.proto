@@ -28,6 +28,118 @@ message UpdateBankRequest{
     string name = 2;
 }
 
+message MonthAmountBankRequest {
+    int32 year = 1;
+    int32 month = 2;
+}
+
+message YearAmountBankRequest {
+    int32 year = 1;
+}
+
+  
+message MonthAmountBankByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+    int32 month = 3;
+}
+  
+message MonthAmountBankByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+    int32 month = 3;
+}
+  
+message YearAmountBankByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+  
+message YearAmountBankByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+  
+message MonthMethodBankByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+  
+message YearMethodBankByIdRequest {
+    int32 id = 1;
+    int32 year = 2;
+}
+  
+message MonthMethodBankByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+  
+message YearMethodBankByMerchantRequest {
+    int32 merchant_id = 1;
+    int32 year = 2;
+}
+
+
+message MonthAmountBankSuccessResponse {
+    int32 id = 1;
+    string bank_name = 2;
+    string year = 3;
+    string month = 4;
+    int32 total_success = 5;
+    int32 total_amount = 6;
+  }
+  
+
+message YearAmountBankSuccessResponse {
+    int32 id = 1;
+    string bank_name = 2;
+    string year = 3;
+    int32 total_success = 4;
+    int32 total_amount = 5;
+}
+  
+
+message MonthAmountBankFailedResponse {
+    int32 id = 1;
+    string bank_name = 2;
+    string year = 3;
+    string month = 4;
+    int32 total_failed = 5;
+    int32 total_amount = 6;
+}
+  
+
+message YearAmountBankFailedResponse {
+    int32 id = 1;
+    string bank_name = 2;
+    string year = 3;
+    int32 total_failed = 4;
+    int32 total_amount = 5;
+}
+  
+
+message MonthMethodBankResponse {
+    int32 id = 1;
+    string month = 2;
+    string bank_name = 3;
+    string payment_method = 4;
+    int32 total_transactions = 5;
+    int32 total_amount = 6;
+}
+  
+
+message YearMethodBankResponse {
+    int32 id = 1;
+    string year = 2;
+    string bank_name = 3;
+    string payment_method = 4;
+    int32 total_transactions = 5;
+    int32 total_amount = 6;
+}
+  
+  
+
 
 message BankResponse {
     int32 id = 1;
@@ -42,6 +154,43 @@ message BankResponseDeleteAt {
     string created_at = 3;
     string updated_at = 4;
     string deleted_at = 5;
+}
+
+
+message ApiResponseBankMonthAmountSuccess {
+    string status = 1;
+    string message = 2;
+    repeated MonthAmountBankSuccessResponse data = 3;
+}
+  
+message ApiResponseBankYearAmountSuccess {
+    string status = 1;
+    string message = 2;
+    repeated YearAmountBankSuccessResponse data = 3;
+}
+  
+message ApiResponseBankMonthAmountFailed {
+    string status = 1;
+    string message = 2;
+    repeated MonthAmountBankFailedResponse data = 3;
+}
+  
+message ApiResponseBankYearAmountFailed {
+    string status = 1;
+    string message = 2;
+    repeated YearAmountBankFailedResponse data = 3;
+}
+  
+message ApiResponseBankMonthMethod {
+    string status = 1;
+    string message = 2;
+    repeated MonthMethodBankResponse data = 3;
+}
+  
+message ApiResponseBankYearMethod {
+    string status = 1;
+    string message = 2;
+    repeated YearMethodBankResponse data = 3;
 }
 
 message ApiResponseBankAll{
@@ -105,5 +254,37 @@ service BankService{
     rpc DeletePermanent(FindByIdBankRequest) returns (ApiResponseBankDelete) {}
     rpc RestoreAll(google.protobuf.Empty) returns (ApiResponseBankAll){}
     rpc DeleteAllPermanent(google.protobuf.Empty) returns (ApiResponseBankAll){}
+
+    rpc FindMonthAmountBankSuccess(MonthAmountBankRequest)returns(ApiResponseBankMonthAmountSuccess){}
+    rpc FindYearAmountBankSuccess(YearAmountBankRequest)returns(ApiResponseBankYearAmountSuccess){}
+    rpc FindMonthAmountBankFailed(MonthAmountBankRequest)returns(ApiResponseBankMonthAmountFailed){}
+    rpc FindYearAmountBankFailed(YearAmountBankRequest)returns(ApiResponseBankYearAmountFailed){}
+
+    rpc FindMonthMethodBankSuccess(YearAmountBankRequest)returns(ApiResponseBankMonthMethod){}
+    rpc FindYearMethodBankSuccess(YearAmountBankRequest)returns(ApiResponseBankYearMethod){}
+    rpc FindMonthMethodBankFailed(YearAmountBankRequest)returns(ApiResponseBankMonthMethod){}
+    rpc FindYearMethodBankFailed(YearAmountBankRequest)returns(ApiResponseBankYearMethod){}
+
+
+    rpc FindMonthAmountBankSuccessById(MonthAmountBankByIdRequest)returns(ApiResponseBankMonthAmountSuccess){}
+    rpc FindYearAmountBankSuccessById(YearAmountBankByIdRequest)returns(ApiResponseBankYearAmountSuccess){}
+    rpc FindMonthAmountBankFailedById(MonthAmountBankByIdRequest)returns(ApiResponseBankMonthAmountFailed){}
+    rpc FindYearAmountBankFailedById(YearAmountBankByIdRequest)returns(ApiResponseBankYearAmountFailed){}
+
+    rpc FindMonthMethodBankSuccessById(MonthMethodBankByIdRequest)returns(ApiResponseBankMonthMethod){}
+    rpc FindYearMethodBankSuccessById(YearMethodBankByIdRequest)returns(ApiResponseBankYearMethod){}
+    rpc FindMonthMethodBankFailedById(MonthMethodBankByIdRequest)returns(ApiResponseBankMonthMethod){}
+    rpc FindYearMethodBankFailedById(YearMethodBankByIdRequest)returns(ApiResponseBankYearMethod){}
+
+    rpc FindMonthAmountBankSuccessByMerchant(MonthAmountBankByMerchantRequest)returns(ApiResponseBankMonthAmountSuccess){}
+    rpc FindYearAmountBankSuccessByMerchant(YearAmountBankByMerchantRequest)returns(ApiResponseBankYearAmountSuccess){}
+    rpc FindMonthAmountBankFailedByMerchant(MonthAmountBankByMerchantRequest)returns(ApiResponseBankMonthAmountFailed){}
+    rpc FindYearAmountBankFailedByMerchant(YearAmountBankByMerchantRequest)returns(ApiResponseBankYearAmountFailed){}
+
+    rpc FindMonthMethodBankSuccessByMerchant(MonthMethodBankByMerchantRequest)returns(ApiResponseBankMonthMethod){}
+    rpc FindYearMethodBankSuccessByMerchant(YearMethodBankByMerchantRequest)returns(ApiResponseBankYearMethod){}
+    rpc FindMonthMethodBankFailedByMerchant(MonthMethodBankByMerchantRequest)returns(ApiResponseBankMonthMethod){}
+    rpc FindYearMethodBankFailedByMerchant(YearMethodBankByMerchantRequest)returns(ApiResponseBankYearMethod){}
+
 }
 

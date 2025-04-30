@@ -6,6 +6,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 type Querier interface {
@@ -86,6 +87,206 @@ type Querier interface {
 	GetMerchantsActive(ctx context.Context, arg GetMerchantsActiveParams) ([]*GetMerchantsActiveRow, error)
 	// Get Trashed Merchants with Pagination and Total Count
 	GetMerchantsTrashed(ctx context.Context, arg GetMerchantsTrashedParams) ([]*GetMerchantsTrashedRow, error)
+	GetMonthAmountBankFailed(ctx context.Context, arg GetMonthAmountBankFailedParams) ([]*GetMonthAmountBankFailedRow, error)
+	GetMonthAmountBankFailedById(ctx context.Context, arg GetMonthAmountBankFailedByIdParams) ([]*GetMonthAmountBankFailedByIdRow, error)
+	GetMonthAmountBankFailedByMerchant(ctx context.Context, arg GetMonthAmountBankFailedByMerchantParams) ([]*GetMonthAmountBankFailedByMerchantRow, error)
+	GetMonthAmountBankSuccess(ctx context.Context, arg GetMonthAmountBankSuccessParams) ([]*GetMonthAmountBankSuccessRow, error)
+	GetMonthAmountBankSuccessById(ctx context.Context, arg GetMonthAmountBankSuccessByIdParams) ([]*GetMonthAmountBankSuccessByIdRow, error)
+	GetMonthAmountBankSuccessByMerchant(ctx context.Context, arg GetMonthAmountBankSuccessByMerchantParams) ([]*GetMonthAmountBankSuccessByMerchantRow, error)
+	GetMonthAmountCategoryFailed(ctx context.Context, arg GetMonthAmountCategoryFailedParams) ([]*GetMonthAmountCategoryFailedRow, error)
+	GetMonthAmountCategoryFailedById(ctx context.Context, arg GetMonthAmountCategoryFailedByIdParams) ([]*GetMonthAmountCategoryFailedByIdRow, error)
+	GetMonthAmountCategoryFailedByMerchant(ctx context.Context, arg GetMonthAmountCategoryFailedByMerchantParams) ([]*GetMonthAmountCategoryFailedByMerchantRow, error)
+	GetMonthAmountCategorySuccess(ctx context.Context, arg GetMonthAmountCategorySuccessParams) ([]*GetMonthAmountCategorySuccessRow, error)
+	GetMonthAmountCategorySuccessById(ctx context.Context, arg GetMonthAmountCategorySuccessByIdParams) ([]*GetMonthAmountCategorySuccessByIdRow, error)
+	GetMonthAmountCategorySuccessByMerchant(ctx context.Context, arg GetMonthAmountCategorySuccessByMerchantParams) ([]*GetMonthAmountCategorySuccessByMerchantRow, error)
+	GetMonthAmountNominalsFailed(ctx context.Context, arg GetMonthAmountNominalsFailedParams) ([]*GetMonthAmountNominalsFailedRow, error)
+	GetMonthAmountNominalsFailedById(ctx context.Context, arg GetMonthAmountNominalsFailedByIdParams) ([]*GetMonthAmountNominalsFailedByIdRow, error)
+	GetMonthAmountNominalsFailedByMerchant(ctx context.Context, arg GetMonthAmountNominalsFailedByMerchantParams) ([]*GetMonthAmountNominalsFailedByMerchantRow, error)
+	GetMonthAmountNominalsSuccess(ctx context.Context, arg GetMonthAmountNominalsSuccessParams) ([]*GetMonthAmountNominalsSuccessRow, error)
+	GetMonthAmountNominalsSuccessById(ctx context.Context, arg GetMonthAmountNominalsSuccessByIdParams) ([]*GetMonthAmountNominalsSuccessByIdRow, error)
+	GetMonthAmountNominalsSuccessByMerchant(ctx context.Context, arg GetMonthAmountNominalsSuccessByMerchantParams) ([]*GetMonthAmountNominalsSuccessByMerchantRow, error)
+	GetMonthAmountVouchersFailed(ctx context.Context, arg GetMonthAmountVouchersFailedParams) ([]*GetMonthAmountVouchersFailedRow, error)
+	GetMonthAmountVouchersFailedById(ctx context.Context, arg GetMonthAmountVouchersFailedByIdParams) ([]*GetMonthAmountVouchersFailedByIdRow, error)
+	GetMonthAmountVouchersFailedByMerchant(ctx context.Context, arg GetMonthAmountVouchersFailedByMerchantParams) ([]*GetMonthAmountVouchersFailedByMerchantRow, error)
+	GetMonthAmountVouchersSuccess(ctx context.Context, arg GetMonthAmountVouchersSuccessParams) ([]*GetMonthAmountVouchersSuccessRow, error)
+	GetMonthAmountVouchersSuccessById(ctx context.Context, arg GetMonthAmountVouchersSuccessByIdParams) ([]*GetMonthAmountVouchersSuccessByIdRow, error)
+	GetMonthAmountVouchersSuccessByMerchant(ctx context.Context, arg GetMonthAmountVouchersSuccessByMerchantParams) ([]*GetMonthAmountVouchersSuccessByMerchantRow, error)
+	GetMonthBankMethodsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetMonthBankMethodsFailedRow, error)
+	GetMonthBankMethodsFailedById(ctx context.Context, arg GetMonthBankMethodsFailedByIdParams) ([]*GetMonthBankMethodsFailedByIdRow, error)
+	GetMonthBankMethodsFailedByMerchant(ctx context.Context, arg GetMonthBankMethodsFailedByMerchantParams) ([]*GetMonthBankMethodsFailedByMerchantRow, error)
+	GetMonthBankMethodsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetMonthBankMethodsSuccessRow, error)
+	GetMonthBankMethodsSuccessById(ctx context.Context, arg GetMonthBankMethodsSuccessByIdParams) ([]*GetMonthBankMethodsSuccessByIdRow, error)
+	GetMonthBankMethodsSuccessByMerchant(ctx context.Context, arg GetMonthBankMethodsSuccessByMerchantParams) ([]*GetMonthBankMethodsSuccessByMerchantRow, error)
+	GetMonthMethodCategoriesFailed(ctx context.Context, dollar_1 time.Time) ([]*GetMonthMethodCategoriesFailedRow, error)
+	GetMonthMethodCategoriesFailedById(ctx context.Context, arg GetMonthMethodCategoriesFailedByIdParams) ([]*GetMonthMethodCategoriesFailedByIdRow, error)
+	GetMonthMethodCategoriesFailedByMerchant(ctx context.Context, arg GetMonthMethodCategoriesFailedByMerchantParams) ([]*GetMonthMethodCategoriesFailedByMerchantRow, error)
+	GetMonthMethodCategoriesSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetMonthMethodCategoriesSuccessRow, error)
+	GetMonthMethodCategoriesSuccessById(ctx context.Context, arg GetMonthMethodCategoriesSuccessByIdParams) ([]*GetMonthMethodCategoriesSuccessByIdRow, error)
+	GetMonthMethodCategoriesSuccessByMerchant(ctx context.Context, arg GetMonthMethodCategoriesSuccessByMerchantParams) ([]*GetMonthMethodCategoriesSuccessByMerchantRow, error)
+	GetMonthMethodNominalsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetMonthMethodNominalsFailedRow, error)
+	GetMonthMethodNominalsFailedById(ctx context.Context, arg GetMonthMethodNominalsFailedByIdParams) ([]*GetMonthMethodNominalsFailedByIdRow, error)
+	GetMonthMethodNominalsFailedByMerchant(ctx context.Context, arg GetMonthMethodNominalsFailedByMerchantParams) ([]*GetMonthMethodNominalsFailedByMerchantRow, error)
+	GetMonthMethodNominalsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetMonthMethodNominalsSuccessRow, error)
+	GetMonthMethodNominalsSuccessById(ctx context.Context, arg GetMonthMethodNominalsSuccessByIdParams) ([]*GetMonthMethodNominalsSuccessByIdRow, error)
+	GetMonthMethodNominalsSuccessByMerchant(ctx context.Context, arg GetMonthMethodNominalsSuccessByMerchantParams) ([]*GetMonthMethodNominalsSuccessByMerchantRow, error)
+	GetMonthMethodVouchersFailed(ctx context.Context, dollar_1 time.Time) ([]*GetMonthMethodVouchersFailedRow, error)
+	GetMonthMethodVouchersFailedById(ctx context.Context, arg GetMonthMethodVouchersFailedByIdParams) ([]*GetMonthMethodVouchersFailedByIdRow, error)
+	GetMonthMethodVouchersFailedByMerchant(ctx context.Context, arg GetMonthMethodVouchersFailedByMerchantParams) ([]*GetMonthMethodVouchersFailedByMerchantRow, error)
+	GetMonthMethodVouchersSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetMonthMethodVouchersSuccessRow, error)
+	GetMonthMethodVouchersSuccessById(ctx context.Context, arg GetMonthMethodVouchersSuccessByIdParams) ([]*GetMonthMethodVouchersSuccessByIdRow, error)
+	GetMonthMethodVouchersSuccessByMerchant(ctx context.Context, arg GetMonthMethodVouchersSuccessByMerchantParams) ([]*GetMonthMethodVouchersSuccessByMerchantRow, error)
+	// GetMonthlyAmountTransactionFailed: Retrieves monthly failed transaction metrics
+	// Purpose: Generate monthly reports of failed transactions for analysis
+	// Parameters:
+	//   $1: Start date of first comparison period (timestamp)
+	//   $2: End date of first comparison period (timestamp)
+	//   $3: Start date of second comparison period (timestamp)
+	//   $4: End date of second comparison period (timestamp)
+	// Returns:
+	//   year: Year as text
+	//   month: 3-letter month abbreviation (e.g. 'Jan')
+	//   total_failed: Count of failed transactions
+	//   total_amount: Sum of failed transaction amounts
+	// Business Logic:
+	//   - Only includes failed (payment_status = 'failed') transactions
+	//   - Excludes deleted transactions
+	//   - Compares two customizable time periods
+	//   - Includes gap-filling for months with no failed transactions
+	//   - Returns 0 values for months with no failed transactions
+	//   - Orders by most recent year/month first
+	GetMonthlyAmountTransactionFailed(ctx context.Context, arg GetMonthlyAmountTransactionFailedParams) ([]*GetMonthlyAmountTransactionFailedRow, error)
+	// GetMonthlyAmountTransactionFailedByMerchant: Retrieves monthly failed transaction metrics
+	// Purpose: Generate monthly reports of failed transactions for analysis by merchant_id
+	// Parameters:
+	//   $1: Start date of first comparison period (timestamp)
+	//   $2: End date of first comparison period (timestamp)
+	//   $3: Start date of second comparison period (timestamp)
+	//   $4: End date of second comparison period (timestamp)
+	//   $5: Merchant ID
+	// Returns:
+	//   year: Year as text
+	//   month: 3-letter month abbreviation (e.g. 'Jan')
+	//   total_failed: Count of failed transactions
+	//   total_amount: Sum of failed transaction amounts
+	// Business Logic:
+	//   - Only includes failed (payment_status = 'failed') transactions
+	//   - Excludes deleted transactions
+	//   - Compares two customizable time periods
+	//   - Includes gap-filling for months with no failed transactions
+	//   - Returns 0 values for months with no failed transactions
+	//   - Orders by most recent year/month first
+	GetMonthlyAmountTransactionFailedByMerchant(ctx context.Context, arg GetMonthlyAmountTransactionFailedByMerchantParams) ([]*GetMonthlyAmountTransactionFailedByMerchantRow, error)
+	// GetMonthlyAmountTransactionSuccess: Retrieves monthly success transaction metrics
+	// Purpose: Generate monthly reports of successful transactions for analysis
+	// Parameters:
+	//   $1: Start date of first comparison period (timestamp)
+	//   $2: End date of first comparison period (timestamp)
+	//   $3: Start date of second comparison period (timestamp)
+	//   $4: End date of second comparison period (timestamp)
+	// Returns:
+	//   year: Year as text
+	//   month: 3-letter month abbreviation (e.g. 'Jan')
+	//   total_success: Count of successful transactions
+	//   total_amount: Sum of successful transaction amounts
+	// Business Logic:
+	//   - Only includes successful (payment_status = 'success') transactions
+	//   - Excludes deleted transactions
+	//   - Compares two customizable time periods
+	//   - Includes gap-filling for months with no transactions
+	//   - Returns 0 values for months with no successful transactions
+	//   - Orders by most recent year/month first
+	GetMonthlyAmountTransactionSuccess(ctx context.Context, arg GetMonthlyAmountTransactionSuccessParams) ([]*GetMonthlyAmountTransactionSuccessRow, error)
+	// GetMonthlyAmountTransactionSuccessByMerchant: Retrieves monthly success transaction metrics by merchant_id
+	// Purpose: Generate monthly reports of successful transactions for analysis
+	// Parameters:
+	//   $1: Start date of first comparison period (timestamp)
+	//   $2: End date of first comparison period (timestamp)
+	//   $3: Start date of second comparison period (timestamp)
+	//   $4: End date of second comparison period (timestamp)
+	//   $5: Merchant ID
+	// Returns:
+	//   year: Year as text
+	//   month: 3-letter month abbreviation (e.g. 'Jan')
+	//   total_success: Count of successful transactions
+	//   total_amount: Sum of successful transaction amounts
+	// Business Logic:
+	//   - Only includes successful (payment_status = 'success') transactions
+	//   - Excludes deleted transactions
+	//   - Compares two customizable time periods
+	//   - Includes gap-filling for months with no transactions
+	//   - Returns 0 values for months with no successful transactions
+	//   - Orders by most recent year/month first
+	GetMonthlyAmountTransactionSuccessByMerchant(ctx context.Context, arg GetMonthlyAmountTransactionSuccessByMerchantParams) ([]*GetMonthlyAmountTransactionSuccessByMerchantRow, error)
+	// GetMonthlyTransactionMethodsFailed: Analyzes failed payment method usage by month
+	// Purpose: Track monthly trends in failed payment method attempts
+	// Parameters:
+	//   $1: Reference date (timestamp) - determines the 12-month analysis period
+	// Returns:
+	//   month: 3-letter month abbreviation (e.g. 'Jan')
+	//   payment_method: The payment method attempted
+	//   total_transactions: Count of failed transactions
+	//   total_amount: Total amount attempted (not successfully processed)
+	// Business Logic:
+	//   - Analyzes a rolling 12-month period from reference date
+	//   - Only includes failed (payment_status = 'failed') transactions
+	//   - Excludes deleted transactions
+	//   - Groups by month and payment method
+	//   - Returns formatted month names for reporting
+	//   - Orders chronologically by month then by payment method
+	GetMonthlyTransactionMethodsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetMonthlyTransactionMethodsFailedRow, error)
+	// Purpose: Analyze the monthly payment method usage for a specific merchant with a focus on failed transactions.
+	// Parameters:
+	//   $1: Reference date (timestamp) - determines the 12-month analysis period.
+	//   $2: Merchant ID - filters transactions for a specific merchant.
+	// Returns:
+	//   month: 3-letter month abbreviation (e.g. 'Jan').
+	//   payment_method: The payment method used.
+	//   total_transactions: Count of failed transactions.
+	//   total_amount: Total amount attempted for this payment method (including failed transactions).
+	// Business Logic:
+	//   - Analyzes a rolling 12-month period starting from the reference date ($1).
+	//   - Only includes transactions with a payment status of 'failed' (payment_status = 'failed').
+	//   - Excludes deleted transactions (where deleted_at IS NULL).
+	//   - Groups the results by month and payment method.
+	//   - For each month, reports the number of failed transactions and the total amount attempted.
+	//   - Orders the result chronologically by month, followed by payment method.
+	//   - Returns a report useful for tracking failed payment trends over the last 12 months.
+	GetMonthlyTransactionMethodsFailedByMerchant(ctx context.Context, arg GetMonthlyTransactionMethodsFailedByMerchantParams) ([]*GetMonthlyTransactionMethodsFailedByMerchantRow, error)
+	// GetMonthlyTransactionMethodsSuccess: Analyzes successful payment method usage by month
+	// Purpose: Track monthly trends in successful payment method preferences
+	// Parameters:
+	//   $1: Reference date (timestamp) - determines the 12-month analysis period
+	// Returns:
+	//   month: 3-letter month abbreviation (e.g. 'Jan')
+	//   payment_method: The payment method used
+	//   total_transactions: Count of successful transactions
+	//   total_amount: Total amount successfully processed by this method
+	// Business Logic:
+	//   - Analyzes a rolling 12-month period from reference date
+	//   - Only includes successful (payment_status = 'success') transactions
+	//   - Excludes deleted transactions
+	//   - Groups by month and payment method
+	//   - Returns formatted month names for reporting
+	//   - Orders chronologically by month then by payment method
+	GetMonthlyTransactionMethodsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetMonthlyTransactionMethodsSuccessRow, error)
+	// Purpose: Analyze the monthly payment method usage for a specific merchant with a focus on successful transactions.
+	// Parameters:
+	//   $1: Reference date (timestamp) - determines the 12-month analysis period.
+	//   $2: Merchant ID - filters transactions for a specific merchant.
+	// Returns:
+	//   month: 3-letter month abbreviation (e.g. 'Jan').
+	//   payment_method: The payment method used.
+	//   total_transactions: Count of successful transactions.
+	//   total_amount: Total amount processed by this payment method.
+	// Business Logic:
+	//   - Analyzes a rolling 12-month period starting from the reference date ($1).
+	//   - Only includes transactions with a payment status of 'success' (payment_status = 'success').
+	//   - Excludes deleted transactions (where deleted_at IS NULL).
+	//   - Groups the results by month and payment method.
+	//   - For each month, reports the number of successful transactions and total amount processed.
+	//   - Orders the result chronologically by month, followed by payment method.
+	//   - Returns a report useful for tracking successful payment trends over the last 12 months.
+	GetMonthlyTransactionMethodsSuccessByMerchant(ctx context.Context, arg GetMonthlyTransactionMethodsSuccessByMerchantParams) ([]*GetMonthlyTransactionMethodsSuccessByMerchantRow, error)
 	// Get Nominal by ID
 	GetNominalByID(ctx context.Context, nominalID int32) (*Nominal, error)
 	// Get Nominals with Pagination and Total Count
@@ -99,6 +300,21 @@ type Querier interface {
 	GetRoles(ctx context.Context, arg GetRolesParams) ([]*GetRolesRow, error)
 	// Get Transaction by ID
 	GetTransactionByID(ctx context.Context, transactionID int32) (*Transaction, error)
+	// GetTransactionByMerchant: Retrieves merchant-specific transactions with pagination
+	// Purpose: List transactions filtered by merchant ID
+	// Parameters:
+	//   $1: search_term - Optional text to filter transactions
+	//   $2: merchant_id - Optional merchant ID to filter by (NULL for all merchants)
+	//   $3: limit - Pagination limit
+	//   $4: offset - Pagination offset
+	// Returns:
+	//   Transaction records with total_count
+	// Business Logic:
+	//   - Combines merchant filtering with search functionality
+	//   - Maintains same sorting and pagination as other transaction queries
+	//   - Useful for merchant-specific transaction reporting
+	//   - NULL merchant_id parameter returns all merchants' transactions
+	GetTransactionByMerchant(ctx context.Context, arg GetTransactionByMerchantParams) ([]*GetTransactionByMerchantRow, error)
 	// Get Transactions with Pagination and Total Count
 	GetTransactions(ctx context.Context, arg GetTransactionsParams) ([]*GetTransactionsRow, error)
 	// Get Active Transactions with Pagination and Total Count
@@ -127,6 +343,190 @@ type Querier interface {
 	GetVouchersActive(ctx context.Context, arg GetVouchersActiveParams) ([]*GetVouchersActiveRow, error)
 	// Get Trashed Vouchers with Pagination and Total Count
 	GetVouchersTrashed(ctx context.Context, arg GetVouchersTrashedParams) ([]*GetVouchersTrashedRow, error)
+	GetYearAmountBankFailed(ctx context.Context, dollar_1 int32) ([]*GetYearAmountBankFailedRow, error)
+	GetYearAmountBankFailedById(ctx context.Context, arg GetYearAmountBankFailedByIdParams) ([]*GetYearAmountBankFailedByIdRow, error)
+	GetYearAmountBankFailedByMerchant(ctx context.Context, arg GetYearAmountBankFailedByMerchantParams) ([]*GetYearAmountBankFailedByMerchantRow, error)
+	GetYearAmountBankSuccess(ctx context.Context, dollar_1 int32) ([]*GetYearAmountBankSuccessRow, error)
+	GetYearAmountBankSuccessById(ctx context.Context, arg GetYearAmountBankSuccessByIdParams) ([]*GetYearAmountBankSuccessByIdRow, error)
+	GetYearAmountBankSuccessByMerchant(ctx context.Context, arg GetYearAmountBankSuccessByMerchantParams) ([]*GetYearAmountBankSuccessByMerchantRow, error)
+	GetYearAmountCategoryFailed(ctx context.Context, dollar_1 int32) ([]*GetYearAmountCategoryFailedRow, error)
+	GetYearAmountCategoryFailedById(ctx context.Context, arg GetYearAmountCategoryFailedByIdParams) ([]*GetYearAmountCategoryFailedByIdRow, error)
+	GetYearAmountCategoryFailedByMerchant(ctx context.Context, arg GetYearAmountCategoryFailedByMerchantParams) ([]*GetYearAmountCategoryFailedByMerchantRow, error)
+	GetYearAmountCategorySuccess(ctx context.Context, dollar_1 int32) ([]*GetYearAmountCategorySuccessRow, error)
+	GetYearAmountCategorySuccessById(ctx context.Context, arg GetYearAmountCategorySuccessByIdParams) ([]*GetYearAmountCategorySuccessByIdRow, error)
+	GetYearAmountCategorySuccessByMerchant(ctx context.Context, arg GetYearAmountCategorySuccessByMerchantParams) ([]*GetYearAmountCategorySuccessByMerchantRow, error)
+	GetYearAmountNominalsFailed(ctx context.Context, dollar_1 int32) ([]*GetYearAmountNominalsFailedRow, error)
+	GetYearAmountNominalsFailedById(ctx context.Context, arg GetYearAmountNominalsFailedByIdParams) ([]*GetYearAmountNominalsFailedByIdRow, error)
+	GetYearAmountNominalsFailedByMerchant(ctx context.Context, arg GetYearAmountNominalsFailedByMerchantParams) ([]*GetYearAmountNominalsFailedByMerchantRow, error)
+	GetYearAmountNominalsSuccess(ctx context.Context, dollar_1 int32) ([]*GetYearAmountNominalsSuccessRow, error)
+	GetYearAmountNominalsSuccessById(ctx context.Context, arg GetYearAmountNominalsSuccessByIdParams) ([]*GetYearAmountNominalsSuccessByIdRow, error)
+	GetYearAmountNominalsSuccessByMerchant(ctx context.Context, arg GetYearAmountNominalsSuccessByMerchantParams) ([]*GetYearAmountNominalsSuccessByMerchantRow, error)
+	GetYearAmountVouchersFailed(ctx context.Context, dollar_1 int32) ([]*GetYearAmountVouchersFailedRow, error)
+	GetYearAmountVouchersFailedById(ctx context.Context, arg GetYearAmountVouchersFailedByIdParams) ([]*GetYearAmountVouchersFailedByIdRow, error)
+	GetYearAmountVouchersFailedByMerchant(ctx context.Context, arg GetYearAmountVouchersFailedByMerchantParams) ([]*GetYearAmountVouchersFailedByMerchantRow, error)
+	GetYearAmountVouchersSuccess(ctx context.Context, dollar_1 int32) ([]*GetYearAmountVouchersSuccessRow, error)
+	GetYearAmountVouchersSuccessById(ctx context.Context, arg GetYearAmountVouchersSuccessByIdParams) ([]*GetYearAmountVouchersSuccessByIdRow, error)
+	GetYearAmountVouchersSuccessByMerchant(ctx context.Context, arg GetYearAmountVouchersSuccessByMerchantParams) ([]*GetYearAmountVouchersSuccessByMerchantRow, error)
+	GetYearBankMethodsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetYearBankMethodsFailedRow, error)
+	GetYearBankMethodsFailedById(ctx context.Context, arg GetYearBankMethodsFailedByIdParams) ([]*GetYearBankMethodsFailedByIdRow, error)
+	GetYearBankMethodsFailedByMerchant(ctx context.Context, arg GetYearBankMethodsFailedByMerchantParams) ([]*GetYearBankMethodsFailedByMerchantRow, error)
+	GetYearBankMethodsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetYearBankMethodsSuccessRow, error)
+	GetYearBankMethodsSuccessById(ctx context.Context, arg GetYearBankMethodsSuccessByIdParams) ([]*GetYearBankMethodsSuccessByIdRow, error)
+	GetYearBankMethodsSuccessByMerchant(ctx context.Context, arg GetYearBankMethodsSuccessByMerchantParams) ([]*GetYearBankMethodsSuccessByMerchantRow, error)
+	GetYearMethodCategoriesFailed(ctx context.Context, dollar_1 time.Time) ([]*GetYearMethodCategoriesFailedRow, error)
+	GetYearMethodCategoriesFailedById(ctx context.Context, arg GetYearMethodCategoriesFailedByIdParams) ([]*GetYearMethodCategoriesFailedByIdRow, error)
+	GetYearMethodCategoriesFailedByMerchant(ctx context.Context, arg GetYearMethodCategoriesFailedByMerchantParams) ([]*GetYearMethodCategoriesFailedByMerchantRow, error)
+	GetYearMethodCategoriesSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetYearMethodCategoriesSuccessRow, error)
+	GetYearMethodCategoriesSuccessById(ctx context.Context, arg GetYearMethodCategoriesSuccessByIdParams) ([]*GetYearMethodCategoriesSuccessByIdRow, error)
+	GetYearMethodCategoriesSuccessByMerchant(ctx context.Context, arg GetYearMethodCategoriesSuccessByMerchantParams) ([]*GetYearMethodCategoriesSuccessByMerchantRow, error)
+	GetYearMethodNominalsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetYearMethodNominalsFailedRow, error)
+	GetYearMethodNominalsFailedById(ctx context.Context, arg GetYearMethodNominalsFailedByIdParams) ([]*GetYearMethodNominalsFailedByIdRow, error)
+	GetYearMethodNominalsFailedByMerchant(ctx context.Context, arg GetYearMethodNominalsFailedByMerchantParams) ([]*GetYearMethodNominalsFailedByMerchantRow, error)
+	GetYearMethodNominalsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetYearMethodNominalsSuccessRow, error)
+	GetYearMethodNominalsSuccessById(ctx context.Context, arg GetYearMethodNominalsSuccessByIdParams) ([]*GetYearMethodNominalsSuccessByIdRow, error)
+	GetYearMethodNominalsSuccessByMerchant(ctx context.Context, arg GetYearMethodNominalsSuccessByMerchantParams) ([]*GetYearMethodNominalsSuccessByMerchantRow, error)
+	GetYearMethodVouchersFailed(ctx context.Context, dollar_1 time.Time) ([]*GetYearMethodVouchersFailedRow, error)
+	GetYearMethodVouchersFailedById(ctx context.Context, arg GetYearMethodVouchersFailedByIdParams) ([]*GetYearMethodVouchersFailedByIdRow, error)
+	GetYearMethodVouchersFailedByMerchant(ctx context.Context, arg GetYearMethodVouchersFailedByMerchantParams) ([]*GetYearMethodVouchersFailedByMerchantRow, error)
+	GetYearMethodVouchersSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetYearMethodVouchersSuccessRow, error)
+	GetYearMethodVouchersSuccessById(ctx context.Context, arg GetYearMethodVouchersSuccessByIdParams) ([]*GetYearMethodVouchersSuccessByIdRow, error)
+	GetYearMethodVouchersSuccessByMerchant(ctx context.Context, arg GetYearMethodVouchersSuccessByMerchantParams) ([]*GetYearMethodVouchersSuccessByMerchantRow, error)
+	// GetYearlyAmountTransactionFailed: Retrieves yearly failed transaction metrics
+	// Purpose: Generate annual reports of failed transactions
+	// Parameters:
+	//   $1: Reference year for comparison (current year as integer)
+	// Returns:
+	//   year: Year as text
+	//   total_failed: Count of failed transactions
+	//   total_amount: Sum of failed transaction amounts
+	// Business Logic:
+	//   - Compares current year with previous year automatically
+	//   - Only includes failed (payment_status = 'failed') transactions
+	//   - Excludes deleted transactions
+	//   - Includes gap-filling for years with no transactions
+	//   - Returns 0 values for years with no failed transactions
+	//   - Orders by most recent year first
+	GetYearlyAmountTransactionFailed(ctx context.Context, dollar_1 int32) ([]*GetYearlyAmountTransactionFailedRow, error)
+	// GetYearlyAmountTransactionFailedByMerchant: Retrieves yearly failed transaction metrics
+	// Purpose: Generate annual reports of failed transactions by merchant_id
+	// Parameters:
+	//   $1: Reference year for comparison (current year as integer)
+	//   $2: Merchant ID
+	// Returns:
+	//   year: Year as text
+	//   total_failed: Count of failed transactions
+	//   total_amount: Sum of failed transaction amounts
+	// Business Logic:
+	//   - Compares current year with previous year automatically
+	//   - Only includes failed (payment_status = 'failed') transactions
+	//   - Excludes deleted transactions
+	//   - Includes gap-filling for years with no transactions
+	//   - Returns 0 values for years with no failed transactions
+	//   - Orders by most recent year first
+	GetYearlyAmountTransactionFailedByMerchant(ctx context.Context, arg GetYearlyAmountTransactionFailedByMerchantParams) ([]*GetYearlyAmountTransactionFailedByMerchantRow, error)
+	// GetYearlyAmountTransactionSuccess: Retrieves yearly success transaction metrics
+	// Purpose: Generate annual reports of successful transactions
+	// Parameters:
+	//   $1: Reference year for comparison (current year as integer)
+	// Returns:
+	//   year: Year as text
+	//   total_success: Count of successful transactions
+	//   total_amount: Sum of successful transaction amounts
+	// Business Logic:
+	//   - Compares current year with previous year automatically
+	//   - Only includes successful (payment_status = 'success') transactions
+	//   - Excludes deleted transactions
+	//   - Includes gap-filling for years with no transactions
+	//   - Returns 0 values for years with no successful transactions
+	//   - Orders by most recent year first
+	GetYearlyAmountTransactionSuccess(ctx context.Context, dollar_1 int32) ([]*GetYearlyAmountTransactionSuccessRow, error)
+	// GetYearlyAmountTransactionSuccessByMerchant: Retrieves yearly success transaction metrics
+	// Purpose: Generate annual reports of successful transactions by merchant_id
+	// Parameters:
+	//   $1: Reference year for comparison (current year as integer)
+	//   $2: Merchant ID
+	// Returns:
+	//   year: Year as text
+	//   total_success: Count of successful transactions
+	//   total_amount: Sum of successful transaction amounts
+	// Business Logic:
+	//   - Compares current year with previous year automatically
+	//   - Only includes successful (payment_status = 'success') transactions
+	//   - Excludes deleted transactions
+	//   - Includes gap-filling for years with no transactions
+	//   - Returns 0 values for years with no successful transactions
+	//   - Orders by most recent year first
+	GetYearlyAmountTransactionSuccessByMerchant(ctx context.Context, arg GetYearlyAmountTransactionSuccessByMerchantParams) ([]*GetYearlyAmountTransactionSuccessByMerchantRow, error)
+	// GetYearlyTransactionMethodsFailed: Analyzes failed payment method usage by year
+	// Purpose: Track annual trends in failed payment method attempts
+	// Parameters:
+	//   $1: Reference date (timestamp) - determines the 5-year analysis window
+	// Returns:
+	//   year: 4-digit year as text
+	//   payment_method: The payment method attempted
+	//   total_transactions: Count of failed transactions
+	//   total_amount: Total amount attempted (not successfully processed)
+	// Business Logic:
+	//   - Covers current year plus previous 4 years (5-year total window)
+	//   - Only includes failed (payment_status = 'failed') transactions
+	//   - Excludes deleted transactions
+	//   - Groups by year and payment method
+	//   - Orders chronologically by year then by payment method
+	//   - Useful for identifying long-term failed payment trends
+	GetYearlyTransactionMethodsFailed(ctx context.Context, dollar_1 time.Time) ([]*GetYearlyTransactionMethodsFailedRow, error)
+	// Purpose: Analyze the yearly payment method usage for a specific merchant with a focus on failed transactions.
+	// Parameters:
+	//   $1: Reference date (timestamp) - determines the 5-year analysis window.
+	//   $2: Merchant ID - filters transactions for a specific merchant.
+	// Returns:
+	//   year: 4-digit year as text (e.g., '2023').
+	//   payment_method: The payment method used.
+	//   total_transactions: Count of failed transactions.
+	//   total_amount: Total amount attempted for this payment method (including failed transactions).
+	// Business Logic:
+	//   - Analyzes a 5-year period, covering the current year and the previous 4 years.
+	//   - Only includes transactions with a payment status of 'failed' (payment_status = 'failed').
+	//   - Excludes deleted transactions (where deleted_at IS NULL).
+	//   - Groups the results by year and payment method.
+	//   - For each year, reports the number of failed transactions and the total amount attempted.
+	//   - Orders the result chronologically by year, followed by payment method.
+	//   - Useful for identifying long-term failed payment trends for the merchant.
+	GetYearlyTransactionMethodsFailedByMerchant(ctx context.Context, arg GetYearlyTransactionMethodsFailedByMerchantParams) ([]*GetYearlyTransactionMethodsFailedByMerchantRow, error)
+	// GetYearlyTransactionMethodsSuccess: Analyzes successful payment method usage by year
+	// Purpose: Track annual trends in successful payment method preferences
+	// Parameters:
+	//   $1: Reference date (timestamp) - determines the 5-year analysis window
+	// Returns:
+	//   year: 4-digit year as text
+	//   payment_method: The payment method used
+	//   total_transactions: Count of successful transactions
+	//   total_amount: Total amount successfully processed by this method
+	// Business Logic:
+	//   - Covers current year plus previous 4 years (5-year total window)
+	//   - Only includes successful (payment_status = 'success') transactions
+	//   - Excludes deleted transactions
+	//   - Groups by year and payment method
+	//   - Orders chronologically by year then by payment method
+	//   - Useful for identifying long-term successful payment trends
+	GetYearlyTransactionMethodsSuccess(ctx context.Context, dollar_1 time.Time) ([]*GetYearlyTransactionMethodsSuccessRow, error)
+	// Purpose: Analyze the yearly payment method usage for a specific merchant with a focus on successful transactions.
+	// Parameters:
+	//   $1: Reference date (timestamp) - determines the 5-year analysis window.
+	//   $2: Merchant ID - filters transactions for a specific merchant.
+	// Returns:
+	//   year: 4-digit year as text (e.g., '2023').
+	//   payment_method: The payment method used.
+	//   total_transactions: Count of successful transactions.
+	//   total_amount: Total amount processed by this payment method.
+	// Business Logic:
+	//   - Analyzes a 5-year period, covering the current year and the previous 4 years.
+	//   - Only includes transactions with a payment status of 'success' (payment_status = 'success').
+	//   - Excludes deleted transactions (where deleted_at IS NULL).
+	//   - Groups the results by year and payment method.
+	//   - For each year, reports the number of successful transactions and total amount processed.
+	//   - Orders the result chronologically by year, followed by payment method.
+	//   - Useful for identifying long-term successful payment trends for the merchant.
+	GetYearlyTransactionMethodsSuccessByMerchant(ctx context.Context, arg GetYearlyTransactionMethodsSuccessByMerchantParams) ([]*GetYearlyTransactionMethodsSuccessByMerchantRow, error)
 	RemoveRoleFromUser(ctx context.Context, arg RemoveRoleFromUserParams) error
 	// Restore All Trashed Banks
 	RestoreAllBanks(ctx context.Context) error
@@ -152,7 +552,7 @@ type Querier interface {
 	RestoreMerchant(ctx context.Context, merchantID int32) (*Merchant, error)
 	// Restore Trashed Nominal
 	RestoreNominal(ctx context.Context, nominalID int32) (*Nominal, error)
-	RestoreRole(ctx context.Context, roleID int32) error
+	RestoreRole(ctx context.Context, roleID int32) (*Role, error)
 	// Restore Trashed Transaction
 	RestoreTransaction(ctx context.Context, transactionID int32) (*Transaction, error)
 	// Restore Trashed User
@@ -168,7 +568,7 @@ type Querier interface {
 	TrashMerchant(ctx context.Context, merchantID int32) (*Merchant, error)
 	// Trash Nominal (Soft Delete)
 	TrashNominal(ctx context.Context, nominalID int32) (*Nominal, error)
-	TrashRole(ctx context.Context, roleID int32) error
+	TrashRole(ctx context.Context, roleID int32) (*Role, error)
 	// Trash Transaction (Soft Delete)
 	TrashTransaction(ctx context.Context, transactionID int32) (*Transaction, error)
 	// Trash User
@@ -184,7 +584,7 @@ type Querier interface {
 	UpdateMerchant(ctx context.Context, arg UpdateMerchantParams) (*Merchant, error)
 	// Update Nominal
 	UpdateNominal(ctx context.Context, arg UpdateNominalParams) (*Nominal, error)
-	UpdateRefreshTokenByUserId(ctx context.Context, arg UpdateRefreshTokenByUserIdParams) error
+	UpdateRefreshTokenByUserId(ctx context.Context, arg UpdateRefreshTokenByUserIdParams) (*RefreshToken, error)
 	UpdateRole(ctx context.Context, arg UpdateRoleParams) (*Role, error)
 	// Update Transaction
 	UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) (*Transaction, error)

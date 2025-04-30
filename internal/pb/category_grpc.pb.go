@@ -20,17 +20,41 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CategoryService_FindAll_FullMethodName            = "/pb.CategoryService/FindAll"
-	CategoryService_FindById_FullMethodName           = "/pb.CategoryService/FindById"
-	CategoryService_FindByActive_FullMethodName       = "/pb.CategoryService/FindByActive"
-	CategoryService_FindByTrashed_FullMethodName      = "/pb.CategoryService/FindByTrashed"
-	CategoryService_Create_FullMethodName             = "/pb.CategoryService/Create"
-	CategoryService_Update_FullMethodName             = "/pb.CategoryService/Update"
-	CategoryService_Trashed_FullMethodName            = "/pb.CategoryService/Trashed"
-	CategoryService_Restore_FullMethodName            = "/pb.CategoryService/Restore"
-	CategoryService_DeletePermanent_FullMethodName    = "/pb.CategoryService/DeletePermanent"
-	CategoryService_RestoreAll_FullMethodName         = "/pb.CategoryService/RestoreAll"
-	CategoryService_DeleteAllPermanent_FullMethodName = "/pb.CategoryService/DeleteAllPermanent"
+	CategoryService_FindAll_FullMethodName                                  = "/pb.CategoryService/FindAll"
+	CategoryService_FindById_FullMethodName                                 = "/pb.CategoryService/FindById"
+	CategoryService_FindByActive_FullMethodName                             = "/pb.CategoryService/FindByActive"
+	CategoryService_FindByTrashed_FullMethodName                            = "/pb.CategoryService/FindByTrashed"
+	CategoryService_Create_FullMethodName                                   = "/pb.CategoryService/Create"
+	CategoryService_Update_FullMethodName                                   = "/pb.CategoryService/Update"
+	CategoryService_Trashed_FullMethodName                                  = "/pb.CategoryService/Trashed"
+	CategoryService_Restore_FullMethodName                                  = "/pb.CategoryService/Restore"
+	CategoryService_DeletePermanent_FullMethodName                          = "/pb.CategoryService/DeletePermanent"
+	CategoryService_RestoreAll_FullMethodName                               = "/pb.CategoryService/RestoreAll"
+	CategoryService_DeleteAllPermanent_FullMethodName                       = "/pb.CategoryService/DeleteAllPermanent"
+	CategoryService_FindMonthAmountCategorySuccess_FullMethodName           = "/pb.CategoryService/FindMonthAmountCategorySuccess"
+	CategoryService_FindYearAmountCategorySuccess_FullMethodName            = "/pb.CategoryService/FindYearAmountCategorySuccess"
+	CategoryService_FindMonthAmountCategoryFailed_FullMethodName            = "/pb.CategoryService/FindMonthAmountCategoryFailed"
+	CategoryService_FindYearAmountCategoryFailed_FullMethodName             = "/pb.CategoryService/FindYearAmountCategoryFailed"
+	CategoryService_FindMonthMethodCategorySuccess_FullMethodName           = "/pb.CategoryService/FindMonthMethodCategorySuccess"
+	CategoryService_FindYearMethodCategorySuccess_FullMethodName            = "/pb.CategoryService/FindYearMethodCategorySuccess"
+	CategoryService_FindMonthMethodCategoryFailed_FullMethodName            = "/pb.CategoryService/FindMonthMethodCategoryFailed"
+	CategoryService_FindYearMethodCategoryFailed_FullMethodName             = "/pb.CategoryService/FindYearMethodCategoryFailed"
+	CategoryService_FindMonthAmountCategorySuccessById_FullMethodName       = "/pb.CategoryService/FindMonthAmountCategorySuccessById"
+	CategoryService_FindYearAmountCategorySuccessById_FullMethodName        = "/pb.CategoryService/FindYearAmountCategorySuccessById"
+	CategoryService_FindMonthAmountCategoryFailedById_FullMethodName        = "/pb.CategoryService/FindMonthAmountCategoryFailedById"
+	CategoryService_FindYearAmountCategoryFailedById_FullMethodName         = "/pb.CategoryService/FindYearAmountCategoryFailedById"
+	CategoryService_FindMonthMethodCategorySuccessById_FullMethodName       = "/pb.CategoryService/FindMonthMethodCategorySuccessById"
+	CategoryService_FindYearMethodCategorySuccessById_FullMethodName        = "/pb.CategoryService/FindYearMethodCategorySuccessById"
+	CategoryService_FindMonthMethodCategoryFailedById_FullMethodName        = "/pb.CategoryService/FindMonthMethodCategoryFailedById"
+	CategoryService_FindYearMethodCategoryFailedById_FullMethodName         = "/pb.CategoryService/FindYearMethodCategoryFailedById"
+	CategoryService_FindMonthAmountCategorySuccessByMerchant_FullMethodName = "/pb.CategoryService/FindMonthAmountCategorySuccessByMerchant"
+	CategoryService_FindYearAmountCategorySuccessByMerchant_FullMethodName  = "/pb.CategoryService/FindYearAmountCategorySuccessByMerchant"
+	CategoryService_FindMonthAmountCategoryFailedByMerchant_FullMethodName  = "/pb.CategoryService/FindMonthAmountCategoryFailedByMerchant"
+	CategoryService_FindYearAmountCategoryFailedByMerchant_FullMethodName   = "/pb.CategoryService/FindYearAmountCategoryFailedByMerchant"
+	CategoryService_FindMonthMethodCategorySuccessByMerchant_FullMethodName = "/pb.CategoryService/FindMonthMethodCategorySuccessByMerchant"
+	CategoryService_FindYearMethodCategorySuccessByMerchant_FullMethodName  = "/pb.CategoryService/FindYearMethodCategorySuccessByMerchant"
+	CategoryService_FindMonthMethodCategoryFailedByMerchant_FullMethodName  = "/pb.CategoryService/FindMonthMethodCategoryFailedByMerchant"
+	CategoryService_FindYearMethodCategoryFailedByMerchant_FullMethodName   = "/pb.CategoryService/FindYearMethodCategoryFailedByMerchant"
 )
 
 // CategoryServiceClient is the client API for CategoryService service.
@@ -48,6 +72,30 @@ type CategoryServiceClient interface {
 	DeletePermanent(ctx context.Context, in *FindByIdCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryDelete, error)
 	RestoreAll(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ApiResponseCategoryAll, error)
 	DeleteAllPermanent(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ApiResponseCategoryAll, error)
+	FindMonthAmountCategorySuccess(ctx context.Context, in *MonthAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountSuccess, error)
+	FindYearAmountCategorySuccess(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountSuccess, error)
+	FindMonthAmountCategoryFailed(ctx context.Context, in *MonthAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountFailed, error)
+	FindYearAmountCategoryFailed(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountFailed, error)
+	FindMonthMethodCategorySuccess(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategorySuccess(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error)
+	FindMonthMethodCategoryFailed(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategoryFailed(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error)
+	FindMonthAmountCategorySuccessById(ctx context.Context, in *MonthAmountCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountSuccess, error)
+	FindYearAmountCategorySuccessById(ctx context.Context, in *YearAmountCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountSuccess, error)
+	FindMonthAmountCategoryFailedById(ctx context.Context, in *MonthAmountCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountFailed, error)
+	FindYearAmountCategoryFailedById(ctx context.Context, in *YearAmountCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountFailed, error)
+	FindMonthMethodCategorySuccessById(ctx context.Context, in *MonthMethodCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategorySuccessById(ctx context.Context, in *YearMethodCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error)
+	FindMonthMethodCategoryFailedById(ctx context.Context, in *MonthMethodCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategoryFailedById(ctx context.Context, in *YearMethodCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error)
+	FindMonthAmountCategorySuccessByMerchant(ctx context.Context, in *MonthAmountCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountSuccess, error)
+	FindYearAmountCategorySuccessByMerchant(ctx context.Context, in *YearAmountCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountSuccess, error)
+	FindMonthAmountCategoryFailedByMerchant(ctx context.Context, in *MonthAmountCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountFailed, error)
+	FindYearAmountCategoryFailedByMerchant(ctx context.Context, in *YearAmountCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountFailed, error)
+	FindMonthMethodCategorySuccessByMerchant(ctx context.Context, in *MonthMethodCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategorySuccessByMerchant(ctx context.Context, in *YearMethodCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error)
+	FindMonthMethodCategoryFailedByMerchant(ctx context.Context, in *MonthMethodCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategoryFailedByMerchant(ctx context.Context, in *YearMethodCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error)
 }
 
 type categoryServiceClient struct {
@@ -168,6 +216,246 @@ func (c *categoryServiceClient) DeleteAllPermanent(ctx context.Context, in *empt
 	return out, nil
 }
 
+func (c *categoryServiceClient) FindMonthAmountCategorySuccess(ctx context.Context, in *MonthAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthAmountCategorySuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearAmountCategorySuccess(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearAmountSuccess)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearAmountCategorySuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindMonthAmountCategoryFailed(ctx context.Context, in *MonthAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthAmountFailed)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthAmountCategoryFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearAmountCategoryFailed(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearAmountFailed)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearAmountCategoryFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindMonthMethodCategorySuccess(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthMethodCategorySuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearMethodCategorySuccess(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearMethodCategorySuccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindMonthMethodCategoryFailed(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthMethodCategoryFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearMethodCategoryFailed(ctx context.Context, in *YearAmountCategoryRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearMethodCategoryFailed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindMonthAmountCategorySuccessById(ctx context.Context, in *MonthAmountCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthAmountCategorySuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearAmountCategorySuccessById(ctx context.Context, in *YearAmountCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearAmountSuccess)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearAmountCategorySuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindMonthAmountCategoryFailedById(ctx context.Context, in *MonthAmountCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthAmountFailed)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthAmountCategoryFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearAmountCategoryFailedById(ctx context.Context, in *YearAmountCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearAmountFailed)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearAmountCategoryFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindMonthMethodCategorySuccessById(ctx context.Context, in *MonthMethodCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthMethodCategorySuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearMethodCategorySuccessById(ctx context.Context, in *YearMethodCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearMethodCategorySuccessById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindMonthMethodCategoryFailedById(ctx context.Context, in *MonthMethodCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthMethodCategoryFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearMethodCategoryFailedById(ctx context.Context, in *YearMethodCategoryByIdRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearMethodCategoryFailedById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindMonthAmountCategorySuccessByMerchant(ctx context.Context, in *MonthAmountCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthAmountSuccess)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthAmountCategorySuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearAmountCategorySuccessByMerchant(ctx context.Context, in *YearAmountCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountSuccess, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearAmountSuccess)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearAmountCategorySuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindMonthAmountCategoryFailedByMerchant(ctx context.Context, in *MonthAmountCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthAmountFailed)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthAmountCategoryFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearAmountCategoryFailedByMerchant(ctx context.Context, in *YearAmountCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearAmountFailed, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearAmountFailed)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearAmountCategoryFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindMonthMethodCategorySuccessByMerchant(ctx context.Context, in *MonthMethodCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthMethodCategorySuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearMethodCategorySuccessByMerchant(ctx context.Context, in *YearMethodCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearMethodCategorySuccessByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindMonthMethodCategoryFailedByMerchant(ctx context.Context, in *MonthMethodCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryMonthMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryMonthMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindMonthMethodCategoryFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *categoryServiceClient) FindYearMethodCategoryFailedByMerchant(ctx context.Context, in *YearMethodCategoryByMerchantRequest, opts ...grpc.CallOption) (*ApiResponseCategoryYearMethod, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponseCategoryYearMethod)
+	err := c.cc.Invoke(ctx, CategoryService_FindYearMethodCategoryFailedByMerchant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CategoryServiceServer is the server API for CategoryService service.
 // All implementations must embed UnimplementedCategoryServiceServer
 // for forward compatibility.
@@ -183,6 +471,30 @@ type CategoryServiceServer interface {
 	DeletePermanent(context.Context, *FindByIdCategoryRequest) (*ApiResponseCategoryDelete, error)
 	RestoreAll(context.Context, *emptypb.Empty) (*ApiResponseCategoryAll, error)
 	DeleteAllPermanent(context.Context, *emptypb.Empty) (*ApiResponseCategoryAll, error)
+	FindMonthAmountCategorySuccess(context.Context, *MonthAmountCategoryRequest) (*ApiResponseCategoryMonthAmountSuccess, error)
+	FindYearAmountCategorySuccess(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryYearAmountSuccess, error)
+	FindMonthAmountCategoryFailed(context.Context, *MonthAmountCategoryRequest) (*ApiResponseCategoryMonthAmountFailed, error)
+	FindYearAmountCategoryFailed(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryYearAmountFailed, error)
+	FindMonthMethodCategorySuccess(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategorySuccess(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryYearMethod, error)
+	FindMonthMethodCategoryFailed(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategoryFailed(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryYearMethod, error)
+	FindMonthAmountCategorySuccessById(context.Context, *MonthAmountCategoryByIdRequest) (*ApiResponseCategoryMonthAmountSuccess, error)
+	FindYearAmountCategorySuccessById(context.Context, *YearAmountCategoryByIdRequest) (*ApiResponseCategoryYearAmountSuccess, error)
+	FindMonthAmountCategoryFailedById(context.Context, *MonthAmountCategoryByIdRequest) (*ApiResponseCategoryMonthAmountFailed, error)
+	FindYearAmountCategoryFailedById(context.Context, *YearAmountCategoryByIdRequest) (*ApiResponseCategoryYearAmountFailed, error)
+	FindMonthMethodCategorySuccessById(context.Context, *MonthMethodCategoryByIdRequest) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategorySuccessById(context.Context, *YearMethodCategoryByIdRequest) (*ApiResponseCategoryYearMethod, error)
+	FindMonthMethodCategoryFailedById(context.Context, *MonthMethodCategoryByIdRequest) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategoryFailedById(context.Context, *YearMethodCategoryByIdRequest) (*ApiResponseCategoryYearMethod, error)
+	FindMonthAmountCategorySuccessByMerchant(context.Context, *MonthAmountCategoryByMerchantRequest) (*ApiResponseCategoryMonthAmountSuccess, error)
+	FindYearAmountCategorySuccessByMerchant(context.Context, *YearAmountCategoryByMerchantRequest) (*ApiResponseCategoryYearAmountSuccess, error)
+	FindMonthAmountCategoryFailedByMerchant(context.Context, *MonthAmountCategoryByMerchantRequest) (*ApiResponseCategoryMonthAmountFailed, error)
+	FindYearAmountCategoryFailedByMerchant(context.Context, *YearAmountCategoryByMerchantRequest) (*ApiResponseCategoryYearAmountFailed, error)
+	FindMonthMethodCategorySuccessByMerchant(context.Context, *MonthMethodCategoryByMerchantRequest) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategorySuccessByMerchant(context.Context, *YearMethodCategoryByMerchantRequest) (*ApiResponseCategoryYearMethod, error)
+	FindMonthMethodCategoryFailedByMerchant(context.Context, *MonthMethodCategoryByMerchantRequest) (*ApiResponseCategoryMonthMethod, error)
+	FindYearMethodCategoryFailedByMerchant(context.Context, *YearMethodCategoryByMerchantRequest) (*ApiResponseCategoryYearMethod, error)
 	mustEmbedUnimplementedCategoryServiceServer()
 }
 
@@ -225,6 +537,78 @@ func (UnimplementedCategoryServiceServer) RestoreAll(context.Context, *emptypb.E
 }
 func (UnimplementedCategoryServiceServer) DeleteAllPermanent(context.Context, *emptypb.Empty) (*ApiResponseCategoryAll, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAllPermanent not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthAmountCategorySuccess(context.Context, *MonthAmountCategoryRequest) (*ApiResponseCategoryMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountCategorySuccess not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearAmountCategorySuccess(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountCategorySuccess not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthAmountCategoryFailed(context.Context, *MonthAmountCategoryRequest) (*ApiResponseCategoryMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountCategoryFailed not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearAmountCategoryFailed(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountCategoryFailed not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthMethodCategorySuccess(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodCategorySuccess not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearMethodCategorySuccess(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodCategorySuccess not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthMethodCategoryFailed(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodCategoryFailed not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearMethodCategoryFailed(context.Context, *YearAmountCategoryRequest) (*ApiResponseCategoryYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodCategoryFailed not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthAmountCategorySuccessById(context.Context, *MonthAmountCategoryByIdRequest) (*ApiResponseCategoryMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountCategorySuccessById not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearAmountCategorySuccessById(context.Context, *YearAmountCategoryByIdRequest) (*ApiResponseCategoryYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountCategorySuccessById not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthAmountCategoryFailedById(context.Context, *MonthAmountCategoryByIdRequest) (*ApiResponseCategoryMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountCategoryFailedById not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearAmountCategoryFailedById(context.Context, *YearAmountCategoryByIdRequest) (*ApiResponseCategoryYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountCategoryFailedById not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthMethodCategorySuccessById(context.Context, *MonthMethodCategoryByIdRequest) (*ApiResponseCategoryMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodCategorySuccessById not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearMethodCategorySuccessById(context.Context, *YearMethodCategoryByIdRequest) (*ApiResponseCategoryYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodCategorySuccessById not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthMethodCategoryFailedById(context.Context, *MonthMethodCategoryByIdRequest) (*ApiResponseCategoryMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodCategoryFailedById not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearMethodCategoryFailedById(context.Context, *YearMethodCategoryByIdRequest) (*ApiResponseCategoryYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodCategoryFailedById not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthAmountCategorySuccessByMerchant(context.Context, *MonthAmountCategoryByMerchantRequest) (*ApiResponseCategoryMonthAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountCategorySuccessByMerchant not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearAmountCategorySuccessByMerchant(context.Context, *YearAmountCategoryByMerchantRequest) (*ApiResponseCategoryYearAmountSuccess, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountCategorySuccessByMerchant not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthAmountCategoryFailedByMerchant(context.Context, *MonthAmountCategoryByMerchantRequest) (*ApiResponseCategoryMonthAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthAmountCategoryFailedByMerchant not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearAmountCategoryFailedByMerchant(context.Context, *YearAmountCategoryByMerchantRequest) (*ApiResponseCategoryYearAmountFailed, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearAmountCategoryFailedByMerchant not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthMethodCategorySuccessByMerchant(context.Context, *MonthMethodCategoryByMerchantRequest) (*ApiResponseCategoryMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodCategorySuccessByMerchant not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearMethodCategorySuccessByMerchant(context.Context, *YearMethodCategoryByMerchantRequest) (*ApiResponseCategoryYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodCategorySuccessByMerchant not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindMonthMethodCategoryFailedByMerchant(context.Context, *MonthMethodCategoryByMerchantRequest) (*ApiResponseCategoryMonthMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMonthMethodCategoryFailedByMerchant not implemented")
+}
+func (UnimplementedCategoryServiceServer) FindYearMethodCategoryFailedByMerchant(context.Context, *YearMethodCategoryByMerchantRequest) (*ApiResponseCategoryYearMethod, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindYearMethodCategoryFailedByMerchant not implemented")
 }
 func (UnimplementedCategoryServiceServer) mustEmbedUnimplementedCategoryServiceServer() {}
 func (UnimplementedCategoryServiceServer) testEmbeddedByValue()                         {}
@@ -445,6 +829,438 @@ func _CategoryService_DeleteAllPermanent_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CategoryService_FindMonthAmountCategorySuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthAmountCategorySuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthAmountCategorySuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthAmountCategorySuccess(ctx, req.(*MonthAmountCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearAmountCategorySuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearAmountCategorySuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearAmountCategorySuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearAmountCategorySuccess(ctx, req.(*YearAmountCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindMonthAmountCategoryFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthAmountCategoryFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthAmountCategoryFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthAmountCategoryFailed(ctx, req.(*MonthAmountCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearAmountCategoryFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearAmountCategoryFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearAmountCategoryFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearAmountCategoryFailed(ctx, req.(*YearAmountCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindMonthMethodCategorySuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthMethodCategorySuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthMethodCategorySuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthMethodCategorySuccess(ctx, req.(*YearAmountCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearMethodCategorySuccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearMethodCategorySuccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearMethodCategorySuccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearMethodCategorySuccess(ctx, req.(*YearAmountCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindMonthMethodCategoryFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthMethodCategoryFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthMethodCategoryFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthMethodCategoryFailed(ctx, req.(*YearAmountCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearMethodCategoryFailed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearMethodCategoryFailed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearMethodCategoryFailed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearMethodCategoryFailed(ctx, req.(*YearAmountCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindMonthAmountCategorySuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountCategoryByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthAmountCategorySuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthAmountCategorySuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthAmountCategorySuccessById(ctx, req.(*MonthAmountCategoryByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearAmountCategorySuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountCategoryByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearAmountCategorySuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearAmountCategorySuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearAmountCategorySuccessById(ctx, req.(*YearAmountCategoryByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindMonthAmountCategoryFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountCategoryByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthAmountCategoryFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthAmountCategoryFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthAmountCategoryFailedById(ctx, req.(*MonthAmountCategoryByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearAmountCategoryFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountCategoryByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearAmountCategoryFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearAmountCategoryFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearAmountCategoryFailedById(ctx, req.(*YearAmountCategoryByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindMonthMethodCategorySuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodCategoryByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthMethodCategorySuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthMethodCategorySuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthMethodCategorySuccessById(ctx, req.(*MonthMethodCategoryByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearMethodCategorySuccessById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodCategoryByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearMethodCategorySuccessById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearMethodCategorySuccessById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearMethodCategorySuccessById(ctx, req.(*YearMethodCategoryByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindMonthMethodCategoryFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodCategoryByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthMethodCategoryFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthMethodCategoryFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthMethodCategoryFailedById(ctx, req.(*MonthMethodCategoryByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearMethodCategoryFailedById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodCategoryByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearMethodCategoryFailedById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearMethodCategoryFailedById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearMethodCategoryFailedById(ctx, req.(*YearMethodCategoryByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindMonthAmountCategorySuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountCategoryByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthAmountCategorySuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthAmountCategorySuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthAmountCategorySuccessByMerchant(ctx, req.(*MonthAmountCategoryByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearAmountCategorySuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountCategoryByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearAmountCategorySuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearAmountCategorySuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearAmountCategorySuccessByMerchant(ctx, req.(*YearAmountCategoryByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindMonthAmountCategoryFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthAmountCategoryByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthAmountCategoryFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthAmountCategoryFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthAmountCategoryFailedByMerchant(ctx, req.(*MonthAmountCategoryByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearAmountCategoryFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearAmountCategoryByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearAmountCategoryFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearAmountCategoryFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearAmountCategoryFailedByMerchant(ctx, req.(*YearAmountCategoryByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindMonthMethodCategorySuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodCategoryByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthMethodCategorySuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthMethodCategorySuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthMethodCategorySuccessByMerchant(ctx, req.(*MonthMethodCategoryByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearMethodCategorySuccessByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodCategoryByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearMethodCategorySuccessByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearMethodCategorySuccessByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearMethodCategorySuccessByMerchant(ctx, req.(*YearMethodCategoryByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindMonthMethodCategoryFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthMethodCategoryByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindMonthMethodCategoryFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindMonthMethodCategoryFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindMonthMethodCategoryFailedByMerchant(ctx, req.(*MonthMethodCategoryByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CategoryService_FindYearMethodCategoryFailedByMerchant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YearMethodCategoryByMerchantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CategoryServiceServer).FindYearMethodCategoryFailedByMerchant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CategoryService_FindYearMethodCategoryFailedByMerchant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CategoryServiceServer).FindYearMethodCategoryFailedByMerchant(ctx, req.(*YearMethodCategoryByMerchantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CategoryService_ServiceDesc is the grpc.ServiceDesc for CategoryService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -495,6 +1311,102 @@ var CategoryService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAllPermanent",
 			Handler:    _CategoryService_DeleteAllPermanent_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountCategorySuccess",
+			Handler:    _CategoryService_FindMonthAmountCategorySuccess_Handler,
+		},
+		{
+			MethodName: "FindYearAmountCategorySuccess",
+			Handler:    _CategoryService_FindYearAmountCategorySuccess_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountCategoryFailed",
+			Handler:    _CategoryService_FindMonthAmountCategoryFailed_Handler,
+		},
+		{
+			MethodName: "FindYearAmountCategoryFailed",
+			Handler:    _CategoryService_FindYearAmountCategoryFailed_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodCategorySuccess",
+			Handler:    _CategoryService_FindMonthMethodCategorySuccess_Handler,
+		},
+		{
+			MethodName: "FindYearMethodCategorySuccess",
+			Handler:    _CategoryService_FindYearMethodCategorySuccess_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodCategoryFailed",
+			Handler:    _CategoryService_FindMonthMethodCategoryFailed_Handler,
+		},
+		{
+			MethodName: "FindYearMethodCategoryFailed",
+			Handler:    _CategoryService_FindYearMethodCategoryFailed_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountCategorySuccessById",
+			Handler:    _CategoryService_FindMonthAmountCategorySuccessById_Handler,
+		},
+		{
+			MethodName: "FindYearAmountCategorySuccessById",
+			Handler:    _CategoryService_FindYearAmountCategorySuccessById_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountCategoryFailedById",
+			Handler:    _CategoryService_FindMonthAmountCategoryFailedById_Handler,
+		},
+		{
+			MethodName: "FindYearAmountCategoryFailedById",
+			Handler:    _CategoryService_FindYearAmountCategoryFailedById_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodCategorySuccessById",
+			Handler:    _CategoryService_FindMonthMethodCategorySuccessById_Handler,
+		},
+		{
+			MethodName: "FindYearMethodCategorySuccessById",
+			Handler:    _CategoryService_FindYearMethodCategorySuccessById_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodCategoryFailedById",
+			Handler:    _CategoryService_FindMonthMethodCategoryFailedById_Handler,
+		},
+		{
+			MethodName: "FindYearMethodCategoryFailedById",
+			Handler:    _CategoryService_FindYearMethodCategoryFailedById_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountCategorySuccessByMerchant",
+			Handler:    _CategoryService_FindMonthAmountCategorySuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearAmountCategorySuccessByMerchant",
+			Handler:    _CategoryService_FindYearAmountCategorySuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthAmountCategoryFailedByMerchant",
+			Handler:    _CategoryService_FindMonthAmountCategoryFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearAmountCategoryFailedByMerchant",
+			Handler:    _CategoryService_FindYearAmountCategoryFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodCategorySuccessByMerchant",
+			Handler:    _CategoryService_FindMonthMethodCategorySuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearMethodCategorySuccessByMerchant",
+			Handler:    _CategoryService_FindYearMethodCategorySuccessByMerchant_Handler,
+		},
+		{
+			MethodName: "FindMonthMethodCategoryFailedByMerchant",
+			Handler:    _CategoryService_FindMonthMethodCategoryFailedByMerchant_Handler,
+		},
+		{
+			MethodName: "FindYearMethodCategoryFailedByMerchant",
+			Handler:    _CategoryService_FindYearMethodCategoryFailedByMerchant_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

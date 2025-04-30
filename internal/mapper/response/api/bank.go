@@ -68,6 +68,54 @@ func (s *bankResponseMapper) ToApiResponsePaginationBankDeleteAt(pbResponse *pb.
 	}
 }
 
+func (s *bankResponseMapper) ToApiResponsesMonthAmountSuccess(pbResponse *pb.ApiResponseBankMonthAmountSuccess) *response.ApiResponseBankMonthAmountSuccess {
+	return &response.ApiResponseBankMonthAmountSuccess{
+		Status:  pbResponse.Status,
+		Message: pbResponse.Message,
+		Data:    s.mapResponsesBankMonthAmountSuccess(pbResponse.Data),
+	}
+}
+
+func (s *bankResponseMapper) ToApiResponseYearAmountSuccess(pbResponse *pb.ApiResponseBankYearAmountSuccess) *response.ApiResponseBankYearAmountSuccess {
+	return &response.ApiResponseBankYearAmountSuccess{
+		Status:  pbResponse.Status,
+		Message: pbResponse.Message,
+		Data:    s.mapResponsesBankYearAmountSuccess(pbResponse.Data),
+	}
+}
+
+func (s *bankResponseMapper) ToApiResponsesMonthAmountFailed(pbResponse *pb.ApiResponseBankMonthAmountFailed) *response.ApiResponseBankMonthAmountFailed {
+	return &response.ApiResponseBankMonthAmountFailed{
+		Status:  pbResponse.Status,
+		Message: pbResponse.Message,
+		Data:    s.mapResponsesBankMonthAmountFailed(pbResponse.Data),
+	}
+}
+
+func (s *bankResponseMapper) ToApiResponseYearAmountFailed(pbResponse *pb.ApiResponseBankYearAmountFailed) *response.ApiResponseBankYearAmountFailed {
+	return &response.ApiResponseBankYearAmountFailed{
+		Status:  pbResponse.Status,
+		Message: pbResponse.Message,
+		Data:    s.mapResponsesBankYearAmountFailed(pbResponse.Data),
+	}
+}
+
+func (s *bankResponseMapper) ToApiResponsesMonthMethod(pbResponse *pb.ApiResponseBankMonthMethod) *response.ApiResponseBankMonthMethod {
+	return &response.ApiResponseBankMonthMethod{
+		Status:  pbResponse.Status,
+		Message: pbResponse.Message,
+		Data:    s.mapResponsesBankMonthMethod(pbResponse.Data),
+	}
+}
+
+func (s *bankResponseMapper) ToApiResponseYearMethod(pbResponse *pb.ApiResponseBankYearMethod) *response.ApiResponseBankYearMethod {
+	return &response.ApiResponseBankYearMethod{
+		Status:  pbResponse.Status,
+		Message: pbResponse.Message,
+		Data:    s.mapResponsesBankYearMethod(pbResponse.Data),
+	}
+}
+
 func (s *bankResponseMapper) mapResponseBank(Bank *pb.BankResponse) *response.BankResponse {
 	return &response.BankResponse{
 		ID:        int(Bank.Id),
@@ -105,4 +153,128 @@ func (s *bankResponseMapper) mapResponsesBankDeleteAt(Banks []*pb.BankResponseDe
 	}
 
 	return responseBanks
+}
+
+func (s *bankResponseMapper) mapResponseBankMonthAmountSuccess(b *pb.MonthAmountBankSuccessResponse) *response.MonthAmountBankSuccessResponse {
+	return &response.MonthAmountBankSuccessResponse{
+		ID:           int(b.Id),
+		BankName:     b.BankName,
+		Year:         b.Year,
+		Month:        b.Month,
+		TotalSuccess: int(b.TotalSuccess),
+		TotalAmount:  int(b.TotalAmount),
+	}
+}
+
+func (s *bankResponseMapper) mapResponsesBankMonthAmountSuccess(b []*pb.MonthAmountBankSuccessResponse) []*response.MonthAmountBankSuccessResponse {
+	var result []*response.MonthAmountBankSuccessResponse
+
+	for _, Bank := range b {
+		result = append(result, s.mapResponseBankMonthAmountSuccess(Bank))
+	}
+
+	return result
+}
+
+func (s *bankResponseMapper) mapResponseBankYearAmountSuccess(b *pb.YearAmountBankSuccessResponse) *response.YearAmountBankSuccessResponse {
+	return &response.YearAmountBankSuccessResponse{
+		ID:           int(b.Id),
+		BankName:     b.BankName,
+		Year:         b.Year,
+		TotalSuccess: int(b.TotalSuccess),
+		TotalAmount:  int(b.TotalAmount),
+	}
+}
+
+func (s *bankResponseMapper) mapResponsesBankYearAmountSuccess(b []*pb.YearAmountBankSuccessResponse) []*response.YearAmountBankSuccessResponse {
+	var result []*response.YearAmountBankSuccessResponse
+
+	for _, Bank := range b {
+		result = append(result, s.mapResponseBankYearAmountSuccess(Bank))
+	}
+
+	return result
+}
+
+func (s *bankResponseMapper) mapResponseBankMonthAmountFailed(b *pb.MonthAmountBankFailedResponse) *response.MonthAmountBankFailedResponse {
+	return &response.MonthAmountBankFailedResponse{
+		ID:          int(b.Id),
+		BankName:    b.BankName,
+		Year:        b.Year,
+		Month:       b.Month,
+		TotalFailed: int(b.TotalFailed),
+		TotalAmount: int(b.TotalAmount),
+	}
+}
+
+func (s *bankResponseMapper) mapResponsesBankMonthAmountFailed(b []*pb.MonthAmountBankFailedResponse) []*response.MonthAmountBankFailedResponse {
+	var result []*response.MonthAmountBankFailedResponse
+
+	for _, Bank := range b {
+		result = append(result, s.mapResponseBankMonthAmountFailed(Bank))
+	}
+
+	return result
+}
+
+func (s *bankResponseMapper) mapResponseBankYearAmountFailed(b *pb.YearAmountBankFailedResponse) *response.YearAmountBankFailedResponse {
+	return &response.YearAmountBankFailedResponse{
+		ID:          int(b.Id),
+		BankName:    b.BankName,
+		Year:        b.Year,
+		TotalFailed: int(b.TotalFailed),
+		TotalAmount: int(b.TotalAmount),
+	}
+}
+
+func (s *bankResponseMapper) mapResponsesBankYearAmountFailed(b []*pb.YearAmountBankFailedResponse) []*response.YearAmountBankFailedResponse {
+	var result []*response.YearAmountBankFailedResponse
+
+	for _, Bank := range b {
+		result = append(result, s.mapResponseBankYearAmountFailed(Bank))
+	}
+
+	return result
+}
+
+func (s *bankResponseMapper) mapResponseBankMonthMethod(b *pb.MonthMethodBankResponse) *response.MonthMethodBankResponse {
+	return &response.MonthMethodBankResponse{
+		ID:                int(b.Id),
+		Month:             b.Month,
+		BankName:          b.BankName,
+		PaymentMethod:     b.PaymentMethod,
+		TotalAmount:       int(b.TotalAmount),
+		TotalTransactions: int(b.TotalTransactions),
+	}
+}
+
+func (s bankResponseMapper) mapResponsesBankMonthMethod(b []*pb.MonthMethodBankResponse) []*response.MonthMethodBankResponse {
+	var result []*response.MonthMethodBankResponse
+
+	for _, Bank := range b {
+		result = append(result, s.mapResponseBankMonthMethod(Bank))
+	}
+
+	return result
+}
+
+func (s *bankResponseMapper) mapResponseBankYearMethod(b *pb.YearMethodBankResponse) *response.YearMethodBankResponse {
+	return &response.YearMethodBankResponse{
+		ID:                int(b.Id),
+		Year:              b.Year,
+		BankName:          b.BankName,
+		PaymentMethod:     b.PaymentMethod,
+		TotalAmount:       int(b.TotalAmount),
+		TotalTransactions: int(b.TotalTransactions),
+	}
+}
+
+func (s bankResponseMapper) mapResponsesBankYearMethod(b []*pb.YearMethodBankResponse) []*response.YearMethodBankResponse {
+	var result []*response.YearMethodBankResponse
+
+	for _, bank := range b {
+		result = append(result, s.mapResponseBankYearMethod(bank))
+	}
+
+	return result
 }

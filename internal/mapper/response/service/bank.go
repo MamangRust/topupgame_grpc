@@ -50,3 +50,127 @@ func (s *bankResponseMapper) ToBanksResponseDeleteAt(Banks []*record.BankRecord)
 
 	return responseBanks
 }
+
+func (s *bankResponseMapper) ToBankResponseMonthAmountSuccess(b *record.MonthAmountBankSuccessRecord) *response.MonthAmountBankSuccessResponse {
+	return &response.MonthAmountBankSuccessResponse{
+		ID:           int(b.ID),
+		BankName:     b.BankName,
+		Year:         b.Year,
+		Month:        b.Month,
+		TotalSuccess: int(b.TotalSuccess),
+		TotalAmount:  int(b.TotalAmount),
+	}
+}
+
+func (s *bankResponseMapper) ToBanksResponseMonthAmountSuccess(b []*record.MonthAmountBankSuccessRecord) []*response.MonthAmountBankSuccessResponse {
+	var result []*response.MonthAmountBankSuccessResponse
+
+	for _, Bank := range b {
+		result = append(result, s.ToBankResponseMonthAmountSuccess(Bank))
+	}
+
+	return result
+}
+
+func (s *bankResponseMapper) ToBankResponseYearAmountSuccess(b *record.YearAmountBankSuccessRecord) *response.YearAmountBankSuccessResponse {
+	return &response.YearAmountBankSuccessResponse{
+		ID:           int(b.ID),
+		BankName:     b.BankName,
+		Year:         b.Year,
+		TotalSuccess: int(b.TotalSuccess),
+		TotalAmount:  int(b.TotalAmount),
+	}
+}
+
+func (s *bankResponseMapper) ToBanksResponseYearAmountSuccess(b []*record.YearAmountBankSuccessRecord) []*response.YearAmountBankSuccessResponse {
+	var result []*response.YearAmountBankSuccessResponse
+
+	for _, Bank := range b {
+		result = append(result, s.ToBankResponseYearAmountSuccess(Bank))
+	}
+
+	return result
+}
+
+func (s *bankResponseMapper) ToBankResponseMonthAmountFailed(b *record.MonthAmountBankFailedRecord) *response.MonthAmountBankFailedResponse {
+	return &response.MonthAmountBankFailedResponse{
+		ID:          int(b.ID),
+		BankName:    b.BankName,
+		Year:        b.Year,
+		Month:       b.Month,
+		TotalFailed: int(b.TotalFailed),
+		TotalAmount: int(b.TotalAmount),
+	}
+}
+
+func (s *bankResponseMapper) ToBanksResponseMonthAmountFailed(b []*record.MonthAmountBankFailedRecord) []*response.MonthAmountBankFailedResponse {
+	var result []*response.MonthAmountBankFailedResponse
+
+	for _, Bank := range b {
+		result = append(result, s.ToBankResponseMonthAmountFailed(Bank))
+	}
+
+	return result
+}
+
+func (s *bankResponseMapper) ToBankResponseYearAmountFailed(b *record.YearAmountBankFailedRecord) *response.YearAmountBankFailedResponse {
+	return &response.YearAmountBankFailedResponse{
+		ID:          int(b.ID),
+		BankName:    b.BankName,
+		Year:        b.Year,
+		TotalFailed: int(b.TotalFailed),
+		TotalAmount: int(b.TotalAmount),
+	}
+}
+
+func (s *bankResponseMapper) ToBanksResponseYearAmountFailed(b []*record.YearAmountBankFailedRecord) []*response.YearAmountBankFailedResponse {
+	var result []*response.YearAmountBankFailedResponse
+
+	for _, Bank := range b {
+		result = append(result, s.ToBankResponseYearAmountFailed(Bank))
+	}
+
+	return result
+}
+
+func (s *bankResponseMapper) ToBankResponseMonthMethod(b *record.MonthMethodBankRecord) *response.MonthMethodBankResponse {
+	return &response.MonthMethodBankResponse{
+		ID:                int(b.ID),
+		Month:             b.Month,
+		BankName:          b.BankName,
+		PaymentMethod:     b.PaymentMethod,
+		TotalAmount:       int(b.TotalAmount),
+		TotalTransactions: int(b.TotalTransactions),
+	}
+}
+
+func (s bankResponseMapper) ToBanksResponseMonthMethod(b []*record.MonthMethodBankRecord) []*response.MonthMethodBankResponse {
+	var result []*response.MonthMethodBankResponse
+
+	for _, Bank := range b {
+		result = append(result, s.ToBankResponseMonthMethod(Bank))
+	}
+
+	return result
+}
+
+func (s *bankResponseMapper) ToBankResponseYearMethod(b *record.YearMethodBankRecord) *response.YearMethodBankResponse {
+	return &response.YearMethodBankResponse{
+		ID:                int(b.ID),
+		Year:              b.Year,
+		BankName:          b.BankName,
+		PaymentMethod:     b.PaymentMethod,
+		TotalAmount:       int(b.TotalAmount),
+		TotalTransactions: int(b.TotalTransactions),
+	}
+}
+
+func (s bankResponseMapper) ToBanksResponseYearMethod(b []*record.YearMethodBankRecord) []*response.YearMethodBankResponse {
+	var result []*response.YearMethodBankResponse
+
+	for _, bank := range b {
+		result = append(result, s.ToBankResponseYearMethod(bank))
+	}
+
+	return result
+}

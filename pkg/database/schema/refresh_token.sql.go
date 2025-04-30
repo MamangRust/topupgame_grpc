@@ -111,10 +111,11 @@ func (q *Queries) FindRefreshTokenByUserId(ctx context.Context, userID int32) (*
 	return &i, err
 }
 
-const updateRefreshTokenByUserId = `-- name: UpdateRefreshTokenByUserId :exec
+const updateRefreshTokenByUserId = `-- name: UpdateRefreshTokenByUserId :one
 UPDATE refresh_tokens
 SET token = $2, expiration = $3, updated_at = current_timestamp
 WHERE user_id = $1 AND deleted_at IS NULL
+RETURNING refresh_token_id, user_id, token, expiration, created_at, updated_at, deleted_at
 `
 
 type UpdateRefreshTokenByUserIdParams struct {
@@ -123,7 +124,17 @@ type UpdateRefreshTokenByUserIdParams struct {
 	Expiration time.Time `json:"expiration"`
 }
 
-func (q *Queries) UpdateRefreshTokenByUserId(ctx context.Context, arg UpdateRefreshTokenByUserIdParams) error {
-	_, err := q.db.ExecContext(ctx, updateRefreshTokenByUserId, arg.UserID, arg.Token, arg.Expiration)
-	return err
+func (q *Queries) UpdateRefreshTokenByUserId(ctx context.Context, arg UpdateRefreshTokenByUserIdParams) (*RefreshToken, error) {
+	row := q.db.QueryRowContext(ctx, updateRefreshTokenByUserId, arg.UserID, arg.Token, arg.Expiration)
+	var i RefreshToken
+	err := row.Scan(
+		&i.RefreshTokenID,
+		&i.UserID,
+		&i.Token,
+		&i.Expiration,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return &i, err
 }
