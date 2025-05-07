@@ -66,12 +66,12 @@ func NewHandlerCategory(router *echo.Echo, category pb.CategoryServiceClient, lo
 	routerCategory.GET("/merchant/monthly-method-failed/:merchant_id", categoryHandler.FindMonthMethodCategorySuccessByMerchant)
 	routerCategory.GET("/merchant/yearly-method-failed/:merchant_id", categoryHandler.FindYearMethodCategorySuccessByMerchant)
 
-	routerCategory.POST("/:id", categoryHandler.Update)
-	routerCategory.DELETE("/:id", categoryHandler.Trashed)
-	routerCategory.PUT("/restore/:id", categoryHandler.Restore)
+	routerCategory.POST("/update/:id", categoryHandler.Update)
+	routerCategory.POST("/trashed/:id", categoryHandler.Trashed)
+	routerCategory.POST("/restore/:id", categoryHandler.Restore)
 	routerCategory.DELETE("/permanent/:id", categoryHandler.DeletePermanent)
-	routerCategory.PUT("/restore-all", categoryHandler.RestoreAll)
-	routerCategory.DELETE("/permanent-all", categoryHandler.DeleteAllPermanent)
+	routerCategory.POST("/restore/all", categoryHandler.RestoreAll)
+	routerCategory.DELETE("/permanent/all", categoryHandler.DeleteAllPermanent)
 
 	return categoryHandler
 }

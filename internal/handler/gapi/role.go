@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	"topup_game/internal/domain/requests"
+	"topup_game/internal/domain/response"
 	protomapper "topup_game/internal/mapper/proto"
 	"topup_game/internal/pb"
 	"topup_game/internal/service"
@@ -46,7 +47,7 @@ func (s *roleHandleGrpc) FindAllRole(ctx context.Context, req *pb.FindAllRoleReq
 	role, totalRecords, err := s.roleService.FindAll(&reqService)
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcFailedFindAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -73,7 +74,7 @@ func (s *roleHandleGrpc) FindByIdRole(ctx context.Context, req *pb.FindByIdRoleR
 	role, err := s.roleService.FindById(id)
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcRoleNotFound
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	roleResponse := s.mapping.ToProtoResponseRole("success", "Successfully fetched role", role)
@@ -91,7 +92,7 @@ func (s *roleHandleGrpc) FindByUserId(ctx context.Context, req *pb.FindByIdUserR
 	role, err := s.roleService.FindByUserId(id)
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcRoleNotFound
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	roleResponse := s.mapping.ToProtoResponsesRole("success", "Successfully fetched role by user ID", role)
@@ -120,7 +121,7 @@ func (s *roleHandleGrpc) FindByActive(ctx context.Context, req *pb.FindAllRoleRe
 	roles, totalRecords, err := s.roleService.FindByActive(&reqService)
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcFailedFindActive
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -157,7 +158,7 @@ func (s *roleHandleGrpc) FindByTrashed(ctx context.Context, req *pb.FindAllRoleR
 	roles, totalRecords, err := s.roleService.FindByTrashed(&reqService)
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcFailedFindTrashed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -189,7 +190,7 @@ func (s *roleHandleGrpc) CreateRole(ctx context.Context, req *pb.CreateRoleReque
 	})
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcFailedCreateRole
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseRole("success", "Successfully created role", role)
@@ -218,7 +219,7 @@ func (s *roleHandleGrpc) UpdateRole(ctx context.Context, req *pb.UpdateRoleReque
 	role, err := s.roleService.Update(request)
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcFailedUpdateRole
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseRole("success", "Successfully updated role", role)
@@ -236,7 +237,7 @@ func (s *roleHandleGrpc) TrashedRole(ctx context.Context, req *pb.FindByIdRoleRe
 	role, err := s.roleService.Trashed(id)
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcFailedTrashedRole
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseRole("success", "Successfully trashed role", role)
@@ -254,7 +255,7 @@ func (s *roleHandleGrpc) RestoreRole(ctx context.Context, req *pb.FindByIdRoleRe
 	role, err := s.roleService.Restore(id)
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcFailedRestoreRole
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseRole("success", "Successfully restored role", role)
@@ -272,7 +273,7 @@ func (s *roleHandleGrpc) DeleteRolePermanent(ctx context.Context, req *pb.FindBy
 	_, err := s.roleService.DeletePermanent(id)
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcFailedDeletePermanent
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseRoleDelete("success", "Successfully deleted role permanently")
@@ -284,7 +285,7 @@ func (s *roleHandleGrpc) RestoreAllRole(ctx context.Context, req *emptypb.Empty)
 	_, err := s.roleService.RestoreAll()
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcFailedRestoreAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseRoleAll("success", "Successfully restored all roles")
@@ -296,7 +297,7 @@ func (s *roleHandleGrpc) DeleteAllRolePermanent(ctx context.Context, req *emptyp
 	_, err := s.roleService.DeleteAllPermanent()
 
 	if err != nil {
-		return nil, role_errors.ErrGrpcFailedDeleteAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseRoleAll("success", "Successfully deleted all roles")

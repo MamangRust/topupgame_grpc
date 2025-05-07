@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	"topup_game/internal/domain/requests"
+	"topup_game/internal/domain/response"
 	protomapper "topup_game/internal/mapper/proto"
 	"topup_game/internal/pb"
 	"topup_game/internal/service"
@@ -46,7 +47,7 @@ func (s *categoryHandleGrpc) FindAll(ctx context.Context, req *pb.FindAllCategor
 	role, totalRecords, err := s.categoryService.FindAll(&reqService)
 
 	if err != nil {
-		return nil, category_errors.ErrGrpcFailedFindAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -64,14 +65,24 @@ func (s *categoryHandleGrpc) FindAll(ctx context.Context, req *pb.FindAllCategor
 }
 
 func (s *categoryHandleGrpc) FindMonthAmountCategorySuccess(ctx context.Context, req *pb.MonthAmountCategoryRequest) (*pb.ApiResponseCategoryMonthAmountSuccess, error) {
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+	if month <= 0 || month >= 12 {
+		return nil, category_errors.ErrGrpcInvalidMonth
+	}
+
 	request := &requests.MonthAmountCategoryRequest{
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.categoryService.FindMonthAmountCategorySuccess(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindMonthAmountCategorySuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountSuccess("success", "Successfully fetched monthly Category success amounts", results)
@@ -81,9 +92,13 @@ func (s *categoryHandleGrpc) FindMonthAmountCategorySuccess(ctx context.Context,
 func (s *categoryHandleGrpc) FindYearAmountCategorySuccess(ctx context.Context, req *pb.YearAmountCategoryRequest) (*pb.ApiResponseCategoryYearAmountSuccess, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.categoryService.FindYearAmountCategorySuccess(year)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearAmountCategorySuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountSuccess("success", "Successfully fetched yearly Category success amounts", results)
@@ -91,14 +106,25 @@ func (s *categoryHandleGrpc) FindYearAmountCategorySuccess(ctx context.Context, 
 }
 
 func (s *categoryHandleGrpc) FindMonthAmountCategoryFailed(ctx context.Context, req *pb.MonthAmountCategoryRequest) (*pb.ApiResponseCategoryMonthAmountFailed, error) {
+	month := int(req.GetMonth())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
+	if month <= 0 || month >= 12 {
+		return nil, category_errors.ErrGrpcInvalidMonth
+	}
+
 	request := &requests.MonthAmountCategoryRequest{
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.categoryService.FindMonthAmountCategoryFailed(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindMonthAmountCategoryFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountFailed("success", "Successfully fetched monthly Category failed amounts", results)
@@ -108,9 +134,13 @@ func (s *categoryHandleGrpc) FindMonthAmountCategoryFailed(ctx context.Context, 
 func (s *categoryHandleGrpc) FindYearAmountCategoryFailed(ctx context.Context, req *pb.YearAmountCategoryRequest) (*pb.ApiResponseCategoryYearAmountFailed, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.categoryService.FindYearAmountCategoryFailed(year)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearAmountCategoryFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountFailed("success", "Successfully fetched yearly Category failed amounts", results)
@@ -120,9 +150,13 @@ func (s *categoryHandleGrpc) FindYearAmountCategoryFailed(ctx context.Context, r
 func (s *categoryHandleGrpc) FindMonthMethodCategorySuccess(ctx context.Context, req *pb.YearAmountCategoryRequest) (*pb.ApiResponseCategoryMonthMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.categoryService.FindMonthMethodCategorySuccess(year)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindMonthMethodCategorySuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod("success", "Successfully fetched monthly Category success methods", results)
@@ -132,9 +166,13 @@ func (s *categoryHandleGrpc) FindMonthMethodCategorySuccess(ctx context.Context,
 func (s *categoryHandleGrpc) FindYearMethodCategorySuccess(ctx context.Context, req *pb.YearAmountCategoryRequest) (*pb.ApiResponseCategoryYearMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.categoryService.FindYearMethodCategorySuccess(year)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearMethodCategorySuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod("success", "Successfully fetched yearly Category success methods", results)
@@ -144,9 +182,13 @@ func (s *categoryHandleGrpc) FindYearMethodCategorySuccess(ctx context.Context, 
 func (s *categoryHandleGrpc) FindMonthMethodCategoryFailed(ctx context.Context, req *pb.YearAmountCategoryRequest) (*pb.ApiResponseCategoryMonthMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.categoryService.FindMonthMethodCategoryFailed(year)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindMonthMethodCategoryFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod("success", "Successfully fetched monthly Category failed methods", results)
@@ -154,15 +196,30 @@ func (s *categoryHandleGrpc) FindMonthMethodCategoryFailed(ctx context.Context, 
 }
 
 func (s *categoryHandleGrpc) FindMonthAmountCategorySuccessById(ctx context.Context, req *pb.MonthAmountCategoryByIdRequest) (*pb.ApiResponseCategoryMonthAmountSuccess, error) {
+	id := int(req.GetId())
+	month := int(req.GetMonth())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+	if month <= 0 || month >= 12 {
+		return nil, category_errors.ErrGrpcInvalidMonth
+	}
+
+	if id <= 0 {
+		return nil, category_errors.ErrGrpcCategoryInvalidId
+	}
+
 	request := &requests.MonthAmountCategoryByIdRequest{
-		ID:    int(req.GetId()),
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		ID:    id,
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.categoryService.FindMonthAmountCategorySuccessById(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindMonthAmountCategorySuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountSuccess(
@@ -174,14 +231,24 @@ func (s *categoryHandleGrpc) FindMonthAmountCategorySuccessById(ctx context.Cont
 }
 
 func (s *categoryHandleGrpc) FindYearAmountCategorySuccessById(ctx context.Context, req *pb.YearAmountCategoryByIdRequest) (*pb.ApiResponseCategoryYearAmountSuccess, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+	if id <= 0 {
+		return nil, category_errors.ErrGrpcCategoryInvalidId
+	}
+
 	request := &requests.YearAmountCategoryByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.categoryService.FindYearAmountCategorySuccessById(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearAmountCategorySuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountSuccess(
@@ -193,15 +260,30 @@ func (s *categoryHandleGrpc) FindYearAmountCategorySuccessById(ctx context.Conte
 }
 
 func (s *categoryHandleGrpc) FindMonthAmountCategoryFailedById(ctx context.Context, req *pb.MonthAmountCategoryByIdRequest) (*pb.ApiResponseCategoryMonthAmountFailed, error) {
+	id := int(req.GetId())
+	month := int(req.GetMonth())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+	if month <= 0 || month >= 12 {
+		return nil, category_errors.ErrGrpcInvalidMonth
+	}
+
+	if id <= 0 {
+		return nil, category_errors.ErrGrpcCategoryInvalidId
+	}
+
 	request := &requests.MonthAmountCategoryByIdRequest{
-		ID:    int(req.GetId()),
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		ID:    id,
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.categoryService.FindMonthAmountCategoryFailedById(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindMonthAmountCategoryFailedById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountFailed(
@@ -213,14 +295,24 @@ func (s *categoryHandleGrpc) FindMonthAmountCategoryFailedById(ctx context.Conte
 }
 
 func (s *categoryHandleGrpc) FindYearAmountCategoryFailedById(ctx context.Context, req *pb.YearAmountCategoryByIdRequest) (*pb.ApiResponseCategoryYearAmountFailed, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+	if id <= 0 {
+		return nil, category_errors.ErrGrpcCategoryInvalidId
+	}
+
 	request := &requests.YearAmountCategoryByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.categoryService.FindYearAmountCategoryFailedById(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearAmountCategoryFailedById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountFailed(
@@ -232,14 +324,24 @@ func (s *categoryHandleGrpc) FindYearAmountCategoryFailedById(ctx context.Contex
 }
 
 func (s *categoryHandleGrpc) FindMonthMethodCategorySuccessById(ctx context.Context, req *pb.MonthMethodCategoryByIdRequest) (*pb.ApiResponseCategoryMonthMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+	if id <= 0 {
+		return nil, category_errors.ErrGrpcCategoryInvalidId
+	}
+
 	request := &requests.MonthMethodCategoryByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.categoryService.FindMonthMethodCategorySuccessById(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindMonthMethodCategorySuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -251,14 +353,24 @@ func (s *categoryHandleGrpc) FindMonthMethodCategorySuccessById(ctx context.Cont
 }
 
 func (s *categoryHandleGrpc) FindYearMethodCategorySuccessById(ctx context.Context, req *pb.YearMethodCategoryByIdRequest) (*pb.ApiResponseCategoryYearMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+	if id <= 0 {
+		return nil, category_errors.ErrGrpcCategoryInvalidId
+	}
+
 	request := &requests.YearMethodCategoryByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.categoryService.FindYearMethodCategorySuccessById(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearMethodCategorySuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -270,14 +382,24 @@ func (s *categoryHandleGrpc) FindYearMethodCategorySuccessById(ctx context.Conte
 }
 
 func (s *categoryHandleGrpc) FindMonthMethodCategoryFailedById(ctx context.Context, req *pb.MonthMethodCategoryByIdRequest) (*pb.ApiResponseCategoryMonthMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+	if id <= 0 {
+		return nil, category_errors.ErrGrpcCategoryInvalidId
+	}
+
 	request := &requests.MonthMethodCategoryByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.categoryService.FindMonthMethodCategoryFailedById(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindMonthMethodCategoryFailedById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -289,14 +411,24 @@ func (s *categoryHandleGrpc) FindMonthMethodCategoryFailedById(ctx context.Conte
 }
 
 func (s *categoryHandleGrpc) FindYearMethodCategoryFailedById(ctx context.Context, req *pb.YearMethodCategoryByIdRequest) (*pb.ApiResponseCategoryYearMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+	if id <= 0 {
+		return nil, category_errors.ErrGrpcCategoryInvalidId
+	}
+
 	request := &requests.YearMethodCategoryByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.categoryService.FindYearMethodCategoryFailedById(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearMethodCategoryFailedById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -308,15 +440,31 @@ func (s *categoryHandleGrpc) FindYearMethodCategoryFailedById(ctx context.Contex
 }
 
 func (s *categoryHandleGrpc) FindMonthAmountCategorySuccessByMerchant(ctx context.Context, req *pb.MonthAmountCategoryByMerchantRequest) (*pb.ApiResponseCategoryMonthAmountSuccess, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if merchantID <= 0 {
+		return nil, category_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
+	if month <= 0 {
+		return nil, category_errors.ErrGrpcInvalidMonth
+	}
+
 	request := &requests.MonthAmountCategoryByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
-		Month:      int(req.GetMonth()),
+		MerchantID: merchantID,
+		Year:       year,
+		Month:      month,
 	}
 
 	results, err := s.categoryService.FindMonthAmountCategorySuccessByMerchant(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindMonthAmountCategorySuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountSuccess(
@@ -328,14 +476,25 @@ func (s *categoryHandleGrpc) FindMonthAmountCategorySuccessByMerchant(ctx contex
 }
 
 func (s *categoryHandleGrpc) FindYearAmountCategorySuccessByMerchant(ctx context.Context, req *pb.YearAmountCategoryByMerchantRequest) (*pb.ApiResponseCategoryYearAmountSuccess, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, category_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearAmountCategoryByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.categoryService.FindYearAmountCategorySuccessByMerchant(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearAmountCategorySuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountSuccess(
@@ -347,10 +506,26 @@ func (s *categoryHandleGrpc) FindYearAmountCategorySuccessByMerchant(ctx context
 }
 
 func (s *categoryHandleGrpc) FindMonthAmountCategoryFailedByMerchant(ctx context.Context, req *pb.MonthAmountCategoryByMerchantRequest) (*pb.ApiResponseCategoryMonthAmountFailed, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if merchantID <= 0 {
+		return nil, category_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
+	if month <= 0 || month >= 12 {
+		return nil, category_errors.ErrGrpcInvalidMonth
+	}
+
 	request := &requests.MonthAmountCategoryByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
-		Month:      int(req.GetMonth()),
+		MerchantID: merchantID,
+		Year:       year,
+		Month:      month,
 	}
 
 	results, err := s.categoryService.FindMonthAmountCategoryFailedByMerchant(request)
@@ -367,14 +542,25 @@ func (s *categoryHandleGrpc) FindMonthAmountCategoryFailedByMerchant(ctx context
 }
 
 func (s *categoryHandleGrpc) FindYearAmountCategoryFailedByMerchant(ctx context.Context, req *pb.YearAmountCategoryByMerchantRequest) (*pb.ApiResponseCategoryYearAmountFailed, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, category_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearAmountCategoryByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.categoryService.FindYearAmountCategoryFailedByMerchant(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearAmountCategoryFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountFailed(
@@ -386,14 +572,25 @@ func (s *categoryHandleGrpc) FindYearAmountCategoryFailedByMerchant(ctx context.
 }
 
 func (s *categoryHandleGrpc) FindMonthMethodCategorySuccessByMerchant(ctx context.Context, req *pb.MonthMethodCategoryByMerchantRequest) (*pb.ApiResponseCategoryMonthMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, category_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.MonthMethodCategoryByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.categoryService.FindMonthMethodCategorySuccessByMerchant(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindMonthMethodCategorySuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -405,14 +602,25 @@ func (s *categoryHandleGrpc) FindMonthMethodCategorySuccessByMerchant(ctx contex
 }
 
 func (s *categoryHandleGrpc) FindYearMethodCategorySuccessByMerchant(ctx context.Context, req *pb.YearMethodCategoryByMerchantRequest) (*pb.ApiResponseCategoryYearMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, category_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearMethodCategoryByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.categoryService.FindYearMethodCategorySuccessByMerchant(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearMethodCategorySuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -424,14 +632,25 @@ func (s *categoryHandleGrpc) FindYearMethodCategorySuccessByMerchant(ctx context
 }
 
 func (s *categoryHandleGrpc) FindMonthMethodCategoryFailedByMerchant(ctx context.Context, req *pb.MonthMethodCategoryByMerchantRequest) (*pb.ApiResponseCategoryMonthMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, category_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.MonthMethodCategoryByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.categoryService.FindMonthMethodCategoryFailedByMerchant(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindMonthMethodCategoryFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -443,14 +662,25 @@ func (s *categoryHandleGrpc) FindMonthMethodCategoryFailedByMerchant(ctx context
 }
 
 func (s *categoryHandleGrpc) FindYearMethodCategoryFailedByMerchant(ctx context.Context, req *pb.YearMethodCategoryByMerchantRequest) (*pb.ApiResponseCategoryYearMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, category_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearMethodCategoryByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.categoryService.FindYearMethodCategoryFailedByMerchant(request)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearMethodCategoryFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -464,9 +694,13 @@ func (s *categoryHandleGrpc) FindYearMethodCategoryFailedByMerchant(ctx context.
 func (s *categoryHandleGrpc) FindYearMethodCategoryFailed(ctx context.Context, req *pb.YearAmountCategoryRequest) (*pb.ApiResponseCategoryYearMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, category_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.categoryService.FindYearMethodCategoryFailed(year)
 	if err != nil {
-		return nil, category_errors.ErrGrpcFindYearMethodCategoryFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod("success", "Successfully fetched yearly Category failed methods", results)
@@ -483,7 +717,7 @@ func (s *categoryHandleGrpc) FindById(ctx context.Context, req *pb.FindByIdCateg
 	Category, err := s.categoryService.FindById(id)
 
 	if err != nil {
-		return nil, category_errors.ErrGrpcCategoryNotFound
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	CategoryResponse := s.mapping.ToProtoResponseCategory("success", "Successfully fetched Category", Category)
@@ -512,7 +746,7 @@ func (s *categoryHandleGrpc) FindByActive(ctx context.Context, req *pb.FindAllCa
 	Categorys, totalRecords, err := s.categoryService.FindByActive(&reqService)
 
 	if err != nil {
-		return nil, category_errors.ErrGrpcFailedFindActive
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -549,7 +783,7 @@ func (s *categoryHandleGrpc) FindByTrashed(ctx context.Context, req *pb.FindAllC
 	roles, totalRecords, err := s.categoryService.FindByTrashed(&reqService)
 
 	if err != nil {
-		return nil, category_errors.ErrGrpcFailedFindTrashed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -579,7 +813,7 @@ func (s *categoryHandleGrpc) Create(ctx context.Context, req *pb.CreateCategoryR
 	Category, err := s.categoryService.Create(request)
 
 	if err != nil {
-		return nil, category_errors.ErrGrpcFailedCreateCategory
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseCategory("success", "Successfully created Category", Category)
@@ -608,7 +842,7 @@ func (s *categoryHandleGrpc) Update(ctx context.Context, req *pb.UpdateCategoryR
 	role, err := s.categoryService.Update(request)
 
 	if err != nil {
-		return nil, category_errors.ErrGrpcFailedUpdateCategory
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseCategory("success", "Successfully updated Category", role)
@@ -626,7 +860,7 @@ func (s *categoryHandleGrpc) Trashed(ctx context.Context, req *pb.FindByIdCatego
 	Category, err := s.categoryService.Trashed(id)
 
 	if err != nil {
-		return nil, category_errors.ErrGrpcFailedTrashedCategory
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseCategoryDeleteAt("success", "Successfully trashed Category", Category)
@@ -644,7 +878,7 @@ func (s *categoryHandleGrpc) Restore(ctx context.Context, req *pb.FindByIdCatego
 	role, err := s.categoryService.Restore(id)
 
 	if err != nil {
-		return nil, category_errors.ErrGrpcFailedRestoreCategory
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseCategoryDeleteAt("success", "Successfully restored Category", role)
@@ -662,7 +896,7 @@ func (s *categoryHandleGrpc) DeletePermanent(ctx context.Context, req *pb.FindBy
 	_, err := s.categoryService.DeletePermanent(id)
 
 	if err != nil {
-		return nil, category_errors.ErrGrpcFailedDeletePermanent
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseCategoryDelete("success", "Successfully deleted Category permanently")
@@ -674,7 +908,7 @@ func (s *categoryHandleGrpc) RestoreAll(ctx context.Context, req *emptypb.Empty)
 	_, err := s.categoryService.RestoreAll()
 
 	if err != nil {
-		return nil, category_errors.ErrGrpcFailedRestoreAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseCategoryAll("success", "Successfully restored all Categorys")
@@ -686,7 +920,7 @@ func (s *categoryHandleGrpc) DeleteAllPermanent(ctx context.Context, req *emptyp
 	_, err := s.categoryService.DeleteAllPermanent()
 
 	if err != nil {
-		return nil, category_errors.ErrGrpcFailedDeleteAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseCategoryAll("success", "Successfully deleted all Categorys")

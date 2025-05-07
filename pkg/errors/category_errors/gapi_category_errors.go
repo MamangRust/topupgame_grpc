@@ -7,6 +7,10 @@ import (
 )
 
 var (
+	ErrGrpcInvalidMerchantId = response.NewGrpcError("error", "Invalid merchant ID", int(codes.InvalidArgument))
+	ErrGrpcInvalidMonth      = response.NewGrpcError("error", "Invalid month", int(codes.InvalidArgument))
+	ErrGrpcInvalidYear       = response.NewGrpcError("error", "Invalid year", int(codes.InvalidArgument))
+
 	ErrGrpcCategoryNotFound  = response.NewGrpcError("error", "Category not found", int(codes.NotFound))
 	ErrGrpcCategoryInvalidId = response.NewGrpcError("error", "Invalid Category ID", int(codes.NotFound))
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	"topup_game/internal/domain/requests"
+	"topup_game/internal/domain/response"
 	protomapper "topup_game/internal/mapper/proto"
 	"topup_game/internal/pb"
 	"topup_game/internal/service"
@@ -47,7 +48,7 @@ func (s *voucherHandleGrpc) FindAll(ctx context.Context, req *pb.FindAllVoucherR
 	role, totalRecords, err := s.voucherService.FindAll(reqService)
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFailedFindAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -65,14 +66,24 @@ func (s *voucherHandleGrpc) FindAll(ctx context.Context, req *pb.FindAllVoucherR
 }
 
 func (s *voucherHandleGrpc) FindMonthAmountVoucherSuccess(ctx context.Context, req *pb.MonthAmountVoucherRequest) (*pb.ApiResponseVoucherMonthAmountSuccess, error) {
+	month := int(req.GetMonth())
+	year := int(req.GetYear())
+
+	if month <= 0 || month > 12 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidMonth
+	}
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	request := &requests.MonthAmountVoucherRequest{
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.voucherService.FindMonthAmountVoucherSuccess(request)
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthAmountVoucherSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesMonthAmountSuccess(
@@ -85,9 +96,13 @@ func (s *voucherHandleGrpc) FindMonthAmountVoucherSuccess(ctx context.Context, r
 func (s *voucherHandleGrpc) FindYearAmountVoucherSuccess(ctx context.Context, req *pb.YearAmountVoucherRequest) (*pb.ApiResponseVoucherYearAmountSuccess, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	results, err := s.voucherService.FindYearAmountVoucherSuccess(year)
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearAmountVoucherSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesYearAmountSuccess(
@@ -98,14 +113,24 @@ func (s *voucherHandleGrpc) FindYearAmountVoucherSuccess(ctx context.Context, re
 }
 
 func (s *voucherHandleGrpc) FindMonthAmountVoucherFailed(ctx context.Context, req *pb.MonthAmountVoucherRequest) (*pb.ApiResponseVoucherMonthAmountFailed, error) {
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if month <= 0 || month > 12 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidMonth
+	}
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	request := &requests.MonthAmountVoucherRequest{
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.voucherService.FindMonthAmountVoucherFailed(request)
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthAmountVoucherFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesMonthAmountFailed(
@@ -118,9 +143,13 @@ func (s *voucherHandleGrpc) FindMonthAmountVoucherFailed(ctx context.Context, re
 func (s *voucherHandleGrpc) FindYearAmountVoucherFailed(ctx context.Context, req *pb.YearAmountVoucherRequest) (*pb.ApiResponseVoucherYearAmountFailed, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	results, err := s.voucherService.FindYearAmountVoucherFailed(year)
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearAmountVoucherFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesYearAmountFailed(
@@ -133,9 +162,13 @@ func (s *voucherHandleGrpc) FindYearAmountVoucherFailed(ctx context.Context, req
 func (s *voucherHandleGrpc) FindMonthMethodVoucherSuccess(ctx context.Context, req *pb.YearAmountVoucherRequest) (*pb.ApiResponseVoucherMonthMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	results, err := s.voucherService.FindMonthMethodVoucherSuccess(year)
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthMethodVoucherSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesMonthMethod(
@@ -148,9 +181,13 @@ func (s *voucherHandleGrpc) FindMonthMethodVoucherSuccess(ctx context.Context, r
 func (s *voucherHandleGrpc) FindYearMethodVoucherSuccess(ctx context.Context, req *pb.YearAmountVoucherRequest) (*pb.ApiResponseVoucherYearMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	results, err := s.voucherService.FindYearMethodVoucherSuccess(year)
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearMethodVoucherSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesYearMethod(
@@ -163,9 +200,13 @@ func (s *voucherHandleGrpc) FindYearMethodVoucherSuccess(ctx context.Context, re
 func (s *voucherHandleGrpc) FindMonthMethodVoucherFailed(ctx context.Context, req *pb.YearAmountVoucherRequest) (*pb.ApiResponseVoucherMonthMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	results, err := s.voucherService.FindMonthMethodVoucherFailed(year)
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthMethodVoucherFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesMonthMethod(
@@ -178,9 +219,13 @@ func (s *voucherHandleGrpc) FindMonthMethodVoucherFailed(ctx context.Context, re
 func (s *voucherHandleGrpc) FindYearMethodVoucherFailed(ctx context.Context, req *pb.YearAmountVoucherRequest) (*pb.ApiResponseVoucherYearMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	results, err := s.voucherService.FindYearMethodVoucherFailed(year)
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearMethodVoucherFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesYearMethod(
@@ -192,17 +237,28 @@ func (s *voucherHandleGrpc) FindYearMethodVoucherFailed(ctx context.Context, req
 
 func (s *voucherHandleGrpc) FindMonthAmountVoucherSuccessById(ctx context.Context, req *pb.MonthAmountVoucherByIdRequest) (*pb.ApiResponseVoucherMonthAmountSuccess, error) {
 	id := int(req.GetId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if month <= 0 || month > 12 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidMonth
+	}
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	result, err := s.voucherService.FindMonthAmountVoucherSuccessById(&requests.MonthAmountVoucherByIdRequest{
-		ID: id,
+		ID:    id,
+		Year:  year,
+		Month: month,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthAmountVoucherSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountSuccess("success", "Successfully fetched monthly voucher success amounts", result)
@@ -211,17 +267,23 @@ func (s *voucherHandleGrpc) FindMonthAmountVoucherSuccessById(ctx context.Contex
 
 func (s *voucherHandleGrpc) FindYearAmountVoucherSuccessById(ctx context.Context, req *pb.YearAmountVoucherByIdRequest) (*pb.ApiResponseVoucherYearAmountSuccess, error) {
 	id := int(req.GetId())
+	year := int(req.GetYear())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	result, err := s.voucherService.FindYearAmountVoucherSuccessById(&requests.YearAmountVoucherByIdRequest{
-		ID: id,
+		ID:   id,
+		Year: year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearAmountVoucherSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesYearAmountSuccess("success", "Successfully fetched yearly voucher success amounts", result)
@@ -230,17 +292,28 @@ func (s *voucherHandleGrpc) FindYearAmountVoucherSuccessById(ctx context.Context
 
 func (s *voucherHandleGrpc) FindMonthAmountVoucherFailedById(ctx context.Context, req *pb.MonthAmountVoucherByIdRequest) (*pb.ApiResponseVoucherMonthAmountFailed, error) {
 	id := int(req.GetId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if month <= 0 || month > 12 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidMonth
+	}
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	result, err := s.voucherService.FindMonthAmountVoucherFailedById(&requests.MonthAmountVoucherByIdRequest{
-		ID: id,
+		ID:    id,
+		Year:  year,
+		Month: month,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthAmountVoucherFailedById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountFailed("success", "Successfully fetched monthly voucher failed amounts", result)
@@ -249,17 +322,23 @@ func (s *voucherHandleGrpc) FindMonthAmountVoucherFailedById(ctx context.Context
 
 func (s *voucherHandleGrpc) FindYearAmountVoucherFailedById(ctx context.Context, req *pb.YearAmountVoucherByIdRequest) (*pb.ApiResponseVoucherYearAmountFailed, error) {
 	id := int(req.GetId())
+	year := int(req.GetYear())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	result, err := s.voucherService.FindYearAmountVoucherFailedById(&requests.YearAmountVoucherByIdRequest{
-		ID: id,
+		ID:   id,
+		Year: year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearAmountVoucherFailedById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesYearAmountFailed("success", "Successfully fetched yearly voucher failed amounts", result)
@@ -268,17 +347,23 @@ func (s *voucherHandleGrpc) FindYearAmountVoucherFailedById(ctx context.Context,
 
 func (s *voucherHandleGrpc) FindMonthMethodVoucherSuccessById(ctx context.Context, req *pb.MonthMethodVoucherByIdRequest) (*pb.ApiResponseVoucherMonthMethod, error) {
 	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
 	result, err := s.voucherService.FindMonthMethodVoucherSuccessById(&requests.MonthMethodVoucherByIdRequest{
-		ID: id,
+		ID:   id,
+		Year: year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthMethodVoucherSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod("success", "Successfully fetched monthly voucher success methods", result)
@@ -287,17 +372,23 @@ func (s *voucherHandleGrpc) FindMonthMethodVoucherSuccessById(ctx context.Contex
 
 func (s *voucherHandleGrpc) FindYearMethodVoucherSuccessById(ctx context.Context, req *pb.YearMethodVoucherByIdRequest) (*pb.ApiResponseVoucherYearMethod, error) {
 	id := int(req.GetId())
+	year := int(req.GetYear())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	result, err := s.voucherService.FindYearMethodVoucherSuccessById(&requests.YearMethodVoucherByIdRequest{
-		ID: id,
+		ID:   id,
+		Year: year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearMethodVoucherSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesYearMethod("success", "Successfully fetched yearly voucher success methods", result)
@@ -306,17 +397,19 @@ func (s *voucherHandleGrpc) FindYearMethodVoucherSuccessById(ctx context.Context
 
 func (s *voucherHandleGrpc) FindMonthMethodVoucherFailedById(ctx context.Context, req *pb.MonthMethodVoucherByIdRequest) (*pb.ApiResponseVoucherMonthMethod, error) {
 	id := int(req.GetId())
+	year := int(req.GetYear())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
 	result, err := s.voucherService.FindMonthMethodVoucherFailedById(&requests.MonthMethodVoucherByIdRequest{
-		ID: id,
+		ID:   id,
+		Year: year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthMethodVoucherFailedById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod("success", "Successfully fetched monthly voucher failed methods", result)
@@ -325,17 +418,23 @@ func (s *voucherHandleGrpc) FindMonthMethodVoucherFailedById(ctx context.Context
 
 func (s *voucherHandleGrpc) FindYearMethodVoucherFailedById(ctx context.Context, req *pb.YearMethodVoucherByIdRequest) (*pb.ApiResponseVoucherYearMethod, error) {
 	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
 	result, err := s.voucherService.FindYearMethodVoucherFailedById(&requests.YearMethodVoucherByIdRequest{
-		ID: id,
+		ID:   id,
+		Year: year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearMethodVoucherFailedById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesYearMethod("success", "Successfully fetched yearly voucher failed methods", result)
@@ -344,17 +443,29 @@ func (s *voucherHandleGrpc) FindYearMethodVoucherFailedById(ctx context.Context,
 
 func (s *voucherHandleGrpc) FindMonthAmountVoucherSuccessByMerchant(ctx context.Context, req *pb.MonthAmountVoucherByMerchantRequest) (*pb.ApiResponseVoucherMonthAmountSuccess, error) {
 	id := int(req.GetMerchantId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
+	if month <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidMonth
+	}
+
 	result, err := s.voucherService.FindMonthAmountVoucherSuccessByMerchant(&requests.MonthAmountVoucherByMerchantRequest{
 		MerchantID: id,
+		Year:       year,
+		Month:      month,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthAmountVoucherSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountSuccess("success", "Successfully fetched monthly voucher success amounts", result)
@@ -363,17 +474,23 @@ func (s *voucherHandleGrpc) FindMonthAmountVoucherSuccessByMerchant(ctx context.
 
 func (s *voucherHandleGrpc) FindYearAmountVoucherSuccessByMerchant(ctx context.Context, req *pb.YearAmountVoucherByMerchantRequest) (*pb.ApiResponseVoucherYearAmountSuccess, error) {
 	id := int(req.GetMerchantId())
+	year := int(req.GetYear())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	result, err := s.voucherService.FindYearAmountVoucherSuccessByMerchant(&requests.YearAmountVoucherByMerchantRequest{
 		MerchantID: id,
+		Year:       year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearAmountVoucherSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesYearAmountSuccess("success", "Successfully fetched yearly voucher success amounts", result)
@@ -382,17 +499,28 @@ func (s *voucherHandleGrpc) FindYearAmountVoucherSuccessByMerchant(ctx context.C
 
 func (s *voucherHandleGrpc) FindMonthAmountVoucherFailedByMerchant(ctx context.Context, req *pb.MonthAmountVoucherByMerchantRequest) (*pb.ApiResponseVoucherMonthAmountFailed, error) {
 	id := int(req.GetMerchantId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if month <= 0 || month > 12 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidMonth
+	}
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	result, err := s.voucherService.FindMonthAmountVoucherFailedByMerchant(&requests.MonthAmountVoucherByMerchantRequest{
 		MerchantID: id,
+		Month:      month,
+		Year:       year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthAmountVoucherFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountFailed("success", "Successfully fetched monthly voucher failed amounts", result)
@@ -401,6 +529,7 @@ func (s *voucherHandleGrpc) FindMonthAmountVoucherFailedByMerchant(ctx context.C
 
 func (s *voucherHandleGrpc) FindYearAmountVoucherFailedByMerchant(ctx context.Context, req *pb.YearAmountVoucherByMerchantRequest) (*pb.ApiResponseVoucherYearAmountFailed, error) {
 	id := int(req.GetMerchantId())
+	year := int(req.GetYear())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
@@ -408,10 +537,11 @@ func (s *voucherHandleGrpc) FindYearAmountVoucherFailedByMerchant(ctx context.Co
 
 	result, err := s.voucherService.FindYearAmountVoucherFailedByMerchant(&requests.YearAmountVoucherByMerchantRequest{
 		MerchantID: id,
+		Year:       year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearAmountVoucherFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesYearAmountFailed("success", "Successfully fetched yearly voucher failed amounts", result)
@@ -420,17 +550,23 @@ func (s *voucherHandleGrpc) FindYearAmountVoucherFailedByMerchant(ctx context.Co
 
 func (s *voucherHandleGrpc) FindMonthMethodVoucherSuccessByMerchant(ctx context.Context, req *pb.MonthMethodVoucherByMerchantRequest) (*pb.ApiResponseVoucherMonthMethod, error) {
 	id := int(req.GetMerchantId())
+	year := int(req.GetYear())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	result, err := s.voucherService.FindMonthMethodVoucherSuccessByMerchant(&requests.MonthMethodVoucherByMerchantRequest{
 		MerchantID: id,
+		Year:       year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthMethodVoucherSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod("success", "Successfully fetched monthly voucher success methods", result)
@@ -439,17 +575,23 @@ func (s *voucherHandleGrpc) FindMonthMethodVoucherSuccessByMerchant(ctx context.
 
 func (s *voucherHandleGrpc) FindYearMethodVoucherSuccessByMerchant(ctx context.Context, req *pb.YearMethodVoucherByMerchantRequest) (*pb.ApiResponseVoucherYearMethod, error) {
 	id := int(req.GetMerchantId())
+	year := int(req.GetYear())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	result, err := s.voucherService.FindYearMethodVoucherSuccessByMerchant(&requests.YearMethodVoucherByMerchantRequest{
 		MerchantID: id,
+		Year:       year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearMethodVoucherSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesYearMethod("success", "Successfully fetched yearly voucher success methods", result)
@@ -458,17 +600,23 @@ func (s *voucherHandleGrpc) FindYearMethodVoucherSuccessByMerchant(ctx context.C
 
 func (s *voucherHandleGrpc) FindMonthMethodVoucherFailedByMerchant(ctx context.Context, req *pb.MonthMethodVoucherByMerchantRequest) (*pb.ApiResponseVoucherMonthMethod, error) {
 	id := int(req.GetMerchantId())
+	year := int(req.GetYear())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	result, err := s.voucherService.FindMonthMethodVoucherFailedByMerchant(&requests.MonthMethodVoucherByMerchantRequest{
 		MerchantID: id,
+		Year:       year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindMonthMethodVoucherFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod("success", "Successfully fetched monthly voucher failed methods", result)
@@ -477,17 +625,23 @@ func (s *voucherHandleGrpc) FindMonthMethodVoucherFailedByMerchant(ctx context.C
 
 func (s *voucherHandleGrpc) FindYearMethodVoucherFailedByMerchant(ctx context.Context, req *pb.YearMethodVoucherByMerchantRequest) (*pb.ApiResponseVoucherYearMethod, error) {
 	id := int(req.GetMerchantId())
+	year := int(req.GetYear())
 
 	if id == 0 {
 		return nil, voucher_errors.ErrGrpcVoucherInvalidId
 	}
 
+	if year <= 0 {
+		return nil, voucher_errors.ErrGrpcVoucherInvalidYear
+	}
+
 	result, err := s.voucherService.FindYearMethodVoucherFailedByMerchant(&requests.YearMethodVoucherByMerchantRequest{
 		MerchantID: id,
+		Year:       year,
 	})
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFindYearMethodVoucherFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesYearMethod("success", "Successfully fetched yearly voucher failed methods", result)
@@ -504,7 +658,7 @@ func (s *voucherHandleGrpc) FindByID(ctx context.Context, req *pb.FindByIdVouche
 	Voucher, err := s.voucherService.FindById(id)
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcVoucherNotFound
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	VoucherResponse := s.mapping.ToProtoResponseVoucher("success", "Successfully fetched Voucher", Voucher)
@@ -533,7 +687,7 @@ func (s *voucherHandleGrpc) FindByActive(ctx context.Context, req *pb.FindAllVou
 	Vouchers, totalRecords, err := s.voucherService.FindByActive(reqService)
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFailedFindActive
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -570,7 +724,7 @@ func (s *voucherHandleGrpc) FindByTrashed(ctx context.Context, req *pb.FindAllVo
 	roles, totalRecords, err := s.voucherService.FindByTrashed(reqService)
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFailedFindTrashed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -600,7 +754,7 @@ func (s *voucherHandleGrpc) Create(ctx context.Context, req *pb.CreateVoucherReq
 	Voucher, err := s.voucherService.Create(request)
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFailedCreateVoucher
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseVoucher("success", "Successfully created Voucher", Voucher)
@@ -629,7 +783,7 @@ func (s *voucherHandleGrpc) Update(ctx context.Context, req *pb.UpdateVoucherReq
 	role, err := s.voucherService.Update(request)
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFailedUpdateVoucher
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseVoucher("success", "Successfully updated Voucher", role)
@@ -647,7 +801,7 @@ func (s *voucherHandleGrpc) Trashed(ctx context.Context, req *pb.FindByIdVoucher
 	Voucher, err := s.voucherService.Trashed(id)
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFailedTrashedVoucher
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseVoucherDeleteAt("success", "Successfully trashed Voucher", Voucher)
@@ -665,7 +819,7 @@ func (s *voucherHandleGrpc) Restore(ctx context.Context, req *pb.FindByIdVoucher
 	role, err := s.voucherService.Restore(id)
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFailedRestoreVoucher
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseVoucherDeleteAt("success", "Successfully restored Voucher", role)
@@ -683,7 +837,7 @@ func (s *voucherHandleGrpc) DeletePermanent(ctx context.Context, req *pb.FindByI
 	_, err := s.voucherService.DeletePermanent(id)
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFailedDeletePermanent
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseVoucherDelete("success", "Successfully deleted Voucher permanently")
@@ -695,7 +849,7 @@ func (s *voucherHandleGrpc) RestoreAll(ctx context.Context, req *emptypb.Empty) 
 	_, err := s.voucherService.RestoreAll()
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFailedRestoreAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseVoucherAll("success", "Successfully restored all Vouchers")
@@ -707,7 +861,7 @@ func (s *voucherHandleGrpc) DeleteAllPermanent(ctx context.Context, req *emptypb
 	_, err := s.voucherService.DeleteAllPermanent()
 
 	if err != nil {
-		return nil, voucher_errors.ErrGrpcFailedDeleteAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseVoucherAll("success", "Successfully deleted all Vouchers")

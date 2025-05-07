@@ -66,12 +66,12 @@ func NewHandlerNominal(router *echo.Echo, nominal pb.NominalServiceClient, logge
 	routerNominal.GET("/merchant/monthly-method-failed/:merchant_id", nominalHandler.FindMonthMethodNominalSuccessByMerchant)
 	routerNominal.GET("/merchant/yearly-method-failed/:merchant_id", nominalHandler.FindYearMethodNominalSuccessByMerchant)
 
-	routerNominal.POST("/:id", nominalHandler.Update)
-	routerNominal.DELETE("/:id", nominalHandler.Trashed)
-	routerNominal.PUT("/restore/:id", nominalHandler.Restore)
+	routerNominal.POST("/update/:id", nominalHandler.Update)
+	routerNominal.POST("/trashed/:id", nominalHandler.Trashed)
+	routerNominal.POST("/restore/:id", nominalHandler.Restore)
 	routerNominal.DELETE("/permanent/:id", nominalHandler.DeletePermanent)
-	routerNominal.PUT("/restore-all", nominalHandler.RestoreAll)
-	routerNominal.DELETE("/permanent-all", nominalHandler.DeleteAllPermanent)
+	routerNominal.POST("/restore/all", nominalHandler.RestoreAll)
+	routerNominal.DELETE("/permanent/all", nominalHandler.DeleteAllPermanent)
 
 	return nominalHandler
 }
@@ -1265,7 +1265,7 @@ func (h *nominalHandleApi) Update(c echo.Context) error {
 // @Success 200 {object} response.ApiResponseNominalDeleteAt "Successfully retrieved trashed Nominal"
 // @Failure 400 {object} response.ErrorResponse "Invalid request body or validation error"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve trashed Nominal"
-// @Router /api/nominal/trashed/{id} [get]
+// @Router /api/nominal/trashed/{id} [post]
 func (h *nominalHandleApi) Trashed(c echo.Context) error {
 	NominalID, err := strconv.Atoi(c.Param("id"))
 	if err != nil || NominalID <= 0 {

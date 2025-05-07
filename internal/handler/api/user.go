@@ -6,7 +6,6 @@ import (
 	"topup_game/internal/domain/requests"
 	response_api "topup_game/internal/mapper/response/api"
 	"topup_game/internal/pb"
-	"topup_game/pkg/errors/nominal_errors"
 	"topup_game/pkg/errors/user_errors"
 	"topup_game/pkg/logger"
 
@@ -280,6 +279,15 @@ func (h *userHandleApi) Create(c echo.Context) error {
 // @Failure 500 {object} response.ErrorResponse "Failed to update user"
 // @Router /api/user/update/{id} [post]
 func (h *userHandleApi) Update(c echo.Context) error {
+	id := c.Param("id")
+
+	idInt, err := strconv.Atoi(id)
+
+	if err != nil {
+		h.logger.Debug("Invalid request body", zap.Error(err))
+		return user_errors.ErrApiUserInvalidId(c)
+	}
+
 	var body requests.UpdateUserRequest
 
 	if err := c.Bind(&body); err != nil {
@@ -295,7 +303,7 @@ func (h *userHandleApi) Update(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	req := &pb.UpdateUserRequest{
-		Id:              int32(body.UserID),
+		Id:              int32(idInt),
 		Firstname:       body.FirstName,
 		Lastname:        body.LastName,
 		Email:           body.Email,
@@ -370,7 +378,7 @@ func (h *userHandleApi) RestoreUser(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Invalid user ID", zap.Error(err))
-		return nominal_errors.ErrInvalidNominalId(c)
+		return user_errors.ErrApiUserInvalidId(c)
 	}
 
 	ctx := c.Request().Context()
@@ -383,7 +391,7 @@ func (h *userHandleApi) RestoreUser(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Failed to restore user", zap.Error(err))
-		return nominal_errors.ErrApiFailedRestoreNominal(c)
+		return user_errors.ErrApiFailedRestoreUser(c)
 	}
 
 	so := h.mapping.ToApiResponseUserDeleteAt(user)
@@ -408,7 +416,7 @@ func (h *userHandleApi) DeleteUserPermanent(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Invalid user ID", zap.Error(err))
-		return nominal_errors.ErrApiNominalInvalidId(c)
+		return user_errors.ErrApiUserInvalidId(c)
 	}
 
 	ctx := c.Request().Context()
@@ -421,7 +429,7 @@ func (h *userHandleApi) DeleteUserPermanent(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Debug("Failed to delete user", zap.Error(err))
-		return nominal_errors.ErrApiFailedDeletePermanent(c)
+		return user_errors.ErrApiFailedDeletePermanent(c)
 	}
 
 	so := h.mapping.ToApiResponseUserDelete(user)
@@ -448,7 +456,7 @@ func (h *userHandleApi) RestoreAllUser(c echo.Context) error {
 
 	if err != nil {
 		h.logger.Error("Failed to restore all user", zap.Error(err))
-		return nominal_errors.ErrApiFailedRestoreAll(c)
+		return user_errors.ErrApiFailedRestoreAll(c)
 	}
 
 	so := h.mapping.ToApiResponseUserAll(res)
@@ -478,7 +486,7 @@ func (h *userHandleApi) DeleteAllUserPermanent(c echo.Context) error {
 	if err != nil {
 		h.logger.Error("Failed to permanently delete all user", zap.Error(err))
 
-		return nominal_errors.ErrApiFailedDeleteAll(c)
+		return user_errors.ErrApiFailedDeleteAll(c)
 	}
 
 	so := h.mapping.ToApiResponseUserAll(res)

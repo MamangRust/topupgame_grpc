@@ -57,12 +57,12 @@ func NewHandlerTransaction(router *echo.Echo, transaction pb.TransactionServiceC
 	routerTransaction.GET("/merchant/monthly-method-failed/:id", transactionHandler.FindMonthMethodTransactionSuccessByMerchant)
 	routerTransaction.GET("/merchant/yearly-method-failed/:id", transactionHandler.FindYearMethodTransactionSuccessByMerchant)
 
-	routerTransaction.POST("/:id", transactionHandler.Update)
-	routerTransaction.DELETE("/:id", transactionHandler.Trashed)
-	routerTransaction.PUT("/restore/:id", transactionHandler.Restore)
+	routerTransaction.POST("/update/:id", transactionHandler.Update)
+	routerTransaction.POST("/trashed/:id", transactionHandler.Trashed)
+	routerTransaction.POST("/restore/:id", transactionHandler.Restore)
 	routerTransaction.DELETE("/permanent/:id", transactionHandler.DeletePermanent)
-	routerTransaction.PUT("/restore-all", transactionHandler.RestoreAll)
-	routerTransaction.DELETE("/permanent-all", transactionHandler.DeleteAllPermanent)
+	routerTransaction.POST("/restore/all", transactionHandler.RestoreAll)
+	routerTransaction.DELETE("/permanent/all", transactionHandler.DeleteAllPermanent)
 
 	return transactionHandler
 }
@@ -999,7 +999,7 @@ func (h *transactionHandleApi) Restore(c echo.Context) error {
 // @Success 200 {object} response.ApiResponseTransactionDelete "Successfully deleted Transaction record permanently"
 // @Failure 400 {object} response.ErrorResponse "Bad Request: Invalid ID"
 // @Failure 500 {object} response.ErrorResponse "Failed to delete Transaction"
-// @Router /api/transaction/delete/{id} [post]
+// @Router /api/transaction/permanent/{id} [post]
 func (h *transactionHandleApi) DeletePermanent(c echo.Context) error {
 	TransactionID, err := strconv.Atoi(c.Param("id"))
 	if err != nil || TransactionID <= 0 {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	"topup_game/internal/domain/requests"
+	"topup_game/internal/domain/response"
 	protomapper "topup_game/internal/mapper/proto"
 	"topup_game/internal/pb"
 	"topup_game/internal/service"
@@ -47,7 +48,7 @@ func (s *transactionHandleGrpc) FindAll(ctx context.Context, req *pb.FindAllTran
 	role, totalRecords, err := s.transactionService.FindAll(reqService)
 
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFailedFindAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -65,85 +66,155 @@ func (s *transactionHandleGrpc) FindAll(ctx context.Context, req *pb.FindAllTran
 }
 
 func (s *transactionHandleGrpc) FindMonthAmountTransactionSuccess(ctx context.Context, req *pb.MonthAmountTransactionRequest) (*pb.ApiResponseTransactionMonthAmountSuccess, error) {
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+	if month <= 0 || month > 12 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidMonth
+	}
+
 	results, err := s.transactionService.FindMonthAmountTransactionSuccess(&requests.MonthAmountTransactionRequest{
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		Year:  year,
+		Month: month,
 	})
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindMonthAmountTransactionSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 	return s.mapping.ToProtoResponsesMonthAmountSuccess("success", "Monthly transaction success amounts", results), nil
 }
 
 func (s *transactionHandleGrpc) FindYearAmountTransactionSuccess(ctx context.Context, req *pb.YearAmountTransactionRequest) (*pb.ApiResponseTransactionYearAmountSuccess, error) {
-	results, err := s.transactionService.FindYearAmountTransactionSuccess(int(req.GetYear()))
+	year := int(req.GetYear())
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	results, err := s.transactionService.FindYearAmountTransactionSuccess(year)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindYearAmountTransactionSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 	return s.mapping.ToProtoResponseYearAmountSuccess("success", "Yearly transaction success amounts", results), nil
 }
 
 func (s *transactionHandleGrpc) FindMonthAmountTransactionFailed(ctx context.Context, req *pb.MonthAmountTransactionRequest) (*pb.ApiResponseTransactionMonthAmountFailed, error) {
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+	if month <= 0 || month > 12 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidMonth
+	}
+
 	results, err := s.transactionService.FindMonthAmountTransactionFailed(&requests.MonthAmountTransactionRequest{
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		Year:  year,
+		Month: month,
 	})
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindMonthAmountTransactionFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 	return s.mapping.ToProtoResponsesMonthAmountFailed("success", "Monthly transaction failed amounts", results), nil
 }
 
 func (s *transactionHandleGrpc) FindYearAmountTransactionFailed(ctx context.Context, req *pb.YearAmountTransactionRequest) (*pb.ApiResponseTransactionYearAmountFailed, error) {
-	results, err := s.transactionService.FindYearAmountTransactionFailed(int(req.GetYear()))
+	year := int(req.GetYear())
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	results, err := s.transactionService.FindYearAmountTransactionFailed(year)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindYearAmountTransactionFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 	return s.mapping.ToProtoResponseYearAmountFailed("success", "Yearly transaction failed amounts", results), nil
 }
 
 func (s *transactionHandleGrpc) FindMonthMethodTransactionSuccess(ctx context.Context, req *pb.YearAmountTransactionRequest) (*pb.ApiResponseTransactionMonthMethod, error) {
-	results, err := s.transactionService.FindMonthMethodTransactionSuccess(int(req.GetYear()))
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	results, err := s.transactionService.FindMonthMethodTransactionSuccess(year)
+
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindMonthMethodTransactionSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 	return s.mapping.ToProtoResponsesMonthMethod("success", "Monthly transaction success methods", results), nil
 }
 
 func (s *transactionHandleGrpc) FindYearMethodTransactionSuccess(ctx context.Context, req *pb.YearAmountTransactionRequest) (*pb.ApiResponseTransactionYearMethod, error) {
-	results, err := s.transactionService.FindYearMethodTransactionSuccess(int(req.GetYear()))
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	results, err := s.transactionService.FindYearMethodTransactionSuccess(year)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindYearMethodTransactionSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 	return s.mapping.ToProtoResponseYearMethod("success", "Yearly transaction success methods", results), nil
 }
 
 func (s *transactionHandleGrpc) FindMonthMethodTransactionFailed(ctx context.Context, req *pb.YearAmountTransactionRequest) (*pb.ApiResponseTransactionMonthMethod, error) {
-	results, err := s.transactionService.FindMonthMethodTransactionFailed(int(req.GetYear()))
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	results, err := s.transactionService.FindMonthMethodTransactionFailed(year)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindMonthMethodTransactionFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 	return s.mapping.ToProtoResponsesMonthMethod("success", "Monthly transaction failed methods", results), nil
 }
 
 func (s *transactionHandleGrpc) FindYearMethodTransactionFailed(ctx context.Context, req *pb.YearAmountTransactionRequest) (*pb.ApiResponseTransactionYearMethod, error) {
-	results, err := s.transactionService.FindYearMethodTransactionFailed(int(req.GetYear()))
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	results, err := s.transactionService.FindYearMethodTransactionFailed(year)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindYearMethodTransactionFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 	return s.mapping.ToProtoResponseYearMethod("success", "Yearly transaction failed methods", results), nil
 }
 
 func (s *transactionHandleGrpc) FindMonthAmountTransactionSuccessByMerchant(ctx context.Context, req *pb.MonthAmountTransactionByMerchantRequest) (*pb.ApiResponseTransactionMonthAmountSuccess, error) {
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+	merchantID := int(req.GetMerchantId())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+	if month <= 0 || month > 12 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidMonth
+	}
+
+	if merchantID <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidId
+	}
+
 	request := &requests.MonthAmountTransactionByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
-		Month:      int(req.GetMonth()),
+		MerchantID: merchantID,
+		Year:       year,
+		Month:      month,
 	}
 
 	results, err := s.transactionService.FindMonthAmountTransactionSuccessByMerchant(request)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindMonthAmountTransactionSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesMonthAmountSuccess(
@@ -154,14 +225,25 @@ func (s *transactionHandleGrpc) FindMonthAmountTransactionSuccessByMerchant(ctx 
 }
 
 func (s *transactionHandleGrpc) FindYearAmountTransactionSuccessByMerchant(ctx context.Context, req *pb.YearAmountTransactionByMerchantRequest) (*pb.ApiResponseTransactionYearAmountSuccess, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	if merchantID <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidId
+	}
+
 	request := &requests.YearAmountTransactionByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.transactionService.FindYearAmountTransactionSuccessByMerchant(request)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindYearAmountTransactionSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponseYearAmountSuccess(
@@ -172,15 +254,30 @@ func (s *transactionHandleGrpc) FindYearAmountTransactionSuccessByMerchant(ctx c
 }
 
 func (s *transactionHandleGrpc) FindMonthAmountTransactionFailedByMerchant(ctx context.Context, req *pb.MonthAmountTransactionByMerchantRequest) (*pb.ApiResponseTransactionMonthAmountFailed, error) {
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+	merchantID := int(req.GetMerchantId())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+	if month <= 0 || month > 12 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidMonth
+	}
+
+	if merchantID <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidId
+	}
+
 	request := &requests.MonthAmountTransactionByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
-		Month:      int(req.GetMonth()),
+		MerchantID: merchantID,
+		Year:       year,
+		Month:      month,
 	}
 
 	results, err := s.transactionService.FindMonthAmountTransactionFailedByMerchant(request)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindMonthAmountTransactionFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesMonthAmountFailed(
@@ -191,14 +288,25 @@ func (s *transactionHandleGrpc) FindMonthAmountTransactionFailedByMerchant(ctx c
 }
 
 func (s *transactionHandleGrpc) FindYearAmountTransactionFailedByMerchant(ctx context.Context, req *pb.YearAmountTransactionByMerchantRequest) (*pb.ApiResponseTransactionYearAmountFailed, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	if merchantID <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidId
+	}
+
 	request := &requests.YearAmountTransactionByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.transactionService.FindYearAmountTransactionFailedByMerchant(request)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindYearAmountTransactionFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponseYearAmountFailed(
@@ -209,14 +317,25 @@ func (s *transactionHandleGrpc) FindYearAmountTransactionFailedByMerchant(ctx co
 }
 
 func (s *transactionHandleGrpc) FindMonthMethodTransactionSuccessByMerchant(ctx context.Context, req *pb.MonthMethodTransactionByMerchantRequest) (*pb.ApiResponseTransactionMonthMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	if merchantID <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidId
+	}
+
 	request := &requests.MonthMethodTransactionByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.transactionService.FindMonthMethodTransactionSuccessByMerchant(request)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindMonthMethodTransactionSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesMonthMethod(
@@ -227,14 +346,25 @@ func (s *transactionHandleGrpc) FindMonthMethodTransactionSuccessByMerchant(ctx 
 }
 
 func (s *transactionHandleGrpc) FindYearMethodTransactionSuccessByMerchant(ctx context.Context, req *pb.YearMethodTransactionByMerchantRequest) (*pb.ApiResponseTransactionYearMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	if merchantID <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidId
+	}
+
 	request := &requests.YearMethodTransactionByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.transactionService.FindYearMethodTransactionSuccessByMerchant(request)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindYearMethodTransactionSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponseYearMethod(
@@ -245,14 +375,25 @@ func (s *transactionHandleGrpc) FindYearMethodTransactionSuccessByMerchant(ctx c
 }
 
 func (s *transactionHandleGrpc) FindMonthMethodTransactionFailedByMerchant(ctx context.Context, req *pb.MonthMethodTransactionByMerchantRequest) (*pb.ApiResponseTransactionMonthMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	if merchantID <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidId
+	}
+
 	request := &requests.MonthMethodTransactionByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.transactionService.FindMonthMethodTransactionFailedByMerchant(request)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindMonthMethodTransactionFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponsesMonthMethod(
@@ -263,14 +404,25 @@ func (s *transactionHandleGrpc) FindMonthMethodTransactionFailedByMerchant(ctx c
 }
 
 func (s *transactionHandleGrpc) FindYearMethodTransactionFailedByMerchant(ctx context.Context, req *pb.YearMethodTransactionByMerchantRequest) (*pb.ApiResponseTransactionYearMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidYear
+	}
+
+	if merchantID <= 0 {
+		return nil, transaction_errors.ErrGrpcTransactionInvalidId
+	}
+
 	request := &requests.YearMethodTransactionByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.transactionService.FindYearMethodTransactionFailedByMerchant(request)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFindYearMethodTransactionFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	return s.mapping.ToProtoResponseYearMethod(
@@ -290,7 +442,7 @@ func (s *transactionHandleGrpc) FindById(ctx context.Context, req *pb.FindByIdTr
 	Transaction, err := s.transactionService.FindById(id)
 
 	if err != nil {
-		return nil, transaction_errors.ErrTransactionNotFound
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	TransactionResponse := s.mapping.ToProtoResponseTransaction("success", "Successfully fetched Transaction", Transaction)
@@ -319,7 +471,7 @@ func (s *transactionHandleGrpc) FindByActive(ctx context.Context, req *pb.FindAl
 	Transactions, totalRecords, err := s.transactionService.FindByActive(reqService)
 
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFailedFindActive
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -356,7 +508,7 @@ func (s *transactionHandleGrpc) FindByTrashed(ctx context.Context, req *pb.FindA
 	roles, totalRecords, err := s.transactionService.FindByTrashed(reqService)
 
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFailedFindTrashed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -388,7 +540,7 @@ func (s *transactionHandleGrpc) Create(ctx context.Context, req *pb.CreateTransa
 
 	transaction, err := s.transactionService.Create(createReq)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFailedCreateTransaction
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseTransaction("success", "Successfully created transaction", transaction)
@@ -418,7 +570,7 @@ func (s *transactionHandleGrpc) Update(ctx context.Context, req *pb.UpdateTransa
 
 	transaction, err := s.transactionService.Update(updateReq)
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFailedUpdateTransaction
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseTransaction("success", "Successfully updated transaction", transaction)
@@ -435,7 +587,7 @@ func (s *transactionHandleGrpc) Trashed(ctx context.Context, req *pb.FindByIdTra
 	Transaction, err := s.transactionService.Trashed(id)
 
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFailedTrashedTransaction
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseTransactionDeleteAt("success", "Successfully trashed Transaction", Transaction)
@@ -453,7 +605,7 @@ func (s *transactionHandleGrpc) Restore(ctx context.Context, req *pb.FindByIdTra
 	role, err := s.transactionService.Restore(id)
 
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFailedRestoreTransaction
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseTransactionDeleteAt("success", "Successfully restored Transaction", role)
@@ -471,7 +623,7 @@ func (s *transactionHandleGrpc) DeletePermanent(ctx context.Context, req *pb.Fin
 	_, err := s.transactionService.DeletePermanent(id)
 
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFailedDeletePermanent
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseTransactionDelete("success", "Successfully deleted Transaction permanently")
@@ -483,7 +635,7 @@ func (s *transactionHandleGrpc) RestoreAll(ctx context.Context, req *emptypb.Emp
 	_, err := s.transactionService.RestoreAll()
 
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFailedRestoreAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseTransactionAll("success", "Successfully restored all Transactions")
@@ -495,7 +647,7 @@ func (s *transactionHandleGrpc) DeleteAllPermanent(ctx context.Context, req *emp
 	_, err := s.transactionService.DeleteAllPermanent()
 
 	if err != nil {
-		return nil, transaction_errors.ErrGrpcFailedDeletePermanent
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseTransactionAll("success", "Successfully deleted all Transactions")

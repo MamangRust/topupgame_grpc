@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	"topup_game/internal/domain/requests"
+	"topup_game/internal/domain/response"
 	protomapper "topup_game/internal/mapper/proto"
 	"topup_game/internal/pb"
 	"topup_game/internal/service"
@@ -46,7 +47,7 @@ func (s *bankHandleGrpc) FindAll(ctx context.Context, req *pb.FindAllBankRequest
 	role, totalRecords, err := s.bankService.FindAll(&reqService)
 
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFailedFindAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -64,14 +65,26 @@ func (s *bankHandleGrpc) FindAll(ctx context.Context, req *pb.FindAllBankRequest
 }
 
 func (s *bankHandleGrpc) FindMonthAmountBankSuccess(ctx context.Context, req *pb.MonthAmountBankRequest) (*pb.ApiResponseBankMonthAmountSuccess, error) {
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
+	if month <= 0 || month >= 12 {
+		return nil, bank_errors.ErrGrpcInvalidMonth
+	}
+
 	request := &requests.MonthAmountBankRequest{
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.bankService.FindMonthAmountBankSuccess(request)
+
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindMonthAmountBankSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountSuccess("success", "Successfully fetched monthly bank success amounts", results)
@@ -81,9 +94,13 @@ func (s *bankHandleGrpc) FindMonthAmountBankSuccess(ctx context.Context, req *pb
 func (s *bankHandleGrpc) FindYearAmountBankSuccess(ctx context.Context, req *pb.YearAmountBankRequest) (*pb.ApiResponseBankYearAmountSuccess, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.bankService.FindYearAmountBankSuccess(year)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearAmountBankSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountSuccess("success", "Successfully fetched yearly bank success amounts", results)
@@ -91,14 +108,25 @@ func (s *bankHandleGrpc) FindYearAmountBankSuccess(ctx context.Context, req *pb.
 }
 
 func (s *bankHandleGrpc) FindMonthAmountBankFailed(ctx context.Context, req *pb.MonthAmountBankRequest) (*pb.ApiResponseBankMonthAmountFailed, error) {
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
+	if month <= 0 || month >= 12 {
+		return nil, bank_errors.ErrGrpcInvalidMonth
+	}
+
 	request := &requests.MonthAmountBankRequest{
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.bankService.FindMonthAmountBankFailed(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindMonthAmountBankFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountFailed("success", "Successfully fetched monthly bank failed amounts", results)
@@ -108,9 +136,13 @@ func (s *bankHandleGrpc) FindMonthAmountBankFailed(ctx context.Context, req *pb.
 func (s *bankHandleGrpc) FindYearAmountBankFailed(ctx context.Context, req *pb.YearAmountBankRequest) (*pb.ApiResponseBankYearAmountFailed, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.bankService.FindYearAmountBankFailed(year)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearAmountBankFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountFailed("success", "Successfully fetched yearly bank failed amounts", results)
@@ -120,9 +152,13 @@ func (s *bankHandleGrpc) FindYearAmountBankFailed(ctx context.Context, req *pb.Y
 func (s *bankHandleGrpc) FindMonthMethodBankSuccess(ctx context.Context, req *pb.YearAmountBankRequest) (*pb.ApiResponseBankMonthMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.bankService.FindMonthMethodBankSuccess(year)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindMonthMethodBankSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod("success", "Successfully fetched monthly bank success methods", results)
@@ -132,9 +168,13 @@ func (s *bankHandleGrpc) FindMonthMethodBankSuccess(ctx context.Context, req *pb
 func (s *bankHandleGrpc) FindYearMethodBankSuccess(ctx context.Context, req *pb.YearAmountBankRequest) (*pb.ApiResponseBankYearMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.bankService.FindYearMethodBankSuccess(year)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearMethodBankSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod("success", "Successfully fetched yearly bank success methods", results)
@@ -144,9 +184,13 @@ func (s *bankHandleGrpc) FindYearMethodBankSuccess(ctx context.Context, req *pb.
 func (s *bankHandleGrpc) FindMonthMethodBankFailed(ctx context.Context, req *pb.YearAmountBankRequest) (*pb.ApiResponseBankMonthMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.bankService.FindMonthMethodBankFailed(year)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindMonthMethodBankFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod("success", "Successfully fetched monthly bank failed methods", results)
@@ -156,9 +200,13 @@ func (s *bankHandleGrpc) FindMonthMethodBankFailed(ctx context.Context, req *pb.
 func (s *bankHandleGrpc) FindYearMethodBankFailed(ctx context.Context, req *pb.YearAmountBankRequest) (*pb.ApiResponseBankYearMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	results, err := s.bankService.FindYearMethodBankFailed(year)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearMethodBankFailed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod("success", "Successfully fetched yearly bank failed methods", results)
@@ -166,15 +214,31 @@ func (s *bankHandleGrpc) FindYearMethodBankFailed(ctx context.Context, req *pb.Y
 }
 
 func (s *bankHandleGrpc) FindMonthAmountBankSuccessById(ctx context.Context, req *pb.MonthAmountBankByIdRequest) (*pb.ApiResponseBankMonthAmountSuccess, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if id <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
+	if month <= 0 || month >= 12 {
+		return nil, bank_errors.ErrGrpcInvalidMonth
+	}
+
 	request := &requests.MonthAmountBankByIdRequest{
-		ID:    int(req.GetId()),
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		ID:    id,
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.bankService.FindMonthAmountBankSuccessById(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindMonthAmountBankSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountSuccess(
@@ -186,14 +250,25 @@ func (s *bankHandleGrpc) FindMonthAmountBankSuccessById(ctx context.Context, req
 }
 
 func (s *bankHandleGrpc) FindYearAmountBankSuccessById(ctx context.Context, req *pb.YearAmountBankByIdRequest) (*pb.ApiResponseBankYearAmountSuccess, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if id <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearAmountBankByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.bankService.FindYearAmountBankSuccessById(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearAmountBankSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountSuccess(
@@ -205,15 +280,31 @@ func (s *bankHandleGrpc) FindYearAmountBankSuccessById(ctx context.Context, req 
 }
 
 func (s *bankHandleGrpc) FindMonthAmountBankFailedById(ctx context.Context, req *pb.MonthAmountBankByIdRequest) (*pb.ApiResponseBankMonthAmountFailed, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if id <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
+	if month <= 0 || month >= 12 {
+		return nil, bank_errors.ErrGrpcInvalidMonth
+	}
+
 	request := &requests.MonthAmountBankByIdRequest{
-		ID:    int(req.GetId()),
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		ID:    id,
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.bankService.FindMonthAmountBankFailedById(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindMonthAmountBankFailedById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountFailed(
@@ -225,14 +316,25 @@ func (s *bankHandleGrpc) FindMonthAmountBankFailedById(ctx context.Context, req 
 }
 
 func (s *bankHandleGrpc) FindYearAmountBankFailedById(ctx context.Context, req *pb.YearAmountBankByIdRequest) (*pb.ApiResponseBankYearAmountFailed, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if id <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearAmountBankByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.bankService.FindYearAmountBankFailedById(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearAmountBankFailedById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountFailed(
@@ -244,14 +346,25 @@ func (s *bankHandleGrpc) FindYearAmountBankFailedById(ctx context.Context, req *
 }
 
 func (s *bankHandleGrpc) FindMonthMethodBankSuccessById(ctx context.Context, req *pb.MonthMethodBankByIdRequest) (*pb.ApiResponseBankMonthMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if id <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.MonthMethodBankByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.bankService.FindMonthMethodBankSuccessById(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindMonthMethodBankSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -263,14 +376,25 @@ func (s *bankHandleGrpc) FindMonthMethodBankSuccessById(ctx context.Context, req
 }
 
 func (s *bankHandleGrpc) FindYearMethodBankSuccessById(ctx context.Context, req *pb.YearMethodBankByIdRequest) (*pb.ApiResponseBankYearMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if id <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearMethodBankByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.bankService.FindYearMethodBankSuccessById(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearMethodBankSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -282,9 +406,20 @@ func (s *bankHandleGrpc) FindYearMethodBankSuccessById(ctx context.Context, req 
 }
 
 func (s *bankHandleGrpc) FindMonthMethodBankFailedById(ctx context.Context, req *pb.MonthMethodBankByIdRequest) (*pb.ApiResponseBankMonthMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if id <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.MonthMethodBankByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.bankService.FindMonthMethodBankFailedById(request)
@@ -301,14 +436,25 @@ func (s *bankHandleGrpc) FindMonthMethodBankFailedById(ctx context.Context, req 
 }
 
 func (s *bankHandleGrpc) FindYearMethodBankFailedById(ctx context.Context, req *pb.YearMethodBankByIdRequest) (*pb.ApiResponseBankYearMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if id <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearMethodBankByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.bankService.FindYearMethodBankFailedById(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearMethodBankFailedById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -320,15 +466,31 @@ func (s *bankHandleGrpc) FindYearMethodBankFailedById(ctx context.Context, req *
 }
 
 func (s *bankHandleGrpc) FindMonthAmountBankSuccessByMerchant(ctx context.Context, req *pb.MonthAmountBankByMerchantRequest) (*pb.ApiResponseBankMonthAmountSuccess, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if merchantID <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
+	if month <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidMonth
+	}
+
 	request := &requests.MonthAmountBankByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
-		Month:      int(req.GetMonth()),
+		MerchantID: merchantID,
+		Year:       year,
+		Month:      month,
 	}
 
 	results, err := s.bankService.FindMonthAmountBankSuccessByMerchant(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindMonthAmountBankSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountSuccess(
@@ -340,14 +502,25 @@ func (s *bankHandleGrpc) FindMonthAmountBankSuccessByMerchant(ctx context.Contex
 }
 
 func (s *bankHandleGrpc) FindYearAmountBankSuccessByMerchant(ctx context.Context, req *pb.YearAmountBankByMerchantRequest) (*pb.ApiResponseBankYearAmountSuccess, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearAmountBankByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.bankService.FindYearAmountBankSuccessByMerchant(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearAmountBankSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountSuccess(
@@ -359,15 +532,31 @@ func (s *bankHandleGrpc) FindYearAmountBankSuccessByMerchant(ctx context.Context
 }
 
 func (s *bankHandleGrpc) FindMonthAmountBankFailedByMerchant(ctx context.Context, req *pb.MonthAmountBankByMerchantRequest) (*pb.ApiResponseBankMonthAmountFailed, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if merchantID <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
+	if month <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidMonth
+	}
+
 	request := &requests.MonthAmountBankByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
-		Month:      int(req.GetMonth()),
+		MerchantID: merchantID,
+		Year:       year,
+		Month:      month,
 	}
 
 	results, err := s.bankService.FindMonthAmountBankFailedByMerchant(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindMonthAmountBankFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountFailed(
@@ -379,14 +568,25 @@ func (s *bankHandleGrpc) FindMonthAmountBankFailedByMerchant(ctx context.Context
 }
 
 func (s *bankHandleGrpc) FindYearAmountBankFailedByMerchant(ctx context.Context, req *pb.YearAmountBankByMerchantRequest) (*pb.ApiResponseBankYearAmountFailed, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearAmountBankByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.bankService.FindYearAmountBankFailedByMerchant(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearAmountBankFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountFailed(
@@ -398,14 +598,25 @@ func (s *bankHandleGrpc) FindYearAmountBankFailedByMerchant(ctx context.Context,
 }
 
 func (s *bankHandleGrpc) FindMonthMethodBankSuccessByMerchant(ctx context.Context, req *pb.MonthMethodBankByMerchantRequest) (*pb.ApiResponseBankMonthMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.MonthMethodBankByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.bankService.FindMonthMethodBankSuccessByMerchant(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindMonthMethodBankSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -417,14 +628,25 @@ func (s *bankHandleGrpc) FindMonthMethodBankSuccessByMerchant(ctx context.Contex
 }
 
 func (s *bankHandleGrpc) FindYearMethodBankSuccessByMerchant(ctx context.Context, req *pb.YearMethodBankByMerchantRequest) (*pb.ApiResponseBankYearMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearMethodBankByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.bankService.FindYearMethodBankSuccessByMerchant(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearMethodBankSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -436,14 +658,25 @@ func (s *bankHandleGrpc) FindYearMethodBankSuccessByMerchant(ctx context.Context
 }
 
 func (s *bankHandleGrpc) FindMonthMethodBankFailedByMerchant(ctx context.Context, req *pb.MonthMethodBankByMerchantRequest) (*pb.ApiResponseBankMonthMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.MonthMethodBankByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.bankService.FindMonthMethodBankFailedByMerchant(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindMonthMethodBankFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -455,14 +688,25 @@ func (s *bankHandleGrpc) FindMonthMethodBankFailedByMerchant(ctx context.Context
 }
 
 func (s *bankHandleGrpc) FindYearMethodBankFailedByMerchant(ctx context.Context, req *pb.YearMethodBankByMerchantRequest) (*pb.ApiResponseBankYearMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if merchantID <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidMerchantId
+	}
+
+	if year <= 0 {
+		return nil, bank_errors.ErrGrpcInvalidYear
+	}
+
 	request := &requests.YearMethodBankByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.bankService.FindYearMethodBankFailedByMerchant(request)
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFindYearMethodBankFailedByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -483,7 +727,7 @@ func (s *bankHandleGrpc) FindById(ctx context.Context, req *pb.FindByIdBankReque
 	bank, err := s.bankService.FindByID(id)
 
 	if err != nil {
-		return nil, bank_errors.ErrGrpcBankNotFound
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	bankResponse := s.mapping.ToProtoResponseBank("success", "Successfully fetched bank", bank)
@@ -512,7 +756,7 @@ func (s *bankHandleGrpc) FindByActive(ctx context.Context, req *pb.FindAllBankRe
 	banks, totalRecords, err := s.bankService.FindByActive(&reqService)
 
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFailedFindActive
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -549,7 +793,7 @@ func (s *bankHandleGrpc) FindByTrashed(ctx context.Context, req *pb.FindAllBankR
 	roles, totalRecords, err := s.bankService.FindByTrashed(&reqService)
 
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFailedFindTrashed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -579,7 +823,7 @@ func (s *bankHandleGrpc) Create(ctx context.Context, req *pb.CreateBankRequest) 
 	bank, err := s.bankService.Create(request)
 
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFailedCreateBank
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseBank("success", "Successfully created bank", bank)
@@ -608,7 +852,7 @@ func (s *bankHandleGrpc) Update(ctx context.Context, req *pb.UpdateBankRequest) 
 	role, err := s.bankService.Update(request)
 
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFailedUpdateBank
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseBank("success", "Successfully updated bank", role)
@@ -626,7 +870,7 @@ func (s *bankHandleGrpc) Trashed(ctx context.Context, req *pb.FindByIdBankReques
 	bank, err := s.bankService.Trashed(id)
 
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFailedTrashedBank
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseBankDeleteAt("success", "Successfully trashed bank", bank)
@@ -644,7 +888,7 @@ func (s *bankHandleGrpc) Restore(ctx context.Context, req *pb.FindByIdBankReques
 	role, err := s.bankService.Restore(id)
 
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFailedRestoreBank
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseBankDeleteAt("success", "Successfully restored bank", role)
@@ -662,7 +906,7 @@ func (s *bankHandleGrpc) DeletePermanent(ctx context.Context, req *pb.FindByIdBa
 	_, err := s.bankService.DeletePermanent(id)
 
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFailedDeletePermanent
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseBankDelete("success", "Successfully deleted bank permanently")
@@ -674,7 +918,7 @@ func (s *bankHandleGrpc) RestoreAll(ctx context.Context, req *emptypb.Empty) (*p
 	_, err := s.bankService.RestoreAll()
 
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFailedRestoreAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseBankAll("success", "Successfully restored all banks")
@@ -686,7 +930,7 @@ func (s *bankHandleGrpc) DeleteAllPermanent(ctx context.Context, req *emptypb.Em
 	_, err := s.bankService.DeleteAllPermanent()
 
 	if err != nil {
-		return nil, bank_errors.ErrGrpcFailedDeleteAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseBankAll("success", "Successfully deleted all banks")

@@ -70,12 +70,12 @@ func NewHandlerVoucher(router *echo.Echo, voucher pb.VoucherServiceClient, logge
 	routerVoucher.GET("/merchant/monthly-method-failed/:merchant_id", voucherHandle.FindMonthMethodVoucherSuccessByMerchant)
 	routerVoucher.GET("/merchant/yearly-method-failed/:merchant_id", voucherHandle.FindYearMethodVoucherSuccessByMerchant)
 
-	routerVoucher.POST("/:id", voucherHandle.Update)
-	routerVoucher.DELETE("/:id", voucherHandle.Trashed)
-	routerVoucher.PUT("/restore/:id", voucherHandle.Restore)
+	routerVoucher.POST("/update/:id", voucherHandle.Update)
+	routerVoucher.POST("/trashed/:id", voucherHandle.Trashed)
+	routerVoucher.POST("/restore/:id", voucherHandle.Restore)
 	routerVoucher.DELETE("/permanent/:id", voucherHandle.DeletePermanent)
-	routerVoucher.PUT("/restore-all", voucherHandle.RestoreAll)
-	routerVoucher.DELETE("/permanent-all", voucherHandle.DeleteAllPermanent)
+	routerVoucher.POST("/restore/all", voucherHandle.RestoreAll)
+	routerVoucher.DELETE("/permanent/all", voucherHandle.DeleteAllPermanent)
 
 	return voucherHandle
 }

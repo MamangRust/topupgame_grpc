@@ -35,11 +35,11 @@ func NewHandlerRole(router *echo.Echo, role pb.RoleServiceClient, logger logger.
 	routerRole.GET("/trashed", roleHandler.FindByTrashed)
 	routerRole.GET("/user/:user_id", roleHandler.FindByUserId)
 	routerRole.POST("", roleHandler.Create)
-	routerRole.POST("/:id", roleHandler.Update)
-	routerRole.DELETE("/:id", roleHandler.Trashed)
-	routerRole.PUT("/restore/:id", roleHandler.Restore)
+	routerRole.POST("/update/:id", roleHandler.Update)
+	routerRole.POST("/trashed/:id", roleHandler.Trashed)
+	routerRole.POST("/restore/:id", roleHandler.Restore)
 	routerRole.DELETE("/permanent/:id", roleHandler.DeletePermanent)
-	routerRole.PUT("/restore-all", roleHandler.RestoreAll)
+	routerRole.POST("/restore/all", roleHandler.RestoreAll)
 	routerRole.DELETE("/permanent-all", roleHandler.DeleteAllPermanent)
 
 	return roleHandler
@@ -264,7 +264,7 @@ func (h *roleHandleApi) FindByUserId(c echo.Context) error {
 // @Success 200 {object} response.ApiResponseRole "Created role data"
 // @Failure 400 {object} response.ErrorResponse "Invalid request body"
 // @Failure 500 {object} response.ErrorResponse "Failed to create role"
-// @Router /api/role [post]
+// @Router /api/role/create [post]
 func (h *roleHandleApi) Create(c echo.Context) error {
 	var req requests.CreateRoleRequest
 
@@ -305,7 +305,7 @@ func (h *roleHandleApi) Create(c echo.Context) error {
 // @Success 200 {object} response.ApiResponseRole "Updated role data"
 // @Failure 400 {object} response.ErrorResponse "Invalid role ID or request body"
 // @Failure 500 {object} response.ErrorResponse "Failed to update role"
-// @Router /api/role/{id} [post]
+// @Router /api/role/update/{id} [post]
 func (h *roleHandleApi) Update(c echo.Context) error {
 	roleID, err := strconv.Atoi(c.Param("id"))
 	if err != nil || roleID <= 0 {
@@ -350,7 +350,7 @@ func (h *roleHandleApi) Update(c echo.Context) error {
 // @Success 200 {object} response.ApiResponseRole "Soft-deleted role data"
 // @Failure 400 {object} response.ErrorResponse "Invalid role ID"
 // @Failure 500 {object} response.ErrorResponse "Failed to soft-delete role"
-// @Router /api/role/{id} [delete]
+// @Router /api/role/trashed/{id} [post]
 func (h *roleHandleApi) Trashed(c echo.Context) error {
 	roleID, err := strconv.Atoi(c.Param("id"))
 	if err != nil || roleID <= 0 {
@@ -385,7 +385,7 @@ func (h *roleHandleApi) Trashed(c echo.Context) error {
 // @Success 200 {object} response.ApiResponseRole "Restored role data"
 // @Failure 400 {object} response.ErrorResponse "Invalid role ID"
 // @Failure 500 {object} response.ErrorResponse "Failed to restore role"
-// @Router /api/role/restore/{id} [put]
+// @Router /api/role/restore/{id} [post]
 func (h *roleHandleApi) Restore(c echo.Context) error {
 	roleID, err := strconv.Atoi(c.Param("id"))
 	if err != nil || roleID <= 0 {
@@ -453,7 +453,7 @@ func (h *roleHandleApi) DeletePermanent(c echo.Context) error {
 // @Produce json
 // @Success 200 {object} response.ApiResponseRoleAll "Restored roles data"
 // @Failure 500 {object} response.ErrorResponse "Failed to restore all roles"
-// @Router /api/role/restore-all [put]
+// @Router /api/role/restore/all [post]
 func (h *roleHandleApi) RestoreAll(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -477,7 +477,7 @@ func (h *roleHandleApi) RestoreAll(c echo.Context) error {
 // @Produce json
 // @Success 200 {object} response.ApiResponseRoleAll "Permanently deleted roles data"
 // @Failure 500 {object} response.ErrorResponse "Failed to delete all roles permanently"
-// @Router /api/role/permanent-all [delete]
+// @Router /api/role/permanent/all [delete]
 func (h *roleHandleApi) DeleteAllPermanent(c echo.Context) error {
 	ctx := c.Request().Context()
 

@@ -44,16 +44,16 @@ var (
 		return response.NewApiErrorResponse(c, "error", "validation failed: invalid update Transaction request", http.StatusBadRequest)
 	}
 
-	ErrInvalidTransactionId = func(c echo.Context) error {
-		return response.NewApiErrorResponse(c, "error", "invalid Transaction id", http.StatusBadRequest)
-	}
-
 	ErrApiBindCreateTransaction = func(c echo.Context) error {
 		return response.NewApiErrorResponse(c, "error", "bind failed: invalid create Transaction request", http.StatusBadRequest)
 	}
 
 	ErrApiBindUpdateTransaction = func(c echo.Context) error {
 		return response.NewApiErrorResponse(c, "error", "bind failed: invalid update Transaction request", http.StatusBadRequest)
+	}
+
+	ErrInvalidTransactionId = func(c echo.Context) error {
+		return response.NewApiErrorResponse(c, "error", "invalid Transaction id", http.StatusBadRequest)
 	}
 
 	ErrApiFailedTrashedTransaction = func(c echo.Context) error {

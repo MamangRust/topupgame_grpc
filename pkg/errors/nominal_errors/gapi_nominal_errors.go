@@ -7,6 +7,10 @@ import (
 )
 
 var (
+	ErrGrpcNominalInvalidYear       = response.NewGrpcError("error", "Invalid Nominal year", int(codes.InvalidArgument))
+	ErrGrpcNominalInvalidMonth      = response.NewGrpcError("error", "Invalid Nominal month", int(codes.InvalidArgument))
+	ErrGrpcNominalInvalidMerchantId = response.NewGrpcError("error", "Invalid Nominal merchant ID", int(codes.InvalidArgument))
+
 	ErrGrpcNominalNotFound  = response.NewGrpcError("error", "Nominal not found", int(codes.NotFound))
 	ErrGrpcNominalInvalidId = response.NewGrpcError("error", "Invalid Nominal ID", int(codes.NotFound))
 

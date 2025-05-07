@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	"topup_game/internal/domain/requests"
+	"topup_game/internal/domain/response"
 	protomapper "topup_game/internal/mapper/proto"
 	"topup_game/internal/pb"
 	"topup_game/internal/service"
@@ -43,7 +44,7 @@ func (s *userHandleGrpc) FindAll(ctx context.Context, request *pb.FindAllUserReq
 	users, totalRecords, err := s.userService.FindAll(reqService)
 
 	if err != nil {
-		return nil, user_errors.ErrGrpcFailedFindAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -69,7 +70,7 @@ func (s *userHandleGrpc) FindById(ctx context.Context, request *pb.FindByIdUserR
 	user, err := s.userService.FindByID(id)
 
 	if err != nil {
-		return nil, user_errors.ErrGrpcUserNotFound
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseUser("success", "Successfully fetched user", user)
@@ -99,7 +100,7 @@ func (s *userHandleGrpc) FindByActive(ctx context.Context, request *pb.FindAllUs
 	users, totalRecords, err := s.userService.FindByActive(reqService)
 
 	if err != nil {
-		return nil, user_errors.ErrGrpcFailedFindActive
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -136,7 +137,7 @@ func (s *userHandleGrpc) FindByTrashed(ctx context.Context, request *pb.FindAllU
 	users, totalRecords, err := s.userService.FindByTrashed(reqService)
 
 	if err != nil {
-		return nil, user_errors.ErrGrpcFailedFindTrashed
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -169,7 +170,7 @@ func (s *userHandleGrpc) Create(ctx context.Context, request *pb.CreateUserReque
 	user, err := s.userService.Create(req)
 
 	if err != nil {
-		return nil, user_errors.ErrGrpcFailedCreateUser
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseUser("success", "Successfully created user", user)
@@ -198,7 +199,7 @@ func (s *userHandleGrpc) Update(ctx context.Context, request *pb.UpdateUserReque
 	user, err := s.userService.Update(req)
 
 	if err != nil {
-		return nil, user_errors.ErrGrpcFailedUpdateUser
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseUser("success", "Successfully updated user", user)
@@ -216,7 +217,7 @@ func (s *userHandleGrpc) TrashedUser(ctx context.Context, request *pb.FindByIdUs
 	user, err := s.userService.Trashed(id)
 
 	if err != nil {
-		return nil, user_errors.ErrGrpcFailedTrashedUser
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseUserDeleteAt("success", "Successfully trashed user", user)
@@ -234,7 +235,7 @@ func (s *userHandleGrpc) RestoreUser(ctx context.Context, request *pb.FindByIdUs
 	user, err := s.userService.Restore(id)
 
 	if err != nil {
-		return nil, user_errors.ErrGrpcFailedRestoreUser
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseUserDeleteAt("success", "Successfully restored user", user)
@@ -252,7 +253,7 @@ func (s *userHandleGrpc) DeleteUserPermanent(ctx context.Context, request *pb.Fi
 	_, err := s.userService.DeletePermanent(id)
 
 	if err != nil {
-		return nil, user_errors.ErrGrpcFailedDeletePermanent
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseUserDelete("success", "Successfully deleted user permanently")
@@ -264,7 +265,7 @@ func (s *userHandleGrpc) RestoreAllUser(ctx context.Context, _ *emptypb.Empty) (
 	_, err := s.userService.RestoreAll()
 
 	if err != nil {
-		return nil, user_errors.ErrGrpcFailedRestoreAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseUserAll("success", "Successfully restore all user")
@@ -276,7 +277,7 @@ func (s *userHandleGrpc) DeleteAllUserPermanent(ctx context.Context, _ *emptypb.
 	_, err := s.userService.DeleteAllPermanent()
 
 	if err != nil {
-		return nil, user_errors.ErrGrpcFailedDeleteAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseUserAll("success", "Successfully delete user permanen")

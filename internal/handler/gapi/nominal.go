@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 	"topup_game/internal/domain/requests"
+	"topup_game/internal/domain/response"
 	protomapper "topup_game/internal/mapper/proto"
 	"topup_game/internal/pb"
 	"topup_game/internal/service"
@@ -47,7 +48,7 @@ func (s *nominalHandleGrpc) FindAll(ctx context.Context, req *pb.FindAllNominalR
 	role, totalRecords, err := s.nominalService.FindAll(&reqService)
 
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFailedFindAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -65,14 +66,25 @@ func (s *nominalHandleGrpc) FindAll(ctx context.Context, req *pb.FindAllNominalR
 }
 
 func (s *nominalHandleGrpc) FindMonthAmountNominalSuccess(ctx context.Context, req *pb.MonthAmountNominalRequest) (*pb.ApiResponseNominalMonthAmountSuccess, error) {
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccess
+	}
+
+	if month <= 0 || month > 12 {
+		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccess
+	}
+
 	request := &requests.MonthAmountNominalRequest{
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.nominalService.FindMonthAmountNominalSuccess(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountSuccess(
@@ -85,6 +97,10 @@ func (s *nominalHandleGrpc) FindMonthAmountNominalSuccess(ctx context.Context, r
 
 func (s *nominalHandleGrpc) FindYearAmountNominalSuccess(ctx context.Context, req *pb.YearAmountNominalRequest) (*pb.ApiResponseNominalYearAmountSuccess, error) {
 	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindYearAmountNominalSuccess
+	}
 
 	results, err := s.nominalService.FindYearAmountNominalSuccess(year)
 	if err != nil {
@@ -100,14 +116,25 @@ func (s *nominalHandleGrpc) FindYearAmountNominalSuccess(ctx context.Context, re
 }
 
 func (s *nominalHandleGrpc) FindMonthAmountNominalFailed(ctx context.Context, req *pb.MonthAmountNominalRequest) (*pb.ApiResponseNominalMonthAmountFailed, error) {
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccess
+	}
+
+	if month <= 0 || month > 12 {
+		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccess
+	}
+
 	request := &requests.MonthAmountNominalRequest{
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.nominalService.FindMonthAmountNominalFailed(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalGrpc
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountFailed(
@@ -121,9 +148,13 @@ func (s *nominalHandleGrpc) FindMonthAmountNominalFailed(ctx context.Context, re
 func (s *nominalHandleGrpc) FindYearAmountNominalFailed(ctx context.Context, req *pb.YearAmountNominalRequest) (*pb.ApiResponseNominalYearAmountFailed, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindYearAmountNominalSuccess
+	}
+
 	results, err := s.nominalService.FindYearAmountNominalFailed(year)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindYearAmountNominalGrpc
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountFailed(
@@ -137,9 +168,13 @@ func (s *nominalHandleGrpc) FindYearAmountNominalFailed(ctx context.Context, req
 func (s *nominalHandleGrpc) FindMonthMethodNominalSuccess(ctx context.Context, req *pb.YearAmountNominalRequest) (*pb.ApiResponseNominalMonthMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindMonthMethodNominalSuccess
+	}
+
 	results, err := s.nominalService.FindMonthMethodNominalSuccess(year)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthMethodNominalSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -153,9 +188,13 @@ func (s *nominalHandleGrpc) FindMonthMethodNominalSuccess(ctx context.Context, r
 func (s *nominalHandleGrpc) FindYearMethodNominalSuccess(ctx context.Context, req *pb.YearAmountNominalRequest) (*pb.ApiResponseNominalYearMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindYearMethodNominalSuccess
+	}
+
 	results, err := s.nominalService.FindYearMethodNominalSuccess(year)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindYearMethodNominalSuccess
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -169,9 +208,13 @@ func (s *nominalHandleGrpc) FindYearMethodNominalSuccess(ctx context.Context, re
 func (s *nominalHandleGrpc) FindMonthMethodNominalFailed(ctx context.Context, req *pb.YearAmountNominalRequest) (*pb.ApiResponseNominalMonthMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
 	results, err := s.nominalService.FindMonthMethodNominalFailed(year)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthMethodNominalGrpc
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -185,9 +228,13 @@ func (s *nominalHandleGrpc) FindMonthMethodNominalFailed(ctx context.Context, re
 func (s *nominalHandleGrpc) FindYearMethodNominalFailed(ctx context.Context, req *pb.YearAmountNominalRequest) (*pb.ApiResponseNominalYearMethod, error) {
 	year := int(req.GetYear())
 
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
 	results, err := s.nominalService.FindYearMethodNominalFailed(year)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindYearMethodNominalGrpc
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -199,15 +246,31 @@ func (s *nominalHandleGrpc) FindYearMethodNominalFailed(ctx context.Context, req
 }
 
 func (s *nominalHandleGrpc) FindMonthAmountNominalSuccessById(ctx context.Context, req *pb.MonthAmountNominalByIdRequest) (*pb.ApiResponseNominalMonthAmountSuccess, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccess
+	}
+
+	if month <= 0 || month > 12 {
+		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccess
+	}
+
+	if id == 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidId
+	}
+
 	request := &requests.MonthAmountNominalByIdRequest{
-		ID:    int(req.GetId()),
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		ID:    id,
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.nominalService.FindMonthAmountNominalSuccessById(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountSuccess(
@@ -219,14 +282,25 @@ func (s *nominalHandleGrpc) FindMonthAmountNominalSuccessById(ctx context.Contex
 }
 
 func (s *nominalHandleGrpc) FindYearAmountNominalSuccessById(ctx context.Context, req *pb.YearAmountNominalByIdRequest) (*pb.ApiResponseNominalYearAmountSuccess, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindYearAmountNominalSuccess
+	}
+
+	if id == 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidId
+	}
+
 	request := &requests.YearAmountNominalByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.nominalService.FindYearAmountNominalSuccessById(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindYearAmountNominalSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountSuccess(
@@ -238,15 +312,31 @@ func (s *nominalHandleGrpc) FindYearAmountNominalSuccessById(ctx context.Context
 }
 
 func (s *nominalHandleGrpc) FindMonthAmountNominalFailedById(ctx context.Context, req *pb.MonthAmountNominalByIdRequest) (*pb.ApiResponseNominalMonthAmountFailed, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
+	if month <= 0 || month > 12 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidMonth
+	}
+
+	if id == 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidId
+	}
+
 	request := &requests.MonthAmountNominalByIdRequest{
-		ID:    int(req.GetId()),
-		Year:  int(req.GetYear()),
-		Month: int(req.GetMonth()),
+		ID:    id,
+		Year:  year,
+		Month: month,
 	}
 
 	results, err := s.nominalService.FindMonthAmountNominalFailedById(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalGrpcById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountFailed(
@@ -258,14 +348,25 @@ func (s *nominalHandleGrpc) FindMonthAmountNominalFailedById(ctx context.Context
 }
 
 func (s *nominalHandleGrpc) FindYearAmountNominalFailedById(ctx context.Context, req *pb.YearAmountNominalByIdRequest) (*pb.ApiResponseNominalYearAmountFailed, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
+	if id == 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidId
+	}
+
 	request := &requests.YearAmountNominalByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.nominalService.FindYearAmountNominalFailedById(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindYearAmountNominalGrpcById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountFailed(
@@ -277,14 +378,25 @@ func (s *nominalHandleGrpc) FindYearAmountNominalFailedById(ctx context.Context,
 }
 
 func (s *nominalHandleGrpc) FindMonthMethodNominalSuccessById(ctx context.Context, req *pb.MonthMethodNominalByIdRequest) (*pb.ApiResponseNominalMonthMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindMonthMethodNominalSuccess
+	}
+
+	if id == 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidId
+	}
+
 	request := &requests.MonthMethodNominalByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.nominalService.FindMonthMethodNominalSuccessById(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthMethodNominalSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -296,14 +408,25 @@ func (s *nominalHandleGrpc) FindMonthMethodNominalSuccessById(ctx context.Contex
 }
 
 func (s *nominalHandleGrpc) FindYearMethodNominalSuccessById(ctx context.Context, req *pb.YearMethodNominalByIdRequest) (*pb.ApiResponseNominalYearMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindYearMethodNominalSuccess
+	}
+
+	if id == 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidId
+	}
+
 	request := &requests.YearMethodNominalByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.nominalService.FindYearMethodNominalSuccessById(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindYearMethodNominalSuccessById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -315,14 +438,25 @@ func (s *nominalHandleGrpc) FindYearMethodNominalSuccessById(ctx context.Context
 }
 
 func (s *nominalHandleGrpc) FindMonthMethodNominalFailedById(ctx context.Context, req *pb.MonthMethodNominalByIdRequest) (*pb.ApiResponseNominalMonthMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
+	if id == 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidId
+	}
+
 	request := &requests.MonthMethodNominalByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.nominalService.FindMonthMethodNominalFailedById(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthMethodNominalGrpcById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -334,14 +468,25 @@ func (s *nominalHandleGrpc) FindMonthMethodNominalFailedById(ctx context.Context
 }
 
 func (s *nominalHandleGrpc) FindYearMethodNominalFailedById(ctx context.Context, req *pb.YearMethodNominalByIdRequest) (*pb.ApiResponseNominalYearMethod, error) {
+	id := int(req.GetId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
+	if id == 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidId
+	}
+
 	request := &requests.YearMethodNominalByIdRequest{
-		ID:   int(req.GetId()),
-		Year: int(req.GetYear()),
+		ID:   id,
+		Year: year,
 	}
 
 	results, err := s.nominalService.FindYearMethodNominalFailedById(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindYearMethodNominalGrpcById
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -353,15 +498,31 @@ func (s *nominalHandleGrpc) FindYearMethodNominalFailedById(ctx context.Context,
 }
 
 func (s *nominalHandleGrpc) FindMonthAmountNominalSuccessByMerchant(ctx context.Context, req *pb.MonthAmountNominalByMerchantRequest) (*pb.ApiResponseNominalMonthAmountSuccess, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccessByMerchant
+	}
+
+	if month <= 0 || month > 12 {
+		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccessByMerchant
+	}
+
+	if merchantID <= 0 {
+		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccessByMerchant
+	}
+
 	request := &requests.MonthAmountNominalByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
-		Month:      int(req.GetMonth()),
+		MerchantID: merchantID,
+		Year:       year,
+		Month:      month,
 	}
 
 	results, err := s.nominalService.FindMonthAmountNominalSuccessByMerchant(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountSuccess(
@@ -373,14 +534,25 @@ func (s *nominalHandleGrpc) FindMonthAmountNominalSuccessByMerchant(ctx context.
 }
 
 func (s *nominalHandleGrpc) FindYearAmountNominalSuccessByMerchant(ctx context.Context, req *pb.YearAmountNominalByMerchantRequest) (*pb.ApiResponseNominalYearAmountSuccess, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcFindYearAmountNominalSuccessByMerchant
+	}
+
+	if merchantID <= 0 {
+		return nil, nominal_errors.ErrGrpcFindYearAmountNominalSuccessByMerchant
+	}
+
 	request := &requests.YearAmountNominalByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.nominalService.FindYearAmountNominalSuccessByMerchant(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindYearAmountNominalSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountSuccess(
@@ -392,15 +564,31 @@ func (s *nominalHandleGrpc) FindYearAmountNominalSuccessByMerchant(ctx context.C
 }
 
 func (s *nominalHandleGrpc) FindMonthAmountNominalFailedByMerchant(ctx context.Context, req *pb.MonthAmountNominalByMerchantRequest) (*pb.ApiResponseNominalMonthAmountFailed, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+	month := int(req.GetMonth())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
+	if month <= 0 || month > 12 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidMonth
+	}
+
+	if merchantID <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidId
+	}
+
 	request := &requests.MonthAmountNominalByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
-		Month:      int(req.GetMonth()),
+		MerchantID: merchantID,
+		Year:       year,
+		Month:      month,
 	}
 
 	results, err := s.nominalService.FindMonthAmountNominalFailedByMerchant(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthAmountNominalGrpcByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthAmountFailed(
@@ -412,14 +600,25 @@ func (s *nominalHandleGrpc) FindMonthAmountNominalFailedByMerchant(ctx context.C
 }
 
 func (s *nominalHandleGrpc) FindYearAmountNominalFailedByMerchant(ctx context.Context, req *pb.YearAmountNominalByMerchantRequest) (*pb.ApiResponseNominalYearAmountFailed, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
+	if merchantID <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidId
+	}
+
 	request := &requests.YearAmountNominalByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.nominalService.FindYearAmountNominalFailedByMerchant(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindYearAmountNominalGrpcByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearAmountFailed(
@@ -431,14 +630,25 @@ func (s *nominalHandleGrpc) FindYearAmountNominalFailedByMerchant(ctx context.Co
 }
 
 func (s *nominalHandleGrpc) FindMonthMethodNominalSuccessByMerchant(ctx context.Context, req *pb.MonthMethodNominalByMerchantRequest) (*pb.ApiResponseNominalMonthMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
+	if merchantID <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidMerchantId
+	}
+
 	request := &requests.MonthMethodNominalByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.nominalService.FindMonthMethodNominalSuccessByMerchant(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthMethodNominalSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -450,14 +660,25 @@ func (s *nominalHandleGrpc) FindMonthMethodNominalSuccessByMerchant(ctx context.
 }
 
 func (s *nominalHandleGrpc) FindYearMethodNominalSuccessByMerchant(ctx context.Context, req *pb.YearMethodNominalByMerchantRequest) (*pb.ApiResponseNominalYearMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
+	if merchantID <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidMerchantId
+	}
+
 	request := &requests.YearMethodNominalByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.nominalService.FindYearMethodNominalSuccessByMerchant(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindYearMethodNominalSuccessByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -469,14 +690,25 @@ func (s *nominalHandleGrpc) FindYearMethodNominalSuccessByMerchant(ctx context.C
 }
 
 func (s *nominalHandleGrpc) FindMonthMethodNominalFailedByMerchant(ctx context.Context, req *pb.MonthMethodNominalByMerchantRequest) (*pb.ApiResponseNominalMonthMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
+	if merchantID <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidMerchantId
+	}
+
 	request := &requests.MonthMethodNominalByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.nominalService.FindMonthMethodNominalFailedByMerchant(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindMonthMethodNominalGrpcByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponsesMonthMethod(
@@ -488,14 +720,25 @@ func (s *nominalHandleGrpc) FindMonthMethodNominalFailedByMerchant(ctx context.C
 }
 
 func (s *nominalHandleGrpc) FindYearMethodNominalFailedByMerchant(ctx context.Context, req *pb.YearMethodNominalByMerchantRequest) (*pb.ApiResponseNominalYearMethod, error) {
+	merchantID := int(req.GetMerchantId())
+	year := int(req.GetYear())
+
+	if year <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidYear
+	}
+
+	if merchantID <= 0 {
+		return nil, nominal_errors.ErrGrpcNominalInvalidMerchantId
+	}
+
 	request := &requests.YearMethodNominalByMerchantRequest{
-		MerchantID: int(req.GetMerchantId()),
-		Year:       int(req.GetYear()),
+		MerchantID: merchantID,
+		Year:       year,
 	}
 
 	results, err := s.nominalService.FindYearMethodNominalFailedByMerchant(request)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFindYearMethodNominalGrpcByMerchant
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	response := s.mapping.ToProtoResponseYearMethod(
@@ -516,7 +759,7 @@ func (s *nominalHandleGrpc) FindById(ctx context.Context, req *pb.FindByIdNomina
 	Nominal, err := s.nominalService.FindByID(id)
 
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcNominalNotFound
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	NominalResponse := s.mapping.ToProtoResponseNominal("success", "Successfully fetched Nominal", Nominal)
@@ -545,7 +788,7 @@ func (s *nominalHandleGrpc) FindByActive(ctx context.Context, req *pb.FindAllNom
 	nominals, totalRecords, err := s.nominalService.FindByActive(&reqService)
 
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFailedFindActive
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -581,7 +824,7 @@ func (s *nominalHandleGrpc) FindByTrashed(ctx context.Context, req *pb.FindAllNo
 	roles, totalRecords, err := s.nominalService.FindByTrashed(&reqService)
 
 	if err != nil {
-		return nil, nominal_errors.ErrFindTrashedNominals
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	totalPages := int(math.Ceil(float64(*totalRecords) / float64(pageSize)))
@@ -611,7 +854,7 @@ func (s *nominalHandleGrpc) Create(ctx context.Context, req *pb.CreateNominalReq
 
 	nominal, err := s.nominalService.Create(createReq)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFailedCreateNominal
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseNominal("success", "Successfully created Nominal", nominal)
@@ -640,7 +883,7 @@ func (s *nominalHandleGrpc) Update(ctx context.Context, req *pb.UpdateNominalReq
 
 	nominal, err := s.nominalService.Update(updateReq)
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFailedUpdateNominal
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseNominal("success", "Successfully updated Nominal", nominal)
@@ -658,7 +901,7 @@ func (s *nominalHandleGrpc) Trashed(ctx context.Context, req *pb.FindByIdNominal
 	Nominal, err := s.nominalService.Trashed(id)
 
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFailedTrashedNominal
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseNominalDeleteAt("success", "Successfully trashed Nominal", Nominal)
@@ -676,7 +919,7 @@ func (s *nominalHandleGrpc) Restore(ctx context.Context, req *pb.FindByIdNominal
 	role, err := s.nominalService.Restore(id)
 
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFailedRestoreNominal
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseNominalDeleteAt("success", "Successfully restored Nominal", role)
@@ -690,7 +933,7 @@ func (s *nominalHandleGrpc) DeletePermanent(ctx context.Context, req *pb.FindByI
 	_, err := s.nominalService.DeletePermanent(int(nominal_id))
 
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFailedDeletePermanent
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseNominalDelete("success", "Successfully deleted Nominal permanently")
@@ -702,7 +945,7 @@ func (s *nominalHandleGrpc) RestoreAll(ctx context.Context, req *emptypb.Empty) 
 	_, err := s.nominalService.RestoreAll()
 
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFailedRestoreAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseNominalAll("success", "Successfully restored all Nominals")
@@ -714,7 +957,7 @@ func (s *nominalHandleGrpc) DeleteAllPermanent(ctx context.Context, req *emptypb
 	_, err := s.nominalService.DeleteAllPermanent()
 
 	if err != nil {
-		return nil, nominal_errors.ErrGrpcFailedDeleteAll
+		return nil, response.ToGrpcErrorFromErrorResponse(err)
 	}
 
 	so := s.mapping.ToProtoResponseNominalAll("success", "Successfully deleted all Nominals")

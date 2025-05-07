@@ -7,6 +7,11 @@ import (
 )
 
 var (
+	ErrGrpcInvalidMerchantId = response.NewGrpcError("error", "Invalid merchant ID", int(codes.InvalidArgument))
+	ErrGrpcInvalidId         = response.NewGrpcError("error", "Invalid ID", int(codes.InvalidArgument))
+	ErrGrpcInvalidYear       = response.NewGrpcError("error", "Invalid year", int(codes.InvalidArgument))
+	ErrGrpcInvalidMonth      = response.NewGrpcError("error", "Invalid month", int(codes.InvalidArgument))
+
 	ErrGrpcBankNotFound      = response.NewGrpcError("error", "Bank not found", int(codes.NotFound))
 	ErrGrpcFailedFindAll     = response.NewGrpcError("error", "Failed to fetch Banks", int(codes.Internal))
 	ErrGrpcFailedFindActive  = response.NewGrpcError("error", "Failed to fetch active Banks", int(codes.Internal))
